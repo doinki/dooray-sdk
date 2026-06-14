@@ -1,0 +1,6 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "ignorePatterns": [".agents", ".claude", "docs/external/dooray-api*.md"],
+  "printWidth": 120,
+  "singleQuote": true
+}

@@ -1,0 +1,60 @@
+{
+  "name": "@dooray-sdk/mcp",
+  "version": "0.0.0",
+  "description": "MCP server that exposes Dooray projects, tasks, and members as tools for AI agents",
+  "keywords": [
+    "dooray",
+    "mcp",
+    "model-context-protocol"
+  ],
+  "homepage": "https://github.com/doinki/dooray-sdk/tree/main/packages/mcp#readme",
+  "bugs": "https://github.com/doinki/dooray-sdk/issues",
+  "license": "MIT",
+  "author": {
+    "name": "doinki",
+    "email": "doinki94@gmail.com",
+    "url": "https://github.com/doinki"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doinki/dooray-sdk.git",
+    "directory": "packages/mcp"
+  },
+  "bin": {
+    "dooray-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && rollup -c ../../tools/rollup.config.js",
+    "inspect": "mcp-inspector node index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxfmt && oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "publint": "publint"
+  },
+  "dependencies": {
+    "@dooray-sdk/client": "workspace:^",
+    "@dooray-sdk/core": "workspace:^",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.22.0",
+    "typescript": "^6.0.3"
+  },
+  "browserslist": [
+    "node 22.12"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  }
+}

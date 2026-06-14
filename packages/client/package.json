@@ -1,0 +1,94 @@
+{
+  "name": "@dooray-sdk/client",
+  "version": "0.0.0",
+  "description": "Typed TypeScript client for the Dooray REST API, runs in browsers and Node.js",
+  "keywords": [
+    "client",
+    "dooray"
+  ],
+  "homepage": "https://github.com/doinki/dooray-sdk/tree/main/packages/client#readme",
+  "bugs": "https://github.com/doinki/dooray-sdk/issues",
+  "license": "MIT",
+  "author": {
+    "name": "doinki",
+    "email": "doinki94@gmail.com",
+    "url": "https://github.com/doinki"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doinki/dooray-sdk.git",
+    "directory": "packages/client"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./calendar": {
+      "types": "./dist/api/calendar/index.d.ts",
+      "default": "./dist/api/calendar/index.js"
+    },
+    "./common": {
+      "types": "./dist/api/common/index.d.ts",
+      "default": "./dist/api/common/index.js"
+    },
+    "./contacts": {
+      "types": "./dist/api/contacts/index.d.ts",
+      "default": "./dist/api/contacts/index.js"
+    },
+    "./drive": {
+      "types": "./dist/api/drive/index.d.ts",
+      "default": "./dist/api/drive/index.js"
+    },
+    "./messenger": {
+      "types": "./dist/api/messenger/index.d.ts",
+      "default": "./dist/api/messenger/index.js"
+    },
+    "./project": {
+      "types": "./dist/api/project/index.d.ts",
+      "default": "./dist/api/project/index.js"
+    },
+    "./reservation": {
+      "types": "./dist/api/reservation/index.d.ts",
+      "default": "./dist/api/reservation/index.js"
+    },
+    "./wiki": {
+      "types": "./dist/api/wiki/index.d.ts",
+      "default": "./dist/api/wiki/index.js"
+    },
+    "./lib": {
+      "types": "./dist/lib/index.d.ts",
+      "default": "./dist/lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && rollup -c ../../tools/rollup.config.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxfmt && oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "publint": "publint"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "browserslist": [
+    "chrome 85",
+    "safari 14.1",
+    "firefox 79"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  }
+}

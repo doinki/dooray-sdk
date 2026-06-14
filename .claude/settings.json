@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_response.filePath // .tool_input.file_path' | { read -r f; pnpm exec oxfmt --no-error-on-unmatched-pattern \"$f\"; pnpm exec oxlint --fix --no-error-on-unmatched-pattern \"$f\"; } || :"
+          }
+        ]
+      }
+    ]
+  }
+}

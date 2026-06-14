@@ -1,0 +1,350 @@
+name: sync-dooray-api-docs
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # daily at 01:00 UTC = 10:00 KST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Dooray API doc pages
+        id: fetch
+        run: |
+          set -uo pipefail
+
+          OUT_DIR='docs/external'
+          mkdir -p "$OUT_DIR"
+
+          # 동기화 대상 페이지: pageId | slug | outFile (repo 루트 기준 상대 경로)
+          # 새 페이지를 추가하려면 이 배열에 한 줄만 더하면 됩니다.
+          PAGES=(
+            '2939987647631384419|service|docs/external/dooray-api.md'
+            '2939992834004986234|messenger-direct-send|docs/external/dooray-api-messenger-direct-send.md'
+            '2939993203869661812|drive-guide|docs/external/dooray-api-drive-guide.md'
+            '3817617091196252578|file-transfer-guide|docs/external/dooray-api-file-transfer-guide.md'
+          )
+
+          RESULTS_FILE=$(mktemp)
+
+          # 한 페이지 fetch. 결과는 RESULTS_FILE 에 TSV 한 줄로 append 합니다.
+          # TSV 컬럼: slug, pageId, outFile, status, subject, breadcrumb, updatedAt, bodyChars, outSize, diffSummary, reason
+          # status 는 ok-changed | ok-unchanged | skipped 중 하나.
+          fetch_page() {
+            local page_id="$1" slug="$2" out_file="$3"
+            local url="https://helpdesk.dooray.com/v2/wapi/shared-tree/9wWo-xwiR66BO5LGshgVTg/pages/${page_id}"
+
+            echo "::group::[$slug] Request"
+            echo "URL : $url"
+            echo "OUT : $out_file"
+            echo "::endgroup::"
+
+            local response_file http_code response_size
+            response_file=$(mktemp)
+            http_code=$(curl -sS \
+              --max-time 60 \
+              --write-out '%{http_code}' \
+              --output "$response_file" \
+              "$url" || echo '000')
+            response_size=$(wc -c < "$response_file" | tr -d ' ')
+
+            echo "::group::[$slug] HTTP response"
+            echo "status     : $http_code"
+            echo "body bytes : $response_size"
+            echo "::endgroup::"
+
+            if [ "$http_code" != "200" ]; then
+              echo "::warning::[$slug] Failed to fetch upstream (HTTP $http_code). Skipping this page."
+              echo "----- first 500 bytes of body -----"
+              head -c 500 "$response_file" || true
+              echo
+              printf '%s\t%s\t%s\tskipped\t\t\t\t\t\t\tHTTP %s\n' \
+                "$slug" "$page_id" "$out_file" "$http_code" >> "$RESULTS_FILE"
+              return 0
+            fi
+
+            local response
+            response=$(cat "$response_file")
+
+            if ! echo "$response" | jq -e '.header' > /dev/null 2>&1; then
+              echo "::warning::[$slug] Response is not the expected JSON envelope. Skipping this page."
+              echo "----- first 500 bytes of body -----"
+              head -c 500 "$response_file" || true
+              echo
+              printf '%s\t%s\t%s\tskipped\t\t\t\t\t\t\tbad JSON envelope\n' \
+                "$slug" "$page_id" "$out_file" >> "$RESULTS_FILE"
+              return 0
+            fi
+
+            local is_successful result_code result_message
+            is_successful=$(echo "$response" | jq -r '.header.isSuccessful')
+            result_code=$(echo "$response" | jq -r '.header.resultCode')
+            result_message=$(echo "$response" | jq -r '.header.resultMessage')
+
+            echo "::group::[$slug] API header"
+            echo "isSuccessful  : $is_successful"
+            echo "resultCode    : $result_code"
+            echo "resultMessage : $result_message"
+            echo "::endgroup::"
+
+            if [ "$is_successful" != "true" ]; then
+              echo "::warning::[$slug] Dooray returned isSuccessful=$is_successful (resultCode=$result_code, resultMessage=$result_message). Skipping this page."
+              printf '%s\t%s\t%s\tskipped\t\t\t\t\t\t\tisSuccessful=%s resultCode=%s\n' \
+                "$slug" "$page_id" "$out_file" "$is_successful" "$result_code" >> "$RESULTS_FILE"
+              return 0
+            fi
+
+            local page_id_resp subject created_at updated_at mime_type content_id breadcrumb body body_chars body_lines
+            page_id_resp=$(echo "$response" | jq -r '.result.content.pageId')
+            subject=$(echo "$response" | jq -r '.result.content.subject')
+            created_at=$(echo "$response" | jq -r '.result.content.createdAt')
+            updated_at=$(echo "$response" | jq -r '.result.content.updatedAt')
+            mime_type=$(echo "$response" | jq -r '.result.content.body.mimeType')
+            content_id=$(echo "$response" | jq -r '.result.content.body.contentId')
+            breadcrumb=$(echo "$response" | jq -r '[.result.content.breadcrumb[].subject] | join(" / ")')
+            body=$(echo "$response" | jq -r '.result.content.body.content')
+            body_chars=$(printf '%s' "$body" | wc -c | tr -d ' ')
+            body_lines=$(printf '%s\n' "$body" | wc -l | tr -d ' ')
+
+            echo "::group::[$slug] Page metadata"
+            echo "pageId     : $page_id_resp"
+            echo "subject    : $subject"
+            echo "breadcrumb : $breadcrumb"
+            echo "mimeType   : $mime_type"
+            echo "contentId  : $content_id"
+            echo "createdAt  : $created_at"
+            echo "updatedAt  : $updated_at"
+            echo "body chars : $body_chars"
+            echo "body lines : $body_lines"
+            echo "::endgroup::"
+
+            {
+              echo '---'
+              echo "source: $url"
+              echo "pageId: \"$page_id_resp\""
+              echo "subject: \"$subject\""
+              echo "breadcrumb: \"$breadcrumb\""
+              echo "dooray_created_at: \"$created_at\""
+              echo "dooray_updated_at: \"$updated_at\""
+              echo 'note: |'
+              echo '  이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.'
+              echo '  손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.'
+              echo '---'
+              echo
+              printf '%s\n' "$body"
+            } > "$out_file"
+
+            local out_size out_lines
+            out_size=$(wc -c < "$out_file" | tr -d ' ')
+            out_lines=$(wc -l < "$out_file" | tr -d ' ')
+
+            # 신규 파일도 diff 에 포함되도록 intent-to-add 로 인덱스에 등록한 뒤 변경 여부를 판정합니다.
+            git add --intent-to-add "$out_file" 2>/dev/null || true
+            local diff_stat changed diff_summary status
+            diff_stat=$(git diff --shortstat -- "$out_file" | sed 's/^ *//')
+            if [ -z "$diff_stat" ]; then
+              changed='false'; diff_summary='변경 없음'; status='ok-unchanged'
+            else
+              changed='true'; diff_summary="$diff_stat"; status='ok-changed'
+            fi
+
+            echo "::group::[$slug] Output file"
+            echo "path      : $out_file"
+            echo "bytes     : $out_size"
+            echo "lines     : $out_lines"
+            echo "changed   : $changed"
+            echo "diff stat : $diff_summary"
+            echo "::endgroup::"
+
+            printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n' \
+              "$slug" "$page_id" "$out_file" "$status" \
+              "$subject" "$breadcrumb" "$updated_at" \
+              "$body_chars" "$out_size" "$diff_summary" >> "$RESULTS_FILE"
+          }
+
+          for entry in "${PAGES[@]}"; do
+            IFS='|' read -r pid slug outf <<< "$entry"
+            fetch_page "$pid" "$slug" "$outf"
+          done
+
+          # 페이지별 결과를 집계해 step 출력 / Job Summary / PR 본문을 만듭니다.
+          any_changed='false'
+          all_failed='true'
+          changed_slugs=()
+          unchanged_slugs=()
+          skipped_slugs=()
+
+          while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
+            case "$status" in
+              ok-changed)
+                any_changed='true'
+                all_failed='false'
+                changed_slugs+=("$slug")
+                ;;
+              ok-unchanged)
+                all_failed='false'
+                unchanged_slugs+=("$slug")
+                ;;
+              skipped)
+                skipped_slugs+=("$slug")
+                ;;
+            esac
+          done < "$RESULTS_FILE"
+
+          join_csv() {
+            # bash 의 "${arr[*]}" 는 IFS 의 첫 글자만 구분자로 쓰므로 ', ' 같은 다중-문자 구분자는 직접 합쳐줍니다.
+            local sep="$1"; shift
+            if [ "$#" -eq 0 ]; then echo ''; return 0; fi
+            local s
+            s=$(printf "%s${sep}" "$@")
+            echo "${s%${sep}}"
+          }
+
+          changed_csv=''
+          if [ "${#changed_slugs[@]}" -gt 0 ]; then changed_csv=$(join_csv ', ' "${changed_slugs[@]}"); fi
+          unchanged_csv=''
+          if [ "${#unchanged_slugs[@]}" -gt 0 ]; then unchanged_csv=$(join_csv ', ' "${unchanged_slugs[@]}"); fi
+          skipped_csv=''
+          if [ "${#skipped_slugs[@]}" -gt 0 ]; then skipped_csv=$(join_csv ', ' "${skipped_slugs[@]}"); fi
+
+          echo "::group::Aggregate"
+          echo "any_changed   : $any_changed"
+          echo "all_failed    : $all_failed"
+          echo "changed   ($(printf %d ${#changed_slugs[@]}))   : $changed_csv"
+          echo "unchanged ($(printf %d ${#unchanged_slugs[@]}))   : $unchanged_csv"
+          echo "skipped   ($(printf %d ${#skipped_slugs[@]}))   : $skipped_csv"
+          echo "::endgroup::"
+
+          # 워크플로우 실행 페이지 상단 Job Summary
+          {
+            echo "## 📘 Dooray API 문서 동기화 결과"
+            echo
+            echo "| slug | status | subject | 업스트림 갱신일 | 본문 글자 수 | 출력 파일 크기 | 변경 요약 / 사유 |"
+            echo "| --- | --- | --- | --- | --- | --- | --- |"
+            while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
+              case "$status" in
+                ok-changed)
+                  echo "| \`$slug\` | ✅ changed | $subject | \`$updated_at\` | $body_chars | $out_size | $diff_summary |"
+                  ;;
+                ok-unchanged)
+                  echo "| \`$slug\` | 🟰 unchanged | $subject | \`$updated_at\` | $body_chars | $out_size | $diff_summary |"
+                  ;;
+                skipped)
+                  echo "| \`$slug\` | ⚠️ skipped | — | — | — | — | $reason |"
+                  ;;
+              esac
+            done < "$RESULTS_FILE"
+            echo
+            echo "**합계**: changed=${#changed_slugs[@]}, unchanged=${#unchanged_slugs[@]}, skipped=${#skipped_slugs[@]}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          # PR 본문 (any_changed=true 일 때만 사용됨)
+          PR_BODY_FILE=$(mktemp)
+          {
+            echo "## 📘 업스트림 변경 감지"
+            echo
+            echo "Dooray 문서 페이지에 변경이 감지되어 자동으로 동기화한 PR 입니다."
+            echo
+            echo "### 변경된 페이지"
+            echo
+            echo "| slug | subject | breadcrumb | pageId | 업스트림 갱신일 | 본문 글자 수 | 출력 파일 크기 | 변경 요약 |"
+            echo "| --- | --- | --- | --- | --- | --- | --- | --- |"
+            while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
+              if [ "$status" = "ok-changed" ]; then
+                echo "| \`$slug\` | [$subject](https://helpdesk.dooray.com/v2/wapi/shared-tree/9wWo-xwiR66BO5LGshgVTg/pages/$pid) | $breadcrumb | \`$pid\` | \`$updated_at\` | $body_chars | $out_size | \`$diff_summary\` |"
+              fi
+            done < "$RESULTS_FILE"
+
+            if [ "${#unchanged_slugs[@]}" -gt 0 ]; then
+              echo
+              echo "### 변경 없음"
+              echo
+              echo "$unchanged_csv"
+            fi
+
+            if [ "${#skipped_slugs[@]}" -gt 0 ]; then
+              echo
+              echo "### ⚠️ 스킵된 페이지"
+              echo
+              echo "| slug | 사유 |"
+              echo "| --- | --- |"
+              while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
+                if [ "$status" = "skipped" ]; then
+                  echo "| \`$slug\` | $reason |"
+                fi
+              done < "$RESULTS_FILE"
+            fi
+
+            echo
+            echo "## ✅ 리뷰 체크리스트"
+            echo
+            echo "- [ ] 변경된 내용이 업스트림 페이지와 일치하는지 확인했습니다."
+            echo "- [ ] 본문에서 코드 블록 / 링크 / 이미지가 깨지지 않았는지 확인했습니다."
+            echo "- [ ] front matter (\`subject\`, \`dooray_updated_at\` 등) 메타데이터가 올바른지 확인했습니다."
+            echo
+            echo "---"
+            echo
+            echo "이 PR 은 cron 으로 자동 생성되며, 같은 페이지에 또 변경이 있으면 force-push 로 갱신됩니다."
+            echo "변경이 의도된 것이라면 그대로 merge 하세요."
+            echo
+            echo "**워크플로우 실행 로그**: [run #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          } > "$PR_BODY_FILE"
+
+          # Commit 메시지 (변경된 slug 들을 본문에 나열)
+          COMMIT_MSG_FILE=$(mktemp)
+          {
+            echo "chore(docs): sync Dooray API docs (${changed_csv})"
+            echo
+            echo "changed   : ${changed_csv}"
+            if [ -n "$unchanged_csv" ]; then echo "unchanged : ${unchanged_csv}"; fi
+            if [ -n "$skipped_csv" ];   then echo "skipped   : ${skipped_csv}"; fi
+          } > "$COMMIT_MSG_FILE"
+
+          # step outputs
+          {
+            echo "any_changed=$any_changed"
+            echo "all_failed=$all_failed"
+            echo "changed_slugs=$changed_csv"
+            echo "unchanged_slugs=$unchanged_csv"
+            echo "skipped_slugs=$skipped_csv"
+            echo "changed_count=${#changed_slugs[@]}"
+            echo "unchanged_count=${#unchanged_slugs[@]}"
+            echo "skipped_count=${#skipped_slugs[@]}"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "pr_body<<DOORAY_PR_BODY_EOF"
+            cat "$PR_BODY_FILE"
+            echo "DOORAY_PR_BODY_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "commit_message<<DOORAY_COMMIT_EOF"
+            cat "$COMMIT_MSG_FILE"
+            echo "DOORAY_COMMIT_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          # 모든 페이지가 실패한 경우 워크플로우를 실패로 마킹해 silent-failure 를 막습니다.
+          if [ "$all_failed" = "true" ]; then
+            echo "::error::All ${#PAGES[@]} pages failed to sync."
+            exit 1
+          fi
+
+      - name: Create or update PR
+        if: steps.fetch.outputs.any_changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: bot/dooray-api-docs
+          base: main
+          commit-message: ${{ steps.fetch.outputs.commit_message }}
+          title: 'chore(docs): Dooray API 문서 동기화 — ${{ steps.fetch.outputs.changed_slugs }}'
+          body: ${{ steps.fetch.outputs.pr_body }}
+          assignees: doinki
+          delete-branch: true

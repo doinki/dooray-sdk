@@ -1,0 +1,46 @@
+{
+  "name": "dooray-sdk",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "release": "pnpm run build && pnpm run publint && changeset publish",
+    "publint": "turbo publint",
+    "prepare": "simple-git-hooks"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@types/node": "^24.13.2",
+    "esbuild": "^0.28.1",
+    "eslint-plugin-perfectionist": "^5.9.0",
+    "eslint-plugin-simple-import-sort": "^13.0.0",
+    "lint-staged": "^17.0.7",
+    "oxfmt": "^0.54.0",
+    "oxlint": "^1.69.0",
+    "oxlint-tsgolint": "^0.23.0",
+    "publint": "^0.3.21",
+    "rimraf": "^6.1.3",
+    "rollup": "^4.62.0",
+    "rollup-plugin-dts": "^6.4.1",
+    "rollup-plugin-esbuild": "^6.2.1",
+    "simple-git-hooks": "^2.13.1",
+    "turbo": "^2.9.18",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "packageManager": "pnpm@11.6.0"
+}

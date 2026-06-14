@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [".agents", ".claude", "docs/external/dooray-api*.md"],
+  "extends": [
+    "./oxlint/eslint.json",
+    "./oxlint/typescript.json",
+    "./oxlint/import.json",
+    "./oxlint/node.json",
+    "./oxlint/oxc.json",
+    "./oxlint/unicorn.json"
+  ],
+  "env": {
+    "builtin": true,
+    "node": true
+  },
+  "options": {
+    "typeAware": true
+  },
+  "jsPlugins": ["eslint-plugin-perfectionist", "eslint-plugin-simple-import-sort"],
+  "rules": {
+    "perfectionist/sort-heritage-clauses": "warn",
+    "perfectionist/sort-interfaces": "warn",
+    "perfectionist/sort-intersection-types": "warn",
+    "perfectionist/sort-object-types": "warn",
+    "perfectionist/sort-objects": "warn",
+    "perfectionist/sort-switch-case": "warn",
+    "perfectionist/sort-union-types": "warn",
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["packages/sdk/src/**/*.ts"],
+      "rules": {
+        "typescript/consistent-type-definitions": "off"
+      }
+    }
+  ]
+}

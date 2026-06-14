@@ -1,0 +1,82 @@
+{
+  "name": "@dooray-sdk/core",
+  "version": "0.0.0",
+  "description": "High-level Dooray operations built on @dooray-sdk/client — shared logic for the CLI and MCP server",
+  "keywords": [
+    "cli",
+    "dooray",
+    "mcp"
+  ],
+  "homepage": "https://github.com/doinki/dooray-sdk/tree/main/packages/core#readme",
+  "bugs": "https://github.com/doinki/dooray-sdk/issues",
+  "license": "MIT",
+  "author": {
+    "name": "doinki",
+    "email": "doinki94@gmail.com",
+    "url": "https://github.com/doinki"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doinki/dooray-sdk.git",
+    "directory": "packages/core"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./constants": {
+      "types": "./dist/constants/index.d.ts",
+      "default": "./dist/constants/index.js"
+    },
+    "./errors": {
+      "types": "./dist/errors/index.d.ts",
+      "default": "./dist/errors/index.js"
+    },
+    "./resolve": {
+      "types": "./dist/resolve/index.d.ts",
+      "default": "./dist/resolve/index.js"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "default": "./dist/schemas/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && rollup -c ../../tools/rollup.config.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxfmt && oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "publint": "publint"
+  },
+  "dependencies": {
+    "@dooray-sdk/client": "workspace:^",
+    "mime": "^4.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "browserslist": [
+    "node 22.12"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  }
+}
