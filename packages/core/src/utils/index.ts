@@ -1,5 +1,6 @@
 export * from './build-create-users';
 export * from './build-multipart-file';
+export * from './build-wiki-cc';
 export * from './extract-message';
 export * from './fetch-all-pages';
 export * from './guess-content-type';
@@ -7,4 +8,6 @@ export * from './is-error';
 export * from './is-network-error';
 export * from './resolve-member-id';
 export * from './resolve-task-project-id';
+export * from './resolve-wiki-project-id';
+export * from './stream-response-to-file';
 export * from './task-user-ref';

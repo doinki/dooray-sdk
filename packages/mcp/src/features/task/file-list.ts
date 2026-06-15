@@ -18,8 +18,7 @@ export function registerTaskFileList(server: McpServer, api: DoorayApi): void {
     'task_file_list',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "List a task's attached files. Use task_file_view for one file's full metadata, task_file_download to fetch its bytes.",
+      description: "List a task's attached files.",
       inputSchema,
       title: 'List task files',
     },

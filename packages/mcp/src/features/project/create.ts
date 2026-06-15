@@ -8,21 +8,10 @@ import { z } from 'zod';
 import { runTool } from '../../shared/result';
 
 const inputSchema = {
-  categoryId: z
-    .string()
-    .optional()
-    .describe(
-      '19-digit project category id (not a name); resolve via project_category_list first. Omit to leave uncategorized.',
-    ),
+  categoryId: z.string().optional().describe('Category id from project_category_list. Omit to leave uncategorized.'),
   description: z.string().optional().describe('Project description.'),
-  name: z
-    .string()
-    .describe(
-      'Display name shown in the UI; must be unique in the org — verify via project_check_name first. (The API field name is `code`.)',
-    ),
-  scope: z
-    .enum(PROJECT_SCOPES)
-    .describe('Who can access — private: project members only; public: any non-guest org member.'),
+  name: z.string().describe('Display name; must be unique in the org (check with project_check_name).'),
+  scope: z.enum(PROJECT_SCOPES).describe('Access scope: private (members only) or public (any non-guest org member).'),
 } satisfies Record<keyof ProjectCreateArgs, z.ZodType>;
 
 export function registerProjectCreate(server: McpServer, api: DoorayApi): void {
@@ -30,8 +19,7 @@ export function registerProjectCreate(server: McpServer, api: DoorayApi): void {
     'project_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Create a project in the caller's organization. A taken name fails the call — verify via project_check_name first.",
+      description: "Create a project in the caller's organization.",
       inputSchema,
       title: 'Create project',
     },

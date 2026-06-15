@@ -7,11 +7,7 @@ import { z } from 'zod';
 import { runTool } from '../../shared/result';
 
 const inputSchema = {
-  id: z
-    .string()
-    .describe(
-      'A 19-digit member id (not a name/email); resolve via member_search (org-wide) or project_member_list (this project).',
-    ),
+  id: z.string().describe('Member id; from member_search or project_member_list.'),
 } satisfies Record<keyof MemberViewArgs, z.ZodType>;
 
 export function registerMemberView(server: McpServer, api: DoorayApi): void {
@@ -19,8 +15,7 @@ export function registerMemberView(server: McpServer, api: DoorayApi): void {
     'member_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "View one tenant member's full profile by id; resolve via member_search (look up by name) or member_me.",
+      description: "View a tenant member's full profile by id.",
       inputSchema,
       title: 'View member',
     },

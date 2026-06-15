@@ -10,9 +10,7 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  commentId: z
-    .string()
-    .describe('19-digit comment id to delete (not the comment body); resolve via task_comment_list first.'),
+  commentId: z.string().describe('Comment id to delete; from task_comment_list.'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskCommentDeleteArgs>, z.ZodType>;
 
@@ -21,7 +19,7 @@ export function registerTaskCommentDelete(server: McpServer, api: DoorayApi): vo
     'task_comment_delete',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description: 'Delete one comment from a task. To edit text instead of removing it, use task_comment_update.',
+      description: 'Delete a comment from a task. Irreversible.',
       inputSchema,
       title: 'Delete task comment',
     },

@@ -18,10 +18,9 @@ export function registerProjectStatusList(server: McpServer, api: DoorayApi): vo
     'project_status_list',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "List a project's task statuses, returning each status's id, name, class — backlog, registered, working, closed — and intra-class order. Use it to resolve a status name to the id that task_set_status, task_close, task_create, and task_update require.",
+      description: "List a project's task statuses, each with its id, name, class, and order.",
       inputSchema,
-      title: 'List project statuses',
+      title: 'List statuses',
     },
     (args) =>
       runTool(async () => {

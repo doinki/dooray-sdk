@@ -15,10 +15,7 @@ const inputSchema = {
   page: pageSchema,
   ref: projectScopeShape.ref,
   size: sizeSchema,
-  state: z
-    .enum(MILESTONE_STATES)
-    .optional()
-    .describe('Filter by state — `open` (active) or `closed` (finished). Omit to include both (default).'),
+  state: z.enum(MILESTONE_STATES).optional().describe('Filter by state: `open` or `closed`. Omit for both (default).'),
 } satisfies Record<keyof ProjectScopedArgs<MilestoneListArgs>, z.ZodType>;
 
 export function registerProjectMilestoneList(server: McpServer, api: DoorayApi): void {
@@ -26,10 +23,9 @@ export function registerProjectMilestoneList(server: McpServer, api: DoorayApi):
     'project_milestone_list',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "List and page a project's milestones, optionally filtered by state. Use to browse milestones or resolve a milestone name to its id; fetch one milestone's full detail with project_milestone_view.",
+      description: "List a project's milestones, optionally filtered by state.",
       inputSchema,
-      title: 'List project milestones',
+      title: 'List milestones',
     },
     (args) =>
       runTool(async () => {

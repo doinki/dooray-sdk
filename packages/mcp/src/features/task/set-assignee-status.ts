@@ -10,15 +10,9 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  memberId: z
-    .string()
-    .describe(
-      '19-digit member id (not a name/email) of the assignee, or `@me` for the caller; resolve via member_search (org-wide) or project_member_list (this project).',
-    ),
+  memberId: z.string().describe('Assignee member id or `@me`; from member_search or project_member_list.'),
   ref: taskScopeShape.ref,
-  statusId: z
-    .string()
-    .describe('19-digit status id (not a name) to set for this assignee; resolve via project_status_list first.'),
+  statusId: z.string().describe('Status id to set for this assignee; from project_status_list.'),
 } satisfies Record<keyof TaskScopedArgs<TaskSetAssigneeStatusArgs>, z.ZodType>;
 
 export function registerTaskSetAssigneeStatus(server: McpServer, api: DoorayApi): void {
@@ -26,8 +20,7 @@ export function registerTaskSetAssigneeStatus(server: McpServer, api: DoorayApi)
     'task_set_assignee_status',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Set one assignee's personal status on a task; use task_set_status to set the task's overall status.",
+      description: "Set one assignee's personal status on a task (not the task's overall status).",
       inputSchema,
       title: 'Set assignee status',
     },

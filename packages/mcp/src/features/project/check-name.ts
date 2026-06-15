@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { runTool } from '../../shared/result';
 
 const inputSchema = {
-  name: z.string().describe('Project name to check; must be unique in the tenant.'),
+  name: z.string().describe('Project name to check.'),
 } satisfies Record<keyof ProjectCheckNameArgs, z.ZodType>;
 
 export function registerProjectCheckName(server: McpServer, api: DoorayApi): void {
@@ -15,8 +15,7 @@ export function registerProjectCheckName(server: McpServer, api: DoorayApi): voi
     'project_check_name',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        'Check a project name before project_create — reports whether it is available, invalid (disallowed characters), or already taken.',
+      description: 'Check whether a project name is available, invalid (disallowed characters), or already taken.',
       inputSchema,
       title: 'Check project name',
     },

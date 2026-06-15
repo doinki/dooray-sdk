@@ -18,7 +18,7 @@ const inputSchema = {
     .number()
     .int()
     .optional()
-    .describe('Sort order within the same class — lower appears first (integer; default: appended last)'),
+    .describe('Sort order within the class; lower appears first (default: appended last).'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<StatusCreateArgs>, z.ZodType>;
 
@@ -27,10 +27,9 @@ export function registerProjectStatusCreate(server: McpServer, api: DoorayApi): 
     'project_status_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Add a task status to a project. Set class to place it in a stage — backlog, registered, working, closed. Returns no id — verify with project_status_list.',
+      description: 'Create a task status in a project.',
       inputSchema,
-      title: 'Create project status',
+      title: 'Create status',
     },
     (args) =>
       runTool(async () => {

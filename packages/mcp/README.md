@@ -1,6 +1,6 @@
 # @dooray-sdk/mcp
 
-The Dooray MCP server connects AI agents to [Dooray](https://dooray.com), letting them browse and manage projects, tasks, and members through natural language. It runs over stdio on top of `@dooray-sdk/core` and `@dooray-sdk/client`.
+The Dooray MCP server connects AI agents to [Dooray](https://dooray.com), letting them browse and manage projects, tasks, members, and wikis through natural language. It runs over stdio on top of `@dooray-sdk/core` and `@dooray-sdk/client`.
 
 ## Run
 
@@ -45,18 +45,19 @@ Add a stdio server entry to your MCP client configuration:
 
 ## Tools
 
-Tools are named `<scope>_<action>`. Project- and task-scoped tools take a single `ref` (see [References](#references)).
+Tools are named `<entity>_<verb>` and share a common set of verbs: `_list` (browse), `_view` (read one), and `_create` / `_update` / `_delete` (write). Project-, task-, and wiki-scoped tools take a single `ref` (see [References](#references)).
 
 - **`member_*`** — current user, search, view
 - **`project_*`** — list, view, create, check name; members and member groups; milestones; statuses; tags; templates; categories; email addresses; hooks
 - **`task_*`** — list, view, create (and drafts), update, close, move, set parent / status / assignee status; comments; file attachments
+- **`wiki_*`** — list wikis and pages, view, create, update (title / body / cc), delete, move; comments; file attachments; shared links
 
 ## References
 
-Project- and task-scoped tools use a single `ref` argument:
+Project-, task-, and wiki-scoped tools use a single `ref` argument:
 
 - a 19-digit Dooray id
-- a `<projectId>/<taskId>` pair
+- a `<projectId>/<id>` pair
 - a Dooray URL
 
-On project-scoped tools `ref` identifies the project; on task-scoped tools it identifies the task. A bare id is read according to the tool's scope.
+`ref` resolves according to the tool's scope: the project on `project_*`, the task on `task_*`, and the wiki page on `wiki_*`. On project-scoped tools, a task, drive, or wiki URL resolves to its owning project.

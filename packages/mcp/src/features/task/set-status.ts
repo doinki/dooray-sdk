@@ -11,9 +11,7 @@ import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
   ref: taskScopeShape.ref,
-  statusId: z
-    .string()
-    .describe('19-digit status id to move the task to (not a name); resolve via project_status_list first.'),
+  statusId: z.string().describe('Status id to move the task to; from project_status_list.'),
 } satisfies Record<keyof TaskScopedArgs<TaskSetStatusArgs>, z.ZodType>;
 
 export function registerTaskSetStatus(server: McpServer, api: DoorayApi): void {
@@ -21,8 +19,7 @@ export function registerTaskSetStatus(server: McpServer, api: DoorayApi): void {
     'task_set_status',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Set a task's status to any project status, including reopening a closed task. Use this over task_close when moving to a non-closed status — task_close only flips to done/closed.",
+      description: "Set a task's status to any project status, including reopening a closed task.",
       inputSchema,
       title: 'Set task status',
     },

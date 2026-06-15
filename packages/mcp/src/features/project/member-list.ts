@@ -17,9 +17,7 @@ const inputSchema = {
   roles: z
     .array(z.enum(ASSIGNABLE_ROLES))
     .optional()
-    .describe(
-      `Filter by role — ${ASSIGNABLE_ROLES.join(' or ')}; pass an array for multiple. Omit to include all roles (default).`,
-    ),
+    .describe(`Filter by role: ${ASSIGNABLE_ROLES.join(' or ')}. Omit to include all roles (default).`),
   size: sizeSchema,
 } satisfies Record<keyof ProjectScopedArgs<ProjectMemberListArgs>, z.ZodType>;
 
@@ -29,7 +27,7 @@ export function registerProjectMemberList(server: McpServer, api: DoorayApi): vo
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        "List a project's members, each with organizationMemberId and role. Use to resolve a member id for project-scoped filters or to check who can be assigned. For group memberships use project_member_group_list.",
+        "List a project's members, each with organizationMemberId and role. Use it to resolve a member id within a project; for groups use project_member_group_list.",
       inputSchema,
       title: 'List project members',
     },

@@ -12,10 +12,7 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  all: z
-    .boolean()
-    .optional()
-    .describe('Fetch every comment in one call, paging through all entries; overrides page/size (default: false).'),
+  all: z.boolean().optional().describe('Fetch all pages in one call; overrides page/size (default: false).'),
   page: pageSchema,
   ref: taskScopeShape.ref,
   size: sizeSchema,
@@ -30,8 +27,7 @@ export function registerTaskCommentList(server: McpServer, api: DoorayApi): void
     'task_comment_list',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "List a task's comment timeline; entries include both user comments and system events. Use task_comment_view for one comment's full body.",
+      description: "List a task's comment timeline. Includes system events.",
       inputSchema,
       title: 'List task comments',
     },

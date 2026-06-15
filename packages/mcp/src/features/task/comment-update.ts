@@ -11,24 +11,16 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z
-    .string()
-    .describe(
-      'New comment text; replaces the entire body, so include anything you want to keep. Rendered as Markdown unless mimeType is text/html.',
-    ),
-  commentId: z
-    .string()
-    .describe('19-digit comment id to update (not the comment body); resolve via task_comment_list first.'),
+  body: z.string().describe('New comment body (Markdown unless mimeType is text/html). Replaces the whole body.'),
+  commentId: z.string().describe('Comment id to update; from task_comment_list.'),
   fileIds: z
     .array(z.string())
     .optional()
-    .describe(
-      '19-digit ids of already-uploaded files (not a file path); resolve via task_file_list first. Replaces the whole attachment set; omit to leave attachments unchanged.',
-    ),
+    .describe('Attachment file ids; from task_file_list. Replaces the whole list; omit to keep current.'),
   mimeType: z
     .enum(BODY_MIME_TYPES)
     .optional()
-    .describe('How body renders — text/x-markdown or text/html (default: text/x-markdown).'),
+    .describe('Body content type — text/x-markdown or text/html (default: text/x-markdown).'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskCommentUpdateArgs>, z.ZodType>;
 
@@ -37,8 +29,7 @@ export function registerTaskCommentUpdate(server: McpServer, api: DoorayApi): vo
     'task_comment_update',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Update an existing task comment. body replaces the entire comment (no partial edit) and fileIds replaces the whole attachment set — omit fileIds to keep attachments unchanged.',
+      description: 'Edit a task comment; body and fileIds each replace the whole value.',
       inputSchema,
       title: 'Update task comment',
     },

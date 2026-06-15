@@ -10,7 +10,7 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  commentId: z.string().describe('19-digit comment id (not the comment body); resolve via task_comment_list first.'),
+  commentId: z.string().describe('Comment id; from task_comment_list.'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskCommentViewArgs>, z.ZodType>;
 
@@ -19,7 +19,7 @@ export function registerTaskCommentView(server: McpServer, api: DoorayApi): void
     'task_comment_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description: "Fetch one task comment's full detail. Use task_comment_list for the whole timeline.",
+      description: "View a task comment's full detail.",
       inputSchema,
       title: 'View task comment',
     },

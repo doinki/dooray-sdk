@@ -2,6 +2,7 @@ import type { DoorayApi } from '@dooray-sdk/client';
 
 import type { COMMENT_SORTS } from '../../constants/task';
 import { COMMENT_SORT_FIELDS } from '../../constants/task';
+import { MAX_SIZE } from '../../schemas';
 import { fetchAllPages } from '../../utils/fetch-all-pages';
 import { resolveTaskProjectId } from '../../utils/resolve-task-project-id';
 import { toOrder } from './sort-order';
@@ -17,8 +18,6 @@ export interface TaskCommentListArgs {
   sort?: CommentSort;
 }
 
-const COMMENT_SIZE = 100;
-
 interface TaskCommentListContext {
   api: DoorayApi;
   args: TaskCommentListArgs;
@@ -30,7 +29,7 @@ export async function runTaskCommentList({ api, args }: TaskCommentListContext) 
   if (args.all) {
     const { paging, result } = await fetchAllPages((page) =>
       api.projectTaskComment.list({
-        params: { order: toOrder(args.sort, COMMENT_SORT_FIELDS), page, size: COMMENT_SIZE },
+        params: { order: toOrder(args.sort, COMMENT_SORT_FIELDS), page, size: MAX_SIZE },
         path: { projectId, taskId: args.id },
       }),
     );

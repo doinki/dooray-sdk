@@ -22,7 +22,7 @@ export function registerProjectTemplateList(server: McpServer, api: DoorayApi): 
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        "List a project's task templates, metadata only — get a template id here, then read its body and guide with project_template_view.",
+        "List a project's task templates (metadata only); use project_template_view for a template's body and guide.",
       inputSchema,
       title: 'List project templates',
     },

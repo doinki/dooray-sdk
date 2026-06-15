@@ -1,12 +1,12 @@
 import type { DoorayApi } from '@dooray-sdk/client';
 
+import { MAX_SIZE } from '../schemas';
 import { RefError } from './errors';
 import { parseIdRef } from './parse-id-ref';
 import type { UrlRefType } from './parse-url-ref';
 import { parseUrlRef } from './parse-url-ref';
 import { tryParseUrl } from './ref-format';
 
-const WIKI_LIST_PAGE_SIZE = 100;
 const WIKI_LIST_MAX_PAGES = 1000;
 
 export function resolveProjectId({ api, ref }: { api: DoorayApi; ref: string }) {
@@ -56,7 +56,7 @@ async function resolveProjectIdFromWikiPageId({ api, id, ref }: { api: DoorayApi
 
   for (let pageIndex = 0; pageIndex < WIKI_LIST_MAX_PAGES; pageIndex += 1) {
     // oxlint-disable-next-line no-await-in-loop
-    const wikis = await api.wiki.list({ params: { page: pageIndex, size: WIKI_LIST_PAGE_SIZE } });
+    const wikis = await api.wiki.list({ params: { page: pageIndex, size: MAX_SIZE } });
     const match = wikis.result.find((w) => w.id === wikiId);
     if (match) return match.project.id;
     if (!wikis.paging.hasNext) break;

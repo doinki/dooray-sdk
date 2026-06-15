@@ -10,7 +10,7 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  fileId: z.string().describe('19-digit attachment file id (not a name); resolve via task_file_list first.'),
+  fileId: z.string().describe('Attachment file id; from task_file_list.'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskFileViewArgs>, z.ZodType>;
 
@@ -19,8 +19,7 @@ export function registerTaskFileView(server: McpServer, api: DoorayApi): void {
     'task_file_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "View one task attachment's metadata. Use task_file_list to enumerate a task's attachments, task_file_download to fetch its bytes.",
+      description: "View a task attachment's metadata. Returns metadata only; use task_file_download for the bytes.",
       inputSchema,
       title: 'View task file',
     },

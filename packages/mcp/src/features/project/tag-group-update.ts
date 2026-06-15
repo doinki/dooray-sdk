@@ -10,22 +10,16 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z
-    .string()
-    .describe(
-      '19-digit tag group id (not a name) — the `tagGroup.id` from project_tag_list; resolve via project_tag_list first',
-    ),
+  id: z.string().describe('Tag group id; the `tagGroup.id` from project_tag_list.'),
   ref: projectScopeShape.ref,
   required: z
     .boolean()
     .optional()
-    .describe('true: a task must have at least one tag from this group; false: optional. Omit to leave unchanged'),
+    .describe('true: a task must have at least one tag from this group; false: optional.'),
   singleSelect: z
     .boolean()
     .optional()
-    .describe(
-      'true: a task may have at most one tag from this group; false: multiple allowed. Omit to leave unchanged',
-    ),
+    .describe('true: a task may have at most one tag from this group; false: multiple allowed.'),
 } satisfies Record<keyof ProjectScopedArgs<TagGroupUpdateArgs>, z.ZodType>;
 
 export function registerProjectTagGroupUpdate(server: McpServer, api: DoorayApi): void {
@@ -33,10 +27,9 @@ export function registerProjectTagGroupUpdate(server: McpServer, api: DoorayApi)
     'project_tag_group_update',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Update a tag group's task-tagging rules: required (a task must carry at least one tag from the group) and singleSelect (a task may carry at most one tag from the group). Affects the group, not its individual tags. Omit a field to leave it unchanged.",
+      description: "Update a tag group's required and singleSelect rules; omit a field to leave it unchanged.",
       inputSchema,
-      title: 'Update project tag group',
+      title: 'Update tag group',
     },
     (args) =>
       runTool(async () => {

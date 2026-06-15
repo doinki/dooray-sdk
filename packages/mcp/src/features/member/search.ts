@@ -11,13 +11,13 @@ const inputSchema = {
   email: z
     .array(z.email())
     .optional()
-    .describe('Filter by external email address, exact match — array, any one matches (e.g. `["a@ex.com"]`).'),
-  exactUserCode: z.string().optional().describe('Filter by user code, exact match. Use userCode for substring match.'),
-  name: z.string().optional().describe('Filter by display name (not a 19-digit id).'),
+    .describe('Filter by email, exact match; any one in the array matches (e.g. `["a@ex.com"]`).'),
+  exactUserCode: z.string().optional().describe('Filter by user code, exact match.'),
+  name: z.string().optional().describe('Filter by display name.'),
   page: pageSchema,
   size: sizeSchema,
-  ssoId: z.string().optional().describe('Filter by SSO/IdP user id, e.g. employee number (not a 19-digit id).'),
-  userCode: z.string().optional().describe('Filter by user code, substring match. Use exactUserCode for exact match.'),
+  ssoId: z.string().optional().describe('Filter by SSO/IdP user id (e.g. employee number).'),
+  userCode: z.string().optional().describe('Filter by user code, substring match.'),
 } satisfies Record<keyof MemberSearchArgs, z.ZodType>;
 
 export function registerMemberSearch(server: McpServer, api: DoorayApi): void {
@@ -26,7 +26,7 @@ export function registerMemberSearch(server: McpServer, api: DoorayApi): void {
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        "Search tenant members by name, email, user code, or SSO id to resolve a name to its member id. Provide at least one filter; multiple filters combine with AND. Use member_view to fetch one member's full detail by id, or member_me for the caller.",
+        'Search tenant members by name, email, user code, or SSO id. Requires at least one filter; multiple filters combine with AND.',
       inputSchema,
       title: 'Search members',
     },

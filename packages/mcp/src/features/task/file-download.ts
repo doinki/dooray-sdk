@@ -10,11 +10,11 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  fileId: z.string().describe('19-digit attachment id (not a name); resolve via task_file_list first.'),
+  fileId: z.string().describe('Attachment id; from task_file_list.'),
   outputPath: z
     .string()
     .describe(
-      "Absolute local path including the filename, on the machine running the server — e.g. /tmp/report.pdf. Overwrites any existing file there. The attachment's original name is NOT applied automatically; copy it from task_file_list into this path to keep it.",
+      "Absolute server path including the filename (e.g. /tmp/report.pdf); overwrites any existing file. The attachment's original name is not applied automatically.",
     ),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskFileDownloadArgs>, z.ZodType>;
@@ -24,8 +24,7 @@ export function registerTaskFileDownload(server: McpServer, api: DoorayApi): voi
     'task_file_download',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Write a task attachment's bytes to a local file on the machine running the server — use this over task_file_view, which returns metadata only. outputPath includes the filename and overwrites any existing file there.",
+      description: "Download a task attachment's bytes to a local file on the server.",
       inputSchema,
       title: 'Download task file',
     },

@@ -11,17 +11,12 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('Comment body text; rendered as Markdown unless mimeType is text/html.'),
-  fileIds: z
-    .array(z.string())
-    .optional()
-    .describe(
-      '19-digit file ids of already-uploaded attachments (not file paths) — upload first via task_file_upload, resolve via task_file_list.',
-    ),
+  body: z.string().describe('Comment body (Markdown unless mimeType is text/html).'),
+  fileIds: z.array(z.string()).optional().describe('Attachment file ids; from task_file_upload or task_file_list.'),
   mimeType: z
     .enum(BODY_MIME_TYPES)
     .optional()
-    .describe('Comment content type (default: text/x-markdown) — text/x-markdown or text/html.'),
+    .describe('Body content type — text/x-markdown or text/html (default: text/x-markdown).'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskCommentCreateArgs>, z.ZodType>;
 
@@ -30,7 +25,7 @@ export function registerTaskCommentCreate(server: McpServer, api: DoorayApi): vo
     'task_comment_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description: "Post a comment to a task's timeline; the write counterpart to task_comment_list.",
+      description: "Post a comment to a task's timeline.",
       inputSchema,
       title: 'Create task comment',
     },

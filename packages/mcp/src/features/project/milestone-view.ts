@@ -10,7 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit milestone id (not a name); resolve via project_milestone_list first.'),
+  id: z.string().describe('Milestone id; from project_milestone_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<MilestoneViewArgs>, z.ZodType>;
 
@@ -19,10 +19,9 @@ export function registerProjectMilestoneView(server: McpServer, api: DoorayApi):
     'project_milestone_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        'View one milestone by id. Prefer over project_milestone_list when you already have the id and need its date range or closed state.',
+      description: "View a milestone's detail.",
       inputSchema,
-      title: 'View project milestone',
+      title: 'View milestone',
     },
     (args) =>
       runTool(async () => {

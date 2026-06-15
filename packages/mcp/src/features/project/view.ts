@@ -19,7 +19,7 @@ export function registerProjectView(server: McpServer, api: DoorayApi): void {
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        "Aggregate one project's configuration: project info, task statuses (ordered, with class — backlog, registered, working, closed), open and closed milestones, tags (with group), total member count, and category path. Read a project's statuses, milestones, and tags here before filtering task_list or setting task fields, instead of calling project_status_list, project_milestone_list, and project_tag_list separately. Returns the member count only — use project_member_list for the members themselves.",
+        "View a project's config in one call: info, task statuses, milestones, tags, member count, and category path. Use it to resolve statuses, milestones, and tags before filtering task_list or setting task fields. Returns member count only; use project_member_list for the members.",
       inputSchema,
       title: 'View project',
     },
