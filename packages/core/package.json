@@ -1,6 +1,6 @@
 {
   "name": "@dooray-sdk/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "High-level Dooray operations built on @dooray-sdk/client — shared logic for the CLI and MCP server",
   "keywords": [
     "cli",
