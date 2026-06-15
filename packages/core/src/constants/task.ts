@@ -15,7 +15,7 @@ export const BODY_MIME_TYPES = ['text/x-markdown', 'text/html'] as const;
 
 export type BodyMimeType = (typeof BODY_MIME_TYPES)[number];
 
-export const DEFAULT_BODY_MIME_TYPE: BodyMimeType = 'text/x-markdown';
+export const DEFAULT_BODY_MIME_TYPE = 'text/x-markdown' satisfies BodyMimeType;
 
 export const COMMENT_SORTS = ['created', '-created'] as const;
 

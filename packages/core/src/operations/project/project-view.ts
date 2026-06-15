@@ -3,9 +3,8 @@ import type { Milestone, ProjectCategory, Tag } from '@dooray-sdk/client/project
 
 import type { MilestoneState } from '../../constants/milestone';
 import type { Status, StatusClass } from '../../constants/status';
+import { MAX_SIZE } from '../../schemas';
 import { fetchAllPages } from '../../utils/fetch-all-pages';
-
-const PROJECT_LIST_PAGE_SIZE = 100;
 
 export interface ProjectViewArgs {
   projectId: string;
@@ -52,15 +51,9 @@ export async function runProjectView(context: ProjectViewContext) {
   ] = await Promise.all([
     api.project.get({ path: { projectId } }),
     api.projectWorkflow.list({ path: { projectId } }),
-    fetchAllPages((page) =>
-      api.projectMilestone.list({ params: { page, size: PROJECT_LIST_PAGE_SIZE }, path: { projectId } }),
-    ),
-    fetchAllPages((page) =>
-      api.projectTag.list({ params: { page, size: PROJECT_LIST_PAGE_SIZE }, path: { projectId } }),
-    ),
-    fetchAllPages((page) =>
-      api.projectMember.list({ params: { page, size: PROJECT_LIST_PAGE_SIZE }, path: { projectId } }),
-    ),
+    fetchAllPages((page) => api.projectMilestone.list({ params: { page, size: MAX_SIZE }, path: { projectId } })),
+    fetchAllPages((page) => api.projectTag.list({ params: { page, size: MAX_SIZE }, path: { projectId } })),
+    fetchAllPages((page) => api.projectMember.list({ params: { page, size: MAX_SIZE }, path: { projectId } })),
     api.projectCategory.list(),
   ]);
 
