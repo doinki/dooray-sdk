@@ -10,11 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z
-    .string()
-    .describe(
-      '19-digit tag id (not a name); resolve via project_tag_list, or use the id returned by project_tag_create',
-    ),
+  id: z.string().describe('Tag id; from project_tag_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<TagViewArgs>, z.ZodType>;
 
@@ -23,9 +19,9 @@ export function registerProjectTagView(server: McpServer, api: DoorayApi): void 
     'project_tag_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description: "View one tag's full detail by id — its color and, if grouped, its tag-group constraints.",
+      description: "View a tag's detail, including its color and any group constraints.",
       inputSchema,
-      title: 'View project tag',
+      title: 'View tag',
     },
     (args) =>
       runTool(async () => {

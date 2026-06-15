@@ -10,12 +10,8 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit status id to delete (not a name); resolve via project_status_list first'),
-  moveTo: z
-    .string()
-    .describe(
-      '19-digit status id that receives the moved tasks (not a name) — every task in the deleted status moves here; resolve via project_status_list first',
-    ),
+  id: z.string().describe('Status id to delete; from project_status_list.'),
+  moveTo: z.string().describe('Status id that receives the deleted status’s tasks; from project_status_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<StatusDeleteArgs>, z.ZodType>;
 
@@ -24,10 +20,9 @@ export function registerProjectStatusDelete(server: McpServer, api: DoorayApi): 
     'project_status_delete',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Delete one task status from a project; every task in it moves to the replacement status given in moveTo.',
+      description: 'Delete a task status from a project; its tasks move to the status given in moveTo. Irreversible.',
       inputSchema,
-      title: 'Delete project status',
+      title: 'Delete status',
     },
     (args) =>
       runTool(async () => {

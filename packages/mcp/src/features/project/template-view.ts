@@ -17,7 +17,7 @@ const inputSchema = {
       'Interpolate macro placeholders (e.g. `$' +
         '{year}`) in the returned body when true; return them literally otherwise (default: false).',
     ),
-  id: z.string().describe('19-digit template id (not a name); resolve via project_template_list first.'),
+  id: z.string().describe('Template id from project_template_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<TemplateViewArgs>, z.ZodType>;
 
@@ -27,8 +27,7 @@ export function registerProjectTemplateView(server: McpServer, api: DoorayApi): 
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        'View one task template’s full detail — the body and user-facing guide that project_template_list omits. Set expand to interpolate macro placeholders (e.g. `$' +
-        '{year}`) in the returned body.',
+        "View one task template's full detail, including the body and guide that project_template_list omits.",
       inputSchema,
       title: 'View project template',
     },

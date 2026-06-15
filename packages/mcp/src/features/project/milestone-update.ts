@@ -15,17 +15,14 @@ const inputSchema = {
     .string()
     .optional()
     .describe('New end date with timezone offset (e.g. `2026-08-22+09:00`); pair with startDate.'),
-  id: z.string().describe('19-digit milestone id (not a name); resolve via project_milestone_list first.'),
+  id: z.string().describe('Milestone id; from project_milestone_list.'),
   name: z.string().optional().describe('New milestone name.'),
   ref: projectScopeShape.ref,
   startDate: z
     .string()
     .optional()
     .describe('New start date with timezone offset (e.g. `2026-07-22+09:00`); pair with endDate.'),
-  state: z
-    .enum(MILESTONE_STATES)
-    .optional()
-    .describe('`open` to reopen — `closed` to close (closed milestones still appear in project_milestone_list).'),
+  state: z.enum(MILESTONE_STATES).optional().describe('`open` to reopen or `closed` to close.'),
 } satisfies Record<keyof ProjectScopedArgs<MilestoneUpdateArgs>, z.ZodType>;
 
 export function registerProjectMilestoneUpdate(server: McpServer, api: DoorayApi): void {
@@ -33,10 +30,9 @@ export function registerProjectMilestoneUpdate(server: McpServer, api: DoorayApi
     'project_milestone_update',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Update a milestone's name, date range, or open/closed state — only the fields you pass change. Set `state` to reopen or close it. Provide `startDate` and `endDate` together or neither.",
+      description: "Update a milestone's name, date range, or open/closed state; omit a field to leave it unchanged.",
       inputSchema,
-      title: 'Update project milestone',
+      title: 'Update milestone',
     },
     (args) =>
       runTool(async () => {

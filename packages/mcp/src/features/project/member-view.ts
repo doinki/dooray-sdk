@@ -10,11 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z
-    .string()
-    .describe(
-      'A 19-digit member id (not a name/email) — the organizationMemberId from project_member_list; this equals the member_search id, but prefer project_member_list within a project.',
-    ),
+  id: z.string().describe('Member id — the organizationMemberId from project_member_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<ProjectMemberViewArgs>, z.ZodType>;
 

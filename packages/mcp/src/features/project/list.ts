@@ -12,27 +12,18 @@ const inputSchema = {
   member: z
     .string()
     .default('me')
-    .describe(
-      'Limit to projects this member belongs to — a 19-digit member id (not a name/email); resolve via member_search. Use `me` for the caller (default: `me`).',
-    ),
+    .describe('Limit to projects this member belongs to — a member id from member_search, or `me` (default: `me`).'),
   page: pageSchema,
   scope: z
     .enum(PROJECT_SCOPES)
     .optional()
-    .describe(
-      'Visibility scope filter — private: members-only; public: open to non-guest org members (default: public).',
-    ),
+    .describe('Filter by scope: private (members only) or public (default: public).'),
   size: sizeSchema,
-  state: z
-    .enum(PROJECT_STATES)
-    .optional()
-    .describe('Project state filter — active, archived, or deleted (default: active).'),
+  state: z.enum(PROJECT_STATES).optional().describe('Filter by state: active, archived, or deleted (default: active).'),
   type: z
     .enum(PROJECT_TYPES)
     .optional()
-    .describe(
-      'Project type filter — private includes 1-on-1 personal projects (sorted first); public excludes them (default: public).',
-    ),
+    .describe('Filter by type: private includes 1-on-1 personal projects, public excludes them (default: public).'),
 } satisfies Record<keyof ProjectListArgs, z.ZodType>;
 
 export function registerProjectList(server: McpServer, api: DoorayApi): void {
@@ -41,7 +32,7 @@ export function registerProjectList(server: McpServer, api: DoorayApi): void {
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
       description:
-        'List projects the caller can access, paged. Use it to resolve a project name to its id before calling project-scoped tools, or to browse projects. Filter by member, scope, state, and type.',
+        'List projects the caller can access. Use it to resolve a project name to its id. Filter by member, scope, state, and type.',
       inputSchema,
       title: 'List projects',
     },

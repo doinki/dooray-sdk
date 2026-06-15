@@ -18,8 +18,7 @@ export function registerTaskClose(server: McpServer, api: DoorayApi): void {
     'task_close',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Mark a task done: sets it to the project's closed status and completes every assignee's status. Use task_set_status to move it to any other status, including reopening a closed task.",
+      description: "Mark a task done — sets it to the project's closed status and completes every assignee's status.",
       inputSchema,
       title: 'Close task',
     },

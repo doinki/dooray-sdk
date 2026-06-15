@@ -10,7 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit task template id to delete (not a name); resolve via project_template_list first.'),
+  id: z.string().describe('Task-template id from project_template_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<TemplateDeleteArgs>, z.ZodType>;
 
@@ -19,7 +19,7 @@ export function registerProjectTemplateDelete(server: McpServer, api: DoorayApi)
     'project_template_delete',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description: 'Delete a task template from a project.',
+      description: 'Delete a task template from a project. Irreversible.',
       inputSchema,
       title: 'Delete project template',
     },

@@ -18,8 +18,7 @@ export function registerTaskView(server: McpServer, api: DoorayApi): void {
     'task_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "View one task's full detail — body, assignees, status, and attached file metadata. Use after task_list to read the body and fields task_list omits.",
+      description: "View a task's full detail, including body, assignees, status, and attached file metadata.",
       inputSchema,
       title: 'View task',
     },

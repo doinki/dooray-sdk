@@ -14,27 +14,21 @@ const inputSchema = {
   embedInlineImages: z
     .boolean()
     .default(false)
-    .describe(
-      "Inline the body's image URLs as base64; affects only postCreated, postBodyChanged, postCommentCreated, postCommentUpdated (default: false).",
-    ),
+    .describe("Inline the body's image URLs as base64; affects only the post-body events (default: false)."),
   events: z
     .array(z.enum(PROJECT_HOOK_EVENTS))
     .describe(
-      `Events to subscribe to; every entry must belong to the chosen type or the API rejects the call — task: ${TASK_EVENTS.join(', ')}; project: ${PROJECT_EVENTS.join(', ')}.`,
+      `Events to subscribe to; every entry must belong to the chosen type. Task: ${TASK_EVENTS.join(', ')}. Project: ${PROJECT_EVENTS.join(', ')}.`,
     ),
   includeBody: z
     .boolean()
     .default(false)
-    .describe(
-      'Include the post/comment body in the payload; affects only postCreated, postBodyChanged, postCommentCreated, postCommentUpdated (default: false).',
-    ),
+    .describe('Include the post/comment body in the payload; affects only the post-body events (default: false).'),
   ref: projectScopeShape.ref,
   type: z
     .enum(PROJECT_HOOK_TYPES)
     .optional()
-    .describe(
-      'Event family this webhook listens on — task for task events, project for project-metadata events; gates which events are valid (default: task).',
-    ),
+    .describe('Event family: task or project; gates which events are valid (default: task).'),
   url: z.url().describe('Endpoint URL Dooray POSTs events to; a valid http(s) URL.'),
 } satisfies Record<keyof ProjectScopedArgs<HookCreateArgs>, z.ZodType>;
 
@@ -44,7 +38,7 @@ export function registerProjectHookCreate(server: McpServer, api: DoorayApi): vo
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: true, readOnlyHint: false },
       description:
-        'Register an outbound webhook on a project so Dooray POSTs the chosen events to url. type selects the event family (task — default — or project), and every entry in events must belong to that family. includeBody and embedInlineImages affect only the post-body events.',
+        'Register an outbound webhook so Dooray POSTs the chosen events to url; type selects the event family and every event must belong to it.',
       inputSchema,
       title: 'Create project webhook',
     },

@@ -21,9 +21,9 @@ export function registerProjectTagList(server: McpServer, api: DoorayApi): void 
     'project_tag_list',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description: "List a project's tags applied to tasks; grouped tags include their group's constraints.",
+      description: "List a project's tags; grouped tags include their group's constraints.",
       inputSchema,
-      title: 'List project tags',
+      title: 'List tags',
     },
     (args) =>
       runTool(async () => {

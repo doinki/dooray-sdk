@@ -12,15 +12,13 @@ import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
   class: statusClassSchema.optional(),
-  id: z.string().describe('19-digit status id to update (not a name); resolve via project_status_list first'),
+  id: z.string().describe('Status id to update; from project_status_list.'),
   localeNames: localeNamesSchema,
   name: z
     .string()
     .optional()
-    .describe(
-      'Default status name shown when no locale-specific name matches the viewer; omitting it may reset the existing name (PUT semantics)',
-    ),
-  order: z.number().int().optional().describe('Sort order within the same class (integer; lower values appear first)'),
+    .describe('Default status name, used when no localeNames entry matches the viewer; omitting may reset it.'),
+  order: z.number().int().optional().describe('Sort order within the class; lower appears first.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<StatusUpdateArgs>, z.ZodType>;
 
@@ -29,10 +27,9 @@ export function registerProjectStatusUpdate(server: McpServer, api: DoorayApi): 
     'project_status_update',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Update one task status in a project. PUT semantics — send every field you want to keep, since omitted fields may be reset by the server.',
+      description: 'Update a task status in a project; omitted fields may be reset, so send every field to keep.',
       inputSchema,
-      title: 'Update project status',
+      title: 'Update status',
     },
     (args) =>
       runTool(async () => {

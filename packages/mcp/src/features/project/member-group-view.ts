@@ -10,7 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit member group id (not a name); resolve via project_member_group_list first.'),
+  id: z.string().describe('Member-group id from project_member_group_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<ProjectMemberGroupViewArgs>, z.ZodType>;
 
@@ -19,8 +19,7 @@ export function registerProjectMemberGroupView(server: McpServer, api: DoorayApi
     'project_member_group_view',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        'View one project member group with its members — project_member_group_list returns codes only, so use this to get the member ids and names in a group.',
+      description: 'View one project member group with its member ids and names.',
       inputSchema,
       title: 'View project member group',
     },

@@ -6,33 +6,30 @@ import packageJson from '../package.json';
 import { registerMemberTools } from './features/member';
 import { registerProjectTools } from './features/project';
 import { registerTaskTools } from './features/task';
+import { registerWikiTools } from './features/wiki';
 import { createClient } from './shared/client';
 
 const instructions = [
-  'Dooray MCP: browse and manage projects, tasks, and members in the Dooray collaboration service.',
+  'Browse and manage Dooray projects, tasks, members, and wikis.',
   '',
-  "Auth: set DOORAY_TOKEN (a Dooray personal API token, required); DOORAY_BASE_URL overrides the endpoint (optional). Call member_me to confirm the token's account.",
+  'Setup: `DOORAY_TOKEN` (a personal API token) is required; `DOORAY_BASE_URL` overrides the API endpoint. Call `member_me` to confirm which account the token belongs to.',
   '',
-  'Three tool families, each sharing the same verbs — `*_list` browses/pages with filters, `*_view` reads one item in full, `*_create`/`*_update`/`*_delete` write:',
-  '- member_* — people in the tenant.',
-  '- project_* — a project and its statuses, milestones, tags, members, templates, inbound emails, and webhooks.',
-  '- task_* — tasks in a project, plus their comments and file attachments.',
+  'Tools: named `<entity>_<verb>` — shared verbs are `_list` (browse), `_view` (read one), and `_create` / `_update` / `_delete` (write).',
+  '- `member_*` — people in the tenant.',
+  '- `project_*` — projects and their statuses, milestones, tags, members, templates, inbound emails, and webhooks.',
+  '- `task_*` — tasks and their comments and attachments.',
+  '- `wiki_*` — wiki pages and their comments, attachments, and shared links.',
   '',
-  'ref: project- and task-scoped tools take a single `ref` (there is no projectId/taskId field) — a 19-digit id, a `<projectId>/<id>` pair, or a Dooray URL. On task tools `ref` is the task; on project tools it is the project (a bare id, or the owning project of a task/drive/wiki URL).',
+  "Refs: most tools take a single `ref` instead of separate id fields, and each tool's `ref` description lists the forms it accepts.",
   '',
-  "Ids, not names: every filter and reference takes a 19-digit id — resolve a name first with the matching `*_list` or member_search tool. The only exceptions are task_list's member filters `@me` (the caller) and `none` (unassigned).",
+  "Files: file tools read from and write to the server host's filesystem, not the agent's own.",
   '',
-  'Returns: `*_list` → `{data, paging}` (`page` 0-based, default 0; `size` default 50, max 100; a plain array wraps as `{data}`); `*_view` → the item; create → the new 19-digit id; other writes → the affected id.',
-  '',
-  'Writing: body fields default to Markdown; member fields take 19-digit ids or `@me`. task_update and task_comment_update replace assignees/cc/tagIds/fileIds wholesale (omit to keep them). File tools read and write LOCAL paths on the server host. create/upload tools are NOT idempotent (retrying duplicates); task_move and `*_delete` are irreversible from here.',
-  '',
-  'Errors: a failed call sets isError with `{error: {code, hint, message}}`; read `hint` and change the input before retrying — an identical retry fails identically.',
+  'Errors: a failed call sets `isError` and returns `{error: {code, hint, message}}`. Follow the `hint` to fix the input before retrying, since an identical retry fails the same way.',
 ].join('\n');
 
 const server = new McpServer(
   {
-    description:
-      'Browse, file, and update Dooray projects, tasks, and members — list and view items, create and edit tasks, manage comments and attachments.',
+    description: packageJson.description,
     name: packageJson.name,
     title: 'Dooray',
     version: packageJson.version,
@@ -45,6 +42,7 @@ const api = createClient();
 registerMemberTools(server, api);
 registerTaskTools(server, api);
 registerProjectTools(server, api);
+registerWikiTools(server, api);
 
 async function main() {
   const transport = new StdioServerTransport();

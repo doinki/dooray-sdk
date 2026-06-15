@@ -10,7 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit inbound email-address id (not a name); resolve via `project_email_create` first.'),
+  id: z.string().describe('Inbound email-address id returned by project_email_create.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<EmailViewArgs>, z.ZodType>;
 

@@ -13,13 +13,13 @@ const inputSchema = {
   endDate: z
     .string()
     .optional()
-    .describe('End date with timezone offset (e.g. `2026-08-22+09:00`); pair with startDate or omit both'),
-  name: z.string().trim().describe('Milestone name — e.g. `1단계`'),
+    .describe('End date with timezone offset (e.g. `2026-08-22+09:00`); pair with startDate or omit both.'),
+  name: z.string().trim().describe('Milestone name.'),
   ref: projectScopeShape.ref,
   startDate: z
     .string()
     .optional()
-    .describe('Start date with timezone offset (e.g. `2026-06-22+09:00`); pair with endDate or omit both'),
+    .describe('Start date with timezone offset (e.g. `2026-06-22+09:00`); pair with endDate or omit both.'),
 } satisfies Record<keyof ProjectScopedArgs<MilestoneCreateArgs>, z.ZodType>;
 
 export function registerProjectMilestoneCreate(server: McpServer, api: DoorayApi): void {
@@ -27,9 +27,9 @@ export function registerProjectMilestoneCreate(server: McpServer, api: DoorayApi
     'project_milestone_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description: 'Create an open milestone in a project. Provide startDate and endDate together or omit both.',
+      description: 'Create an open milestone in a project.',
       inputSchema,
-      title: 'Create project milestone',
+      title: 'Create milestone',
     },
     (args) =>
       runTool(async () => {

@@ -1,7 +1,7 @@
 {
   "name": "@dooray-sdk/mcp",
   "version": "0.0.0",
-  "description": "MCP server that exposes Dooray projects, tasks, and members as tools for AI agents",
+  "description": "MCP server to browse and manage Dooray projects, tasks, members, and wikis — list, view, create, update, and delete items, comments, and attachments",
   "keywords": [
     "dooray",
     "mcp",

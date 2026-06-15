@@ -10,11 +10,9 @@ const inputSchema = {
   contentType: z
     .string()
     .optional()
-    .describe(
-      'MIME type to store for the attachment (e.g. application/json). Omit to infer from the file extension (default: application/octet-stream).',
-    ),
-  draftId: z.string().describe('19-digit draft id from task_create_draft (not a task id).'),
-  filePath: z.string().describe('Absolute local path of the file to upload.'),
+    .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream).'),
+  draftId: z.string().describe('Draft id; from task_create_draft (not a task id).'),
+  filePath: z.string().describe('Absolute server path of the file to upload.'),
 } satisfies Record<keyof TaskUploadDraftFileArgs, z.ZodType>;
 
 export function registerTaskUploadDraftFile(server: McpServer, api: DoorayApi): void {
@@ -22,8 +20,7 @@ export function registerTaskUploadDraftFile(server: McpServer, api: DoorayApi): 
     'task_upload_draft_file',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Attach a local file to a draft, uploading it under draftId — the id from task_create_draft, not a task id; task attachments use task_file_upload instead.',
+      description: 'Attach a local file to a draft task; use task_file_upload for a real task.',
       inputSchema,
       title: 'Upload draft file',
     },

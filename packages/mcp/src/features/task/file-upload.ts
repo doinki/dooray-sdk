@@ -13,12 +13,10 @@ const inputSchema = {
   contentType: z
     .string()
     .optional()
-    .describe(
-      'MIME type stored for the attachment — e.g. application/json. Omit to infer from the file extension (default: application/octet-stream when unknown).',
-    ),
+    .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream).'),
   filePath: z
     .string()
-    .describe("Absolute path of the file to read and attach. The attachment keeps this file's base name."),
+    .describe("Absolute server path of the file to attach; the attachment keeps this file's base name."),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskFileUploadArgs>, z.ZodType>;
 
@@ -27,8 +25,7 @@ export function registerTaskFileUpload(server: McpServer, api: DoorayApi): void 
     'task_file_upload',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Attach a local file to a task — reads filePath from disk, infers its MIME type, and uploads it. The new file id can be passed as a fileIds value in task_comment_create.',
+      description: 'Attach a local file to a task; the returned file id can be passed as a fileIds value.',
       inputSchema,
       title: 'Upload task file',
     },

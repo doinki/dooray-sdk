@@ -10,7 +10,7 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  fileId: z.string().describe('19-digit attachment id to delete (not a file path); resolve via task_file_list first.'),
+  fileId: z.string().describe('Attachment id to delete; from task_file_list.'),
   ref: taskScopeShape.ref,
 } satisfies Record<keyof TaskScopedArgs<TaskFileDeleteArgs>, z.ZodType>;
 
@@ -19,7 +19,7 @@ export function registerTaskFileDelete(server: McpServer, api: DoorayApi): void 
     'task_file_delete',
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description: 'Permanently remove one attachment from a task.',
+      description: 'Delete an attachment from a task. Irreversible.',
       inputSchema,
       title: 'Delete task file',
     },

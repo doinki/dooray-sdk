@@ -10,7 +10,7 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z.string().describe('19-digit milestone id (not a name); resolve via project_milestone_list first'),
+  id: z.string().describe('Milestone id; from project_milestone_list.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<MilestoneDeleteArgs>, z.ZodType>;
 
@@ -20,9 +20,9 @@ export function registerProjectMilestoneDelete(server: McpServer, api: DoorayApi
     {
       annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
       description:
-        'Delete a milestone from a project. Tasks assigned to it are not deleted — they lose their milestone reference.',
+        'Delete a milestone from a project; its tasks remain but lose the milestone reference. Irreversible.',
       inputSchema,
-      title: 'Delete project milestone',
+      title: 'Delete milestone',
     },
     (args) =>
       runTool(async () => {

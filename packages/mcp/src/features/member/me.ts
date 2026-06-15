@@ -9,8 +9,7 @@ export function registerMemberMe(server: McpServer, api: DoorayApi): void {
     'member_me',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: true },
-      description:
-        "View the authenticated caller's profile — the member `@me` resolves to in other tools; takes no arguments. To look up any other member, use member_search or member_view.",
+      description: "View the authenticated caller's own profile (the member `@me` resolves to).",
       title: 'View current member',
     },
     () => runTool(() => runMemberMe({ api }).then((r) => r.data)),

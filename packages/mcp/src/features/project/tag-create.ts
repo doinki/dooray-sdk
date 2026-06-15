@@ -14,7 +14,7 @@ const inputSchema = {
   name: z
     .string()
     .describe(
-      'Tag name. Use `<group>:<tag>` (e.g. `Priority:High`) to nest it in a tag group, creating the group if absent.',
+      'Tag name; use `<group>:<tag>` (e.g. `Priority:High`) to nest it in a group, creating the group if absent.',
     ),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<TagCreateArgs>, z.ZodType>;
@@ -24,10 +24,9 @@ export function registerProjectTagCreate(server: McpServer, api: DoorayApi): voi
     'project_tag_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Create a tag for labeling tasks in a project. Set name to `<group>:<tag>` to nest the tag in a tag group, creating the group if absent.',
+      description: 'Create a tag for labeling tasks in a project.',
       inputSchema,
-      title: 'Create project tag',
+      title: 'Create tag',
     },
     (args) =>
       runTool(async () => {

@@ -10,21 +10,17 @@ import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  includeSubTasks: z
-    .boolean()
-    .optional()
-    .describe("Move the task's subtasks along with it (default: true) — set false to move only this task."),
+  includeSubTasks: z.boolean().optional().describe("Move the task's subtasks along with it (default: true)."),
   ref: taskScopeShape.ref,
-  targetProjectId: z.string().describe('19-digit destination project id (not a name); resolve via project_list first.'),
+  targetProjectId: z.string().describe('Destination project id; from project_list.'),
 } satisfies Record<keyof TaskScopedArgs<TaskMoveArgs>, z.ZodType>;
 
 export function registerTaskMove(server: McpServer, api: DoorayApi): void {
   server.registerTool(
     'task_move',
     {
-      annotations: { destructiveHint: true, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Move a task to another project. Subtasks move with it by default. The move clears the task's status and tags.",
+      annotations: { destructiveHint: true, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
+      description: "Move a task to another project; clears the task's status and tags. Irreversible.",
       inputSchema,
       title: 'Move task',
     },

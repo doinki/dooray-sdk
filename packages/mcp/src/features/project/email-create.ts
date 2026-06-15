@@ -13,9 +13,9 @@ const inputSchema = {
   email: z
     .email('Enter a valid email address.')
     .describe(
-      'Inbound address to register — e.g. `support@acme.dooray.com`. Domain must be the tenant mail domain (`<sub>.dooray.com` or a registered custom domain); local part must be unused tenant-wide.',
+      'Address to register (e.g. `support@acme.dooray.com`). Domain must be the tenant mail domain; local part must be unused tenant-wide.',
     ),
-  name: z.string().describe('Display name shown alongside the address in mail clients.'),
+  name: z.string().describe('Display name shown alongside the address.'),
   ref: projectScopeShape.ref,
 } satisfies Record<keyof ProjectScopedArgs<EmailCreateArgs>, z.ZodType>;
 
@@ -24,8 +24,7 @@ export function registerProjectEmailCreate(server: McpServer, api: DoorayApi): v
     'project_email_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description:
-        'Register an inbound email address for a project so mail sent to it files a new task — use to set up email-to-task intake. The local part must be unused tenant-wide and the domain must match the tenant mail domain.',
+      description: 'Register an inbound email address for a project so mail sent to it files a new task.',
       inputSchema,
       title: 'Create project inbound email',
     },

@@ -11,13 +11,9 @@ import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  id: z
-    .string()
-    .describe(
-      "A 19-digit member id (not a name/email); resolve via member_search. Must already belong to the project's organization.",
-    ),
+  id: z.string().describe("Member id from member_search; must already be in the project's organization."),
   ref: projectScopeShape.ref,
-  role: z.enum(ASSIGNABLE_ROLES).describe('Role to grant — admin manages the project, member participates only.'),
+  role: z.enum(ASSIGNABLE_ROLES).describe('Role to grant: admin (manages the project) or member (participates only).'),
 } satisfies Record<keyof ProjectScopedArgs<ProjectMemberAddArgs>, z.ZodType>;
 
 export function registerProjectMemberAdd(server: McpServer, api: DoorayApi): void {
@@ -26,7 +22,7 @@ export function registerProjectMemberAdd(server: McpServer, api: DoorayApi): voi
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
       description:
-        'Add an organization member to a project with a role. Fails if the member is already on the project. The response member id comes back null, so confirm the add via project_member_list.',
+        'Add an organization member to a project with a role. The returned id is null, so confirm with project_member_list.',
       inputSchema,
       title: 'Add project member',
     },
