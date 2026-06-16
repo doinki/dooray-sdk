@@ -1,6 +1,6 @@
 {
   "name": "@dooray-sdk/client",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Typed TypeScript client for the Dooray REST API, runs in browsers and Node.js",
   "keywords": [
     "client",
