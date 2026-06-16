@@ -13,7 +13,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Fetch Dooray API doc pages
         id: fetch
@@ -245,16 +245,16 @@ jobs:
             echo "**합계**: changed=${#changed_slugs[@]}, unchanged=${#unchanged_slugs[@]}, skipped=${#skipped_slugs[@]}"
           } >> "$GITHUB_STEP_SUMMARY"
 
-          # PR 본문 (any_changed=true 일 때만 사용됨)
+          # PR body (only used when any_changed=true)
           PR_BODY_FILE=$(mktemp)
           {
-            echo "## 📘 업스트림 변경 감지"
+            echo "## 📘 Upstream changes detected"
             echo
-            echo "Dooray 문서 페이지에 변경이 감지되어 자동으로 동기화한 PR 입니다."
+            echo "This PR automatically syncs Dooray documentation pages after detecting upstream changes."
             echo
-            echo "### 변경된 페이지"
+            echo "### Changed pages"
             echo
-            echo "| slug | subject | breadcrumb | pageId | 업스트림 갱신일 | 본문 글자 수 | 출력 파일 크기 | 변경 요약 |"
+            echo "| slug | subject | breadcrumb | pageId | upstream updated at | body chars | output file size | diff summary |"
             echo "| --- | --- | --- | --- | --- | --- | --- | --- |"
             while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
               if [ "$status" = "ok-changed" ]; then
@@ -264,16 +264,16 @@ jobs:
 
             if [ "${#unchanged_slugs[@]}" -gt 0 ]; then
               echo
-              echo "### 변경 없음"
+              echo "### Unchanged"
               echo
               echo "$unchanged_csv"
             fi
 
             if [ "${#skipped_slugs[@]}" -gt 0 ]; then
               echo
-              echo "### ⚠️ 스킵된 페이지"
+              echo "### ⚠️ Skipped pages"
               echo
-              echo "| slug | 사유 |"
+              echo "| slug | reason |"
               echo "| --- | --- |"
               while IFS=$'\t' read -r slug pid outf status subject breadcrumb updated_at body_chars out_size diff_summary reason; do
                 if [ "$status" = "skipped" ]; then
@@ -283,24 +283,13 @@ jobs:
             fi
 
             echo
-            echo "## ✅ 리뷰 체크리스트"
-            echo
-            echo "- [ ] 변경된 내용이 업스트림 페이지와 일치하는지 확인했습니다."
-            echo "- [ ] 본문에서 코드 블록 / 링크 / 이미지가 깨지지 않았는지 확인했습니다."
-            echo "- [ ] front matter (\`subject\`, \`dooray_updated_at\` 등) 메타데이터가 올바른지 확인했습니다."
-            echo
-            echo "---"
-            echo
-            echo "이 PR 은 cron 으로 자동 생성되며, 같은 페이지에 또 변경이 있으면 force-push 로 갱신됩니다."
-            echo "변경이 의도된 것이라면 그대로 merge 하세요."
-            echo
-            echo "**워크플로우 실행 로그**: [run #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo "**Workflow run log**: [run #${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           } > "$PR_BODY_FILE"
 
-          # Commit 메시지 (변경된 slug 들을 본문에 나열)
+          # Commit message (lists the changed slugs in the body)
           COMMIT_MSG_FILE=$(mktemp)
           {
-            echo "chore(docs): sync Dooray API docs (${changed_csv})"
+            echo "chore(docs): Sync Dooray API docs (${changed_csv})"
             echo
             echo "changed   : ${changed_csv}"
             if [ -n "$unchanged_csv" ]; then echo "unchanged : ${unchanged_csv}"; fi
@@ -339,12 +328,12 @@ jobs:
 
       - name: Create or update PR
         if: steps.fetch.outputs.any_changed == 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: bot/dooray-api-docs
           base: main
           commit-message: ${{ steps.fetch.outputs.commit_message }}
-          title: 'chore(docs): Dooray API 문서 동기화 — ${{ steps.fetch.outputs.changed_slugs }}'
+          title: 'chore(docs): Sync Dooray API docs'
           body: ${{ steps.fetch.outputs.pr_body }}
           assignees: doinki
           delete-branch: true
