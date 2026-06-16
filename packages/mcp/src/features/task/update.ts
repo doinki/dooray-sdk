@@ -42,10 +42,9 @@ const inputSchema = {
   title: z.string().optional().describe('New title. Omit to keep current.'),
   version: z
     .number()
-    .nullable()
     .optional()
     .describe(
-      'Optimistic-lock version (default: null — applies to the latest revision). Pass a known version to fail on a concurrent edit.',
+      'Optimistic-lock version. Omit to apply to the latest revision. Pass a known version to fail on a concurrent edit.',
     ),
 } satisfies Record<keyof TaskScopedArgs<TaskUpdateArgs>, z.ZodType>;
 

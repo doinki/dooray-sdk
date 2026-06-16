@@ -80,7 +80,8 @@ export class DoorayClient {
     if (requestInit.redirect === 'manual')
       ({ request, response } = await this.#followManualRedirects({ request, requestInit, response }));
 
-    if (!response.ok) throw await this.#notifyAndCreateError(request, response, makeHttpErrorRestResponse(response));
+    if (!response.ok)
+      throw await this.#notifyAndCreateError(request, response, await resolveErrorRestResponse(response));
 
     return { request, response };
   }
@@ -188,4 +189,15 @@ export class DoorayClient {
 
 function isRedirectStatus(status: number): boolean {
   return status === HTTP_STATUS_TEMPORARY_REDIRECT || status === HTTP_STATUS_PERMANENT_REDIRECT;
+}
+
+async function resolveErrorRestResponse(response: Response): Promise<RestResponse> {
+  if (response.headers.get(CONTENT_TYPE_HEADER)?.includes(JSON_MIME_TYPE)) {
+    try {
+      const data = await response.clone().json();
+      if (isRestResponse(data)) return data;
+    } catch {}
+  }
+
+  return makeHttpErrorRestResponse(response);
 }

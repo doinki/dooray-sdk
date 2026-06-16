@@ -18,7 +18,7 @@ export interface TaskUpdateArgs {
   projectId?: string;
   tagIds?: string[];
   title?: string;
-  version?: null | number;
+  version?: number;
 }
 
 interface TaskUpdateContext {
@@ -54,7 +54,7 @@ async function buildUpdateBody(api: DoorayApi, args: TaskUpdateArgs, task: Task)
     subject: args.title ?? task.subject,
     tagIds: args.tagIds ?? task.tags.map((tag) => tag.id),
     users: { cc, to },
-    version: args.version ?? null,
+    version: args.version,
   };
 }
 
