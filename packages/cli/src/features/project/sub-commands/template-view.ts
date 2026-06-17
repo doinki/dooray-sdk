@@ -6,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { formatUser } from '../../../shared/formatter/user';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const templateViewArgsSchema = z.object({
   expand: z
@@ -15,22 +16,11 @@ export const templateViewArgsSchema = z.object({
       'When true, expand template macros (e.g. `$' +
         '{year}`) in the response. When false/omitted, return them literally',
     ),
-  id: z.string().min(1).describe('Template id'),
+  id: z.string().min(1).meta({ hint: 'templateId', positional: true }).describe('Template id'),
 });
 
 export default defineSubcommand({
-  args: {
-    expand: {
-      description: templateViewArgsSchema.shape.expand.description,
-      type: 'boolean',
-    },
-    id: {
-      description: templateViewArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'templateId',
-    },
-  },
+  args: argsFromSchema(templateViewArgsSchema),
   meta: {
     // oxlint-disable-next-line no-template-curly-in-string
     description: "Show a task template's full content; expand substitutes ${...} macros",

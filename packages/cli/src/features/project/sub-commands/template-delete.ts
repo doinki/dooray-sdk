@@ -5,26 +5,17 @@ import { z } from 'zod';
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { confirmField } from '../../../shared/schema/fields';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const templateDeleteArgsSchema = z.object({
-  id: z.string().min(1).describe('Template id to delete'),
-  yes: z.boolean().default(false).describe('Skip the confirmation prompt'),
+  id: z.string().min(1).meta({ hint: 'templateId', positional: true }).describe('Template id to delete'),
+  yes: confirmField,
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: templateDeleteArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'templateId',
-    },
-    yes: {
-      description: templateDeleteArgsSchema.shape.yes.description,
-      type: 'boolean',
-    },
-  },
+  args: argsFromSchema(templateDeleteArgsSchema),
   meta: { description: 'Delete a task template from the project (irreversible)', name: 'template-delete' },
   async run({ api, args, formatter }) {
     const { id, yes } = parseArgsOrThrow(templateDeleteArgsSchema, args);

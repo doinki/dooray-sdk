@@ -8,6 +8,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
 import { formatUser } from '../../../shared/formatter/user';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const templateListArgsSchema = z.object({
   page: pageSchema,
@@ -15,10 +16,7 @@ export const templateListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    page: { description: templateListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    size: { description: templateListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-  },
+  args: argsFromSchema(templateListArgsSchema),
   meta: {
     description: 'List task templates (body/guide omitted; use template-view)',
     name: 'template-list',

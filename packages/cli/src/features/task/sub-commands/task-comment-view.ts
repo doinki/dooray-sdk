@@ -2,44 +2,25 @@ import { runTaskCommentView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { formatDateTime } from '../../../shared/formatter/text';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
 
-export const taskCommentViewArgsSchema = z
-  .object({
-    commentId: z.string().min(1).describe('Comment id to view (from `dooray task comment-list`)'),
-    id: z
+export const taskCommentViewArgsSchema = requireTaskRef(
+  z.object({
+    ...taskRefShape,
+    commentId: z
       .string()
-      .optional()
-      .describe('Task ID (19-digit). Looked up across all accessible projects when given alone.'),
-    ref: z
-      .string()
-      .optional()
-      .describe('Task to target instead of <taskId>: a 19-digit task ID, `<projectId>/<id>`, or a Dooray task URL.'),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the task: pass <taskId> or --ref (task ID, `<projectId>/<id>`, or a Dooray task URL).',
-    path: ['id'],
-  });
+      .min(1)
+      .meta({ hint: 'commentId' })
+      .describe('Comment id to view (from `dooray task comment-list`)'),
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    'comment-id': {
-      description: taskCommentViewArgsSchema.shape.commentId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'commentId',
-    },
-    id: {
-      description: taskCommentViewArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'taskId',
-    },
-    ref: { ...globalArgs.ref, description: taskCommentViewArgsSchema.shape.ref.description, required: false },
-  },
+  args: argsFromSchema(taskCommentViewArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a task comment's full detail", name: 'comment-view' },
   async run({ api, args, formatter }) {

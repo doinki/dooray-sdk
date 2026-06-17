@@ -4,45 +4,25 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
+import { parseArgsOrThrow, scopeRef } from '../../../shared/schema/parse-args';
 
-export const wikiDeleteArgsSchema = z
-  .object({
-    id: z
-      .string()
-      .optional()
-      .describe('Wiki page ID to delete (19-digit). Looked up across all accessible wikis when given alone.'),
-    ref: z
-      .string()
-      .optional()
-      .describe(
-        'Wiki page to delete instead of <pageId>: a 19-digit page ID, `<projectId>/<id>`, or a Dooray wiki URL.',
-      ),
-    yes: z.boolean().default(false).describe('Skip the confirmation prompt'),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the wiki page: pass <pageId> or --ref (page ID, `<projectId>/<id>`, or a Dooray wiki URL).',
-    path: ['id'],
-  });
+export const wikiDeleteArgsSchema = requireWikiRef(
+  z.object({
+    ...wikiRefShape,
+    yes: confirmField,
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: wikiDeleteArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'pageId',
-    },
-    ref: { ...globalArgs.ref, description: wikiDeleteArgsSchema.shape.ref.description, required: false },
-    yes: { description: wikiDeleteArgsSchema.shape.yes.description, type: 'boolean' },
-  },
+  args: argsFromSchema(wikiDeleteArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete a wiki page along with its child pages and attachments (irreversible)', name: 'delete' },
   async run({ api, args, formatter }) {
     const { yes } = parseArgsOrThrow(wikiDeleteArgsSchema, args);
-    const { id, projectId } = resolveWikiId({ id: args.id, ref: args.ref });
+    const { id, projectId } = resolveWikiId(scopeRef(args));
 
     await confirmDeletion({
       json: args.json,

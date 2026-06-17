@@ -4,9 +4,14 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const tagGroupUpdateArgsSchema = z.object({
-  id: z.string().min(1).describe('Tag group id (the `tagGroup.id` shown in `tag-list`)'),
+  id: z
+    .string()
+    .min(1)
+    .meta({ hint: 'tagGroupId', positional: true })
+    .describe('Tag group id (the `tagGroup.id` shown in `tag-list`)'),
   required: z.boolean().optional().describe('required = a tag from this group is mandatory on task creation'),
   singleSelect: z
     .boolean()
@@ -15,22 +20,7 @@ export const tagGroupUpdateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: tagGroupUpdateArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'tagGroupId',
-    },
-    required: {
-      description: tagGroupUpdateArgsSchema.shape.required.description,
-      type: 'boolean',
-    },
-    'single-select': {
-      description: tagGroupUpdateArgsSchema.shape.singleSelect.description,
-      type: 'boolean',
-    },
-  },
+  args: argsFromSchema(tagGroupUpdateArgsSchema),
   meta: {
     description: "Update a tag group's constraints (required / single-select)",
     name: 'tag-group-update',

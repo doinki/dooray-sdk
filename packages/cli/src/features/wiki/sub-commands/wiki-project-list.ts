@@ -5,20 +5,18 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { allField } from '../../../shared/schema/fields';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const wikiProjectListArgsSchema = z.object({
-  all: z.boolean().optional().describe('Fetch every page of wikis (overrides --page/--size)'),
+  all: allField,
   page: pageSchema,
   size: sizeSchema,
 });
 
 export default defineSubcommand({
-  args: {
-    all: { description: wikiProjectListArgsSchema.shape.all.description, type: 'boolean' },
-    page: { description: wikiProjectListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    size: { description: wikiProjectListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-  },
+  args: argsFromSchema(wikiProjectListArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'List the wikis you can access (each is tied to a project)', name: 'project-list' },
   async run({ api, args, formatter }) {

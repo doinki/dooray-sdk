@@ -8,6 +8,7 @@ import { createOutputFormatter } from '../formatter/output-formatter';
 import type { ProfileRecord, ProfileStore } from '../profile/profile-store';
 import { createDefaultProfileStore } from '../profile/profile-store';
 import { resolveProfile } from '../profile/resolve-profile';
+import { splitCsv } from '../schema/csv';
 import { globalArgs } from './global-args';
 import { createVerboseClientOptions } from './verbose';
 
@@ -50,8 +51,13 @@ export function defineSubcommand<
 >(def: DefineSubcommandOptions<T, G>) {
   const { args, globalArgs = DEFAULT_GLOBAL_ARG_NAMES, meta } = def;
 
+  // `--jq`/`--fields` shape the JSON output, so they ride along wherever `--json` is offered.
+  const globalNames: readonly GlobalArgName[] = globalArgs.includes('json')
+    ? [...globalArgs, 'fields', 'jq']
+    : globalArgs;
+
   const mergedArgs = orderArgs({
-    ...pickGlobalArgs(globalArgs),
+    ...pickGlobalArgs(globalNames),
     ...args,
   });
 
@@ -59,7 +65,11 @@ export function defineSubcommand<
     args: mergedArgs as SubcommandArgs<T, G>,
     meta,
     async run(ctx) {
-      const formatter = createOutputFormatter({ json: !!ctx.args.json });
+      const formatter = createOutputFormatter({
+        fields: typeof ctx.args.fields === 'string' && ctx.args.fields ? splitCsv(ctx.args.fields) : undefined,
+        jq: typeof ctx.args.jq === 'string' && ctx.args.jq ? ctx.args.jq : undefined,
+        json: !!ctx.args.json,
+      });
       try {
         const profileStore = createDefaultProfileStore();
 

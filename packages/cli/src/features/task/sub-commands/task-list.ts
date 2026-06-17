@@ -10,32 +10,30 @@ import { renderList } from '../../../shared/formatter/table';
 import { formatDate, truncate } from '../../../shared/formatter/text';
 import { formatUser } from '../../../shared/formatter/user';
 import { splitCsv } from '../../../shared/schema/csv';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { csvField } from '../../../shared/schema/fields';
 
 export const taskListArgsSchema = z.object({
-  assignee: z
-    .string()
-    .transform(splitCsv)
-    .optional()
-    .describe(
-      'Filter by assignee (comma-separated — `@me`, member ids, or `none` for unassigned; `none` overrides any ids)',
-    ),
-  author: z
-    .string()
-    .transform(splitCsv)
-    .optional()
-    .describe('Filter by author (comma-separated — `@me` or a member id)'),
+  assignee: csvField(
+    'Filter by assignee (comma-separated — `@me`, member ids, or `none` for unassigned; `none` overrides any ids)',
+    'user[,user...]',
+  ),
+  author: csvField('Filter by author (comma-separated — `@me` or a member id)', 'user[,user...]'),
   authorEmail: z
     .string()
     .optional()
+    .meta({ hint: 'email' })
     .describe('Filter by the email address that created the task (for tasks created via email)'),
-  cc: z.string().transform(splitCsv).optional().describe('Filter by CC (comma-separated — `@me` or a member id)'),
+  cc: csvField('Filter by CC (comma-separated — `@me` or a member id)', 'user[,user...]'),
   created: datePatternSchema
     .optional()
+    .meta({ hint: 'pattern' })
     .describe('Filter by creation date — today, thisweek, prev-Nd, next-Nd, or <startISO>~<endISO>'),
   due: datePatternSchema
     .optional()
+    .meta({ hint: 'pattern' })
     .describe('Filter by due date — today, thisweek, prev-Nd, next-Nd, or <startISO>~<endISO>'),
-  milestone: z.string().transform(splitCsv).optional().describe('Filter by milestone id (comma-separated)'),
+  milestone: csvField('Filter by milestone id (comma-separated)', 'id[,id...]'),
   number: z.coerce
     .number()
     .int()
@@ -43,71 +41,27 @@ export const taskListArgsSchema = z.object({
     .optional()
     .describe('Filter by task number — the numeric part of the task key (e.g. 123 for ABC-123)'),
   page: pageSchema,
-  parent: z.string().optional().describe('Filter by parent task id'),
-  search: z
-    .string()
-    .transform(splitCsv)
-    .optional()
-    .describe('Filter by exact task title (subject); comma-separated; not body text'),
+  parent: z.string().optional().meta({ hint: 'id' }).describe('Filter by parent task id'),
+  search: csvField('Filter by exact task title (subject); comma-separated; not body text', 'title[,title...]'),
   size: sizeSchema,
   sort: z.enum(SORT_OPTIONS).optional().describe('Sort by due, updated, or created date (prefix with `-` to reverse)'),
-  status: z
-    .string()
-    .transform(splitCsv)
-    .optional()
-    .describe('Filter by status id (not name); comma-separated; ids from project status list'),
+  status: csvField('Filter by status id (not name); comma-separated; ids from project status list', 'id[,id...]'),
   statusClass: z
     .string()
     .transform(splitCsv)
     .pipe(z.array(z.enum(STATUS_CLASSES)))
     .optional()
+    .meta({ hint: 'class[,class...]' })
     .describe('Filter by status class (comma-separated — backlog, registered, working, closed)'),
-  tagIds: z.string().transform(splitCsv).optional().describe('Filter by tag id (comma-separated)'),
+  tagIds: csvField('Filter by tag id (comma-separated)', 'id[,id...]'),
   updated: datePatternSchema
     .optional()
+    .meta({ hint: 'pattern' })
     .describe('Filter by last-updated date — today, thisweek, prev-Nd, next-Nd, or <startISO>~<endISO>'),
 });
 
 export default defineSubcommand({
-  args: {
-    assignee: {
-      description: taskListArgsSchema.shape.assignee.description,
-      type: 'string',
-      valueHint: 'user[,user...]',
-    },
-    author: { description: taskListArgsSchema.shape.author.description, type: 'string', valueHint: 'user[,user...]' },
-    'author-email': {
-      description: taskListArgsSchema.shape.authorEmail.description,
-      type: 'string',
-      valueHint: 'email',
-    },
-    cc: { description: taskListArgsSchema.shape.cc.description, type: 'string', valueHint: 'user[,user...]' },
-    created: { description: taskListArgsSchema.shape.created.description, type: 'string', valueHint: 'pattern' },
-    due: { description: taskListArgsSchema.shape.due.description, type: 'string', valueHint: 'pattern' },
-    milestone: {
-      description: taskListArgsSchema.shape.milestone.description,
-      type: 'string',
-      valueHint: 'id[,id...]',
-    },
-    number: { description: taskListArgsSchema.shape.number.description, type: 'string', valueHint: 'n' },
-    page: { description: taskListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    parent: { description: taskListArgsSchema.shape.parent.description, type: 'string', valueHint: 'id' },
-    search: {
-      description: taskListArgsSchema.shape.search.description,
-      type: 'string',
-      valueHint: 'title[,title...]',
-    },
-    size: { description: taskListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-    sort: { description: taskListArgsSchema.shape.sort.description, options: [...SORT_OPTIONS], type: 'enum' },
-    status: { description: taskListArgsSchema.shape.status.description, type: 'string', valueHint: 'id[,id...]' },
-    'status-class': {
-      description: taskListArgsSchema.shape.statusClass.description,
-      type: 'string',
-      valueHint: 'class[,class...]',
-    },
-    'tag-ids': { description: taskListArgsSchema.shape.tagIds.description, type: 'string', valueHint: 'id[,id...]' },
-    updated: { description: taskListArgsSchema.shape.updated.description, type: 'string', valueHint: 'pattern' },
-  },
+  args: argsFromSchema(taskListArgsSchema),
   meta: {
     description: 'List tasks in a project with filters, sorting, and pagination',
     name: 'list',

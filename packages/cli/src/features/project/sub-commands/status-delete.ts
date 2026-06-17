@@ -5,33 +5,22 @@ import { z } from 'zod';
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { confirmField } from '../../../shared/schema/fields';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const statusDeleteArgsSchema = z.object({
-  id: z.string().min(1).describe('Status id to delete'),
-  moveTo: z.string().min(1).describe('Required — id of the status that orphaned tasks are moved to'),
-  yes: z.boolean().default(false).describe('Skip the confirmation prompt'),
+  id: z.string().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to delete'),
+  moveTo: z
+    .string()
+    .min(1)
+    .meta({ hint: 'id' })
+    .describe('Required — id of the status that orphaned tasks are moved to'),
+  yes: confirmField,
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: statusDeleteArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'statusId',
-    },
-    'move-to': {
-      description: statusDeleteArgsSchema.shape.moveTo.description,
-      required: true,
-      type: 'string',
-      valueHint: 'id',
-    },
-    yes: {
-      description: statusDeleteArgsSchema.shape.yes.description,
-      type: 'boolean',
-    },
-  },
+  args: argsFromSchema(statusDeleteArgsSchema),
   meta: {
     description: 'Delete a status; its tasks move to `--move-to` (irreversible)',
     name: 'status-delete',

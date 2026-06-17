@@ -6,12 +6,14 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const projectListArgsSchema = z.object({
   member: z
     .string()
     .default('me')
+    .meta({ hint: 'member' })
     .describe('Filter to projects this member belongs to. Use `me` for the calling user (default: `me`)'),
   page: pageSchema,
   scope: z
@@ -31,30 +33,7 @@ export const projectListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    member: {
-      description: projectListArgsSchema.shape.member.description,
-      type: 'string',
-      valueHint: 'member',
-    },
-    page: { description: projectListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    scope: {
-      description: projectListArgsSchema.shape.scope.description,
-      options: [...PROJECT_SCOPES],
-      type: 'enum',
-    },
-    size: { description: projectListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-    state: {
-      description: projectListArgsSchema.shape.state.description,
-      options: [...PROJECT_STATES],
-      type: 'enum',
-    },
-    type: {
-      description: projectListArgsSchema.shape.type.description,
-      options: [...PROJECT_TYPES],
-      type: 'enum',
-    },
-  },
+  args: argsFromSchema(projectListArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'List projects accessible to the caller, with filters and pagination', name: 'list' },
   async run({ api, args, formatter }) {

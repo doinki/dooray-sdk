@@ -2,46 +2,25 @@ import { runWikiCommentView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { formatDateTime } from '../../../shared/formatter/text';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
 
-export const wikiCommentViewArgsSchema = z
-  .object({
-    commentId: z.string().min(1).describe('Comment id to view (from `dooray wiki comment-list`)'),
-    id: z
+export const wikiCommentViewArgsSchema = requireWikiRef(
+  z.object({
+    ...wikiRefShape,
+    commentId: z
       .string()
-      .optional()
-      .describe('Wiki page ID (19-digit). Looked up across all accessible wikis when given alone.'),
-    ref: z
-      .string()
-      .optional()
-      .describe(
-        'Wiki page to target instead of <pageId>: a 19-digit page ID, `<projectId>/<id>`, or a Dooray wiki URL.',
-      ),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the wiki page: pass <pageId> or --ref (page ID, `<projectId>/<id>`, or a Dooray wiki URL).',
-    path: ['id'],
-  });
+      .min(1)
+      .meta({ hint: 'commentId' })
+      .describe('Comment id to view (from `dooray wiki comment-list`)'),
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    'comment-id': {
-      description: wikiCommentViewArgsSchema.shape.commentId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'commentId',
-    },
-    id: {
-      description: wikiCommentViewArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'pageId',
-    },
-    ref: { ...globalArgs.ref, description: wikiCommentViewArgsSchema.shape.ref.description, required: false },
-  },
+  args: argsFromSchema(wikiCommentViewArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a wiki comment's full body and metadata", name: 'comment-view' },
   async run({ api, args, formatter }) {

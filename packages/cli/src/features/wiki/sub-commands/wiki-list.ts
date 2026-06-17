@@ -5,19 +5,19 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderList } from '../../../shared/formatter/table';
 import { truncate } from '../../../shared/formatter/text';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const wikiListArgsSchema = z.object({
-  parentId: z.string().trim().optional().describe('Parent page id (from `dooray wiki list`); omit for the top level'),
+  parentId: z
+    .string()
+    .trim()
+    .optional()
+    .meta({ hint: 'pageId' })
+    .describe('Parent page id (from `dooray wiki list`); omit for the top level'),
 });
 
 export default defineSubcommand({
-  args: {
-    'parent-id': {
-      description: wikiListArgsSchema.shape.parentId.description,
-      type: 'string',
-      valueHint: 'pageId',
-    },
-  },
+  args: argsFromSchema(wikiListArgsSchema),
   meta: {
     description: "List a wiki's pages one level deep (pass --parent-id for a page's children)",
     name: 'list',

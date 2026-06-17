@@ -6,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { splitCsv } from '../../../shared/schema/csv';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const hookCreateArgsSchema = z.object({
   embedInlineImages: z
@@ -18,6 +19,7 @@ export const hookCreateArgsSchema = z.object({
     .string()
     .transform(splitCsv)
     .pipe(z.array(z.enum(PROJECT_HOOK_EVENTS)).min(1))
+    .meta({ hint: 'event[,event...]' })
     .describe(
       `Comma-separated hook events. Allowed values depend on --type — task: ${TASK_EVENTS.join(', ')}; project: ${PROJECT_EVENTS.join(', ')}`,
     ),
@@ -31,37 +33,11 @@ export const hookCreateArgsSchema = z.object({
     .enum(PROJECT_HOOK_TYPES)
     .optional()
     .describe('Hook type — task triggers on tasks, project triggers on project metadata (default: task)'),
-  url: z.url().describe('Webhook endpoint URL that will receive the events'),
+  url: z.url().meta({ hint: 'url' }).describe('Webhook endpoint URL that will receive the events'),
 });
 
 export default defineSubcommand({
-  args: {
-    'embed-inline-images': {
-      description: hookCreateArgsSchema.shape.embedInlineImages.description,
-      type: 'boolean',
-    },
-    events: {
-      description: hookCreateArgsSchema.shape.events.description,
-      required: true,
-      type: 'string',
-      valueHint: 'event[,event...]',
-    },
-    'include-body': {
-      description: hookCreateArgsSchema.shape.includeBody.description,
-      type: 'boolean',
-    },
-    type: {
-      description: hookCreateArgsSchema.shape.type.description,
-      options: [...PROJECT_HOOK_TYPES],
-      type: 'enum',
-    },
-    url: {
-      description: hookCreateArgsSchema.shape.url.description,
-      required: true,
-      type: 'string',
-      valueHint: 'url',
-    },
-  },
+  args: argsFromSchema(hookCreateArgsSchema),
   meta: {
     description: 'Create an outbound webhook (one URL, multiple events; events depend on --type)',
     name: 'hook-create',

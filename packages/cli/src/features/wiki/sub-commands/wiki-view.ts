@@ -2,37 +2,20 @@ import { runWikiView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { formatDateTime } from '../../../shared/formatter/text';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
 
-export const wikiViewArgsSchema = z
-  .object({
-    id: z
-      .string()
-      .optional()
-      .describe('Wiki page ID to view (19-digit). Looked up across all accessible wikis when given alone.'),
-    ref: z
-      .string()
-      .optional()
-      .describe('Wiki page to view instead of <pageId>: a 19-digit page ID, `<projectId>/<id>`, or a Dooray wiki URL.'),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the wiki page: pass <pageId> or --ref (page ID, `<projectId>/<id>`, or a Dooray wiki URL).',
-    path: ['id'],
-  });
+export const wikiViewArgsSchema = requireWikiRef(
+  z.object({
+    ...wikiRefShape,
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: wikiViewArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'pageId',
-    },
-    ref: { ...globalArgs.ref, description: wikiViewArgsSchema.shape.ref.description, required: false },
-  },
+  args: argsFromSchema(wikiViewArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a wiki page's full detail, including body and attached file metadata", name: 'view' },
   async run({ api, args, formatter }) {

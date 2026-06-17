@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const projectCreateArgsSchema = z.object({
@@ -11,40 +12,22 @@ export const projectCreateArgsSchema = z.object({
     .string()
     .trim()
     .optional()
+    .meta({ hint: 'categoryId' })
     .describe('Project category id (managed under admin > tenant > project categories)'),
-  description: z.string().trim().optional().describe('Project description'),
-  name: z.string().trim().min(1).describe('Display name and API project code (tenant-unique; restricted charset)'),
+  description: z.string().trim().optional().meta({ alias: 'd', hint: 'text' }).describe('Project description'),
+  name: z
+    .string()
+    .trim()
+    .min(1)
+    .meta({ hint: 'text' })
+    .describe('Display name and API project code (tenant-unique; restricted charset)'),
   scope: z
     .enum(PROJECT_SCOPES)
     .describe('private: only project members can access; public: any non-guest member of the organization can access'),
 });
 
 export default defineSubcommand({
-  args: {
-    'category-id': {
-      description: projectCreateArgsSchema.shape.categoryId.description,
-      type: 'string',
-      valueHint: 'categoryId',
-    },
-    description: {
-      alias: 'd',
-      description: projectCreateArgsSchema.shape.description.description,
-      type: 'string',
-      valueHint: 'text',
-    },
-    name: {
-      description: projectCreateArgsSchema.shape.name.description,
-      required: true,
-      type: 'string',
-      valueHint: 'text',
-    },
-    scope: {
-      description: projectCreateArgsSchema.shape.scope.description,
-      options: [...PROJECT_SCOPES],
-      required: true,
-      type: 'enum',
-    },
-  },
+  args: argsFromSchema(projectCreateArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Create a new project in the caller's organization (name = API project code)",

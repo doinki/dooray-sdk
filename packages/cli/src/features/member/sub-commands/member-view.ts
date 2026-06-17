@@ -3,21 +3,15 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const memberViewArgsSchema = z.object({
-  id: z.string().min(1).describe('Dooray member id'),
+  id: z.string().min(1).meta({ hint: 'memberId', positional: true }).describe('Dooray member id'),
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: memberViewArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'memberId',
-    },
-  },
+  args: argsFromSchema(memberViewArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Show a tenant member by id', name: 'view' },
   async run({ api, args, formatter }) {

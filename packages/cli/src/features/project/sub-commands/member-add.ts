@@ -5,11 +5,13 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const memberAddArgsSchema = z.object({
   id: z
     .string()
     .min(1)
+    .meta({ hint: 'memberId', positional: true })
     .describe(
       'Organization member id to add (look up via `dooray member search`). Must already belong to the project’s organization',
     ),
@@ -17,20 +19,7 @@ export const memberAddArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: memberAddArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'memberId',
-    },
-    role: {
-      description: memberAddArgsSchema.shape.role.description,
-      options: [...ASSIGNABLE_ROLES],
-      required: true,
-      type: 'enum',
-    },
-  },
+  args: argsFromSchema(memberAddArgsSchema),
   meta: { description: 'Add an existing organization member to the project', name: 'member-add' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -42,7 +31,7 @@ export default defineSubcommand({
       schema: memberAddArgsSchema,
     });
 
-    formatter.printInfo(`Added member \`${args.id}\` as \`${data.role}\`.`);
+    formatter.printInfo(`Added member \`${data.id}\` as \`${data.role}\`.`);
   },
 });
 

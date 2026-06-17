@@ -2,53 +2,25 @@ import { runTaskFileDownload } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
 
-export const taskFileDownloadArgsSchema = z
-  .object({
-    fileId: z.string().min(1).describe('Attachment id (from `dooray task file-list`)'),
-    id: z
-      .string()
-      .optional()
-      .describe('Task ID (19-digit). Looked up across all accessible projects when given alone.'),
+export const taskFileDownloadArgsSchema = requireTaskRef(
+  z.object({
+    ...taskRefShape,
+    fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Attachment id (from `dooray task file-list`)'),
     outputPath: z
       .string()
       .min(1)
+      .meta({ hint: 'path' })
       .describe('Path including the filename to write (e.g. ./report.pdf); overwrites any existing file'),
-    ref: z
-      .string()
-      .optional()
-      .describe('Task to target instead of <taskId>: a 19-digit task ID, `<projectId>/<id>`, or a Dooray task URL.'),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the task: pass <taskId> or --ref (task ID, `<projectId>/<id>`, or a Dooray task URL).',
-    path: ['id'],
-  });
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    'file-id': {
-      description: taskFileDownloadArgsSchema.shape.fileId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'fileId',
-    },
-    id: {
-      description: taskFileDownloadArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'taskId',
-    },
-    'output-path': {
-      description: taskFileDownloadArgsSchema.shape.outputPath.description,
-      required: true,
-      type: 'string',
-      valueHint: 'path',
-    },
-    ref: { ...globalArgs.ref, description: taskFileDownloadArgsSchema.shape.ref.description, required: false },
-  },
+  args: argsFromSchema(taskFileDownloadArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "Download a task attachment's bytes to a local file", name: 'file-download' },
   async run({ api, args, formatter }) {

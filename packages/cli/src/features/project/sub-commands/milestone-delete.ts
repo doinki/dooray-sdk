@@ -5,26 +5,17 @@ import { z } from 'zod';
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { confirmField } from '../../../shared/schema/fields';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const milestoneDeleteArgsSchema = z.object({
-  id: z.string().min(1).describe('Milestone id to delete'),
-  yes: z.boolean().default(false).describe('Skip the confirmation prompt'),
+  id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id to delete'),
+  yes: confirmField,
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: milestoneDeleteArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'milestoneId',
-    },
-    yes: {
-      description: milestoneDeleteArgsSchema.shape.yes.description,
-      type: 'boolean',
-    },
-  },
+  args: argsFromSchema(milestoneDeleteArgsSchema),
   meta: {
     description: 'Delete a milestone (its tasks lose the milestone reference; irreversible)',
     name: 'milestone-delete',

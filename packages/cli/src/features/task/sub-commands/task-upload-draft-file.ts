@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
 export const taskUploadDraftFileArgsSchema = z.object({
@@ -10,31 +11,18 @@ export const taskUploadDraftFileArgsSchema = z.object({
     .string()
     .trim()
     .optional()
+    .meta({ hint: 'mime' })
     .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream)'),
-  draftId: z.string().min(1).describe('Draft id (from `dooray task create-draft`; not a task id)'),
-  filePath: z.string().min(1).describe('Path of the local file to upload'),
+  draftId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'draftId' })
+    .describe('Draft id (from `dooray task create-draft`; not a task id)'),
+  filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
 });
 
 export default defineSubcommand({
-  args: {
-    'content-type': {
-      description: taskUploadDraftFileArgsSchema.shape.contentType.description,
-      type: 'string',
-      valueHint: 'mime',
-    },
-    'draft-id': {
-      description: taskUploadDraftFileArgsSchema.shape.draftId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'draftId',
-    },
-    'file-path': {
-      description: taskUploadDraftFileArgsSchema.shape.filePath.description,
-      required: true,
-      type: 'string',
-      valueHint: 'path',
-    },
-  },
+  args: argsFromSchema(taskUploadDraftFileArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Attach a local file to a draft task (use `task file-upload` for a real task)',

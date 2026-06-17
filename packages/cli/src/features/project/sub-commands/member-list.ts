@@ -8,6 +8,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
 import { splitCsv } from '../../../shared/schema/csv';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const memberListArgsSchema = z.object({
   page: pageSchema,
@@ -20,6 +21,7 @@ export const memberListArgsSchema = z.object({
       return tokens.length > 0 ? tokens : undefined;
     })
     .pipe(z.array(z.enum(ASSIGNABLE_ROLES)).optional())
+    .meta({ hint: 'role[,role...]' })
     .describe(
       `Filter by role(s), comma-separated (allowed: ${ASSIGNABLE_ROLES.join(', ')}). Omit to include all roles`,
     ),
@@ -27,15 +29,7 @@ export const memberListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    page: { description: memberListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    roles: {
-      description: memberListArgsSchema.shape.roles.description,
-      type: 'string',
-      valueHint: 'role[,role...]',
-    },
-    size: { description: memberListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-  },
+  args: argsFromSchema(memberListArgsSchema),
   meta: {
     description: 'List project members (organizationMemberId + role)',
     name: 'member-list',

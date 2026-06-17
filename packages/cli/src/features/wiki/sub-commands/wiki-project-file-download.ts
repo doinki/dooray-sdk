@@ -4,30 +4,19 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const wikiProjectFileDownloadArgsSchema = z.object({
-  attachFileId: z.string().min(1).describe('Attach file id (from `dooray wiki view`)'),
+  attachFileId: z.string().min(1).meta({ hint: 'attachFileId' }).describe('Attach file id (from `dooray wiki view`)'),
   outputPath: z
     .string()
     .min(1)
+    .meta({ hint: 'path' })
     .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
 });
 
 export default defineSubcommand({
-  args: {
-    'attach-file-id': {
-      description: wikiProjectFileDownloadArgsSchema.shape.attachFileId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'attachFileId',
-    },
-    'output-path': {
-      description: wikiProjectFileDownloadArgsSchema.shape.outputPath.description,
-      required: true,
-      type: 'string',
-      valueHint: 'path',
-    },
-  },
+  args: argsFromSchema(wikiProjectFileDownloadArgsSchema),
   meta: { description: 'Download a wiki-level attach file to a local file', name: 'project-file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({

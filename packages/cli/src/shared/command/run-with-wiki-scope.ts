@@ -4,11 +4,11 @@ import type { z } from 'zod';
 
 import type { OutputFormatter, Render } from '../formatter/output-formatter';
 import type { ArgInput } from '../schema/parse-args';
-import { parseArgsOrThrow } from '../schema/parse-args';
+import { parseArgsOrThrow, scopeRef } from '../schema/parse-args';
 
 interface WikiScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;
-  args: { id?: string; ref?: string } & ArgInput;
+  args: ArgInput;
   formatter: OutputFormatter;
   render: Render<Result>;
   run: (input: { api: DoorayApi; args: { id: string; projectId?: string } & Args }) => Promise<Result>;
@@ -21,7 +21,7 @@ export async function runWithWikiScope<Args extends Record<string, unknown>, Res
   const { api, args, formatter, render, run, schema } = context;
 
   const data = parseArgsOrThrow(schema, args);
-  const { id, projectId } = resolveWikiId({ id: args.id, ref: args.ref });
+  const { id, projectId } = resolveWikiId(scopeRef(args));
   const result = await run({ api, args: { ...data, id, projectId } });
 
   formatter.printData(result, render);

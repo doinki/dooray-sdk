@@ -4,45 +4,25 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { parseArgsOrThrow, scopeRef } from '../../../shared/schema/parse-args';
 
-export const taskFileDeleteArgsSchema = z
-  .object({
-    fileId: z.string().min(1).describe('Attachment id to delete (from `dooray task file-list`)'),
-    id: z
+export const taskFileDeleteArgsSchema = requireTaskRef(
+  z.object({
+    ...taskRefShape,
+    fileId: z
       .string()
-      .optional()
-      .describe('Task ID (19-digit). Looked up across all accessible projects when given alone.'),
-    ref: z
-      .string()
-      .optional()
-      .describe('Task to target instead of <taskId>: a 19-digit task ID, `<projectId>/<id>`, or a Dooray task URL.'),
-    yes: z.boolean().default(false).describe('Skip the confirmation prompt'),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the task: pass <taskId> or --ref (task ID, `<projectId>/<id>`, or a Dooray task URL).',
-    path: ['id'],
-  });
+      .min(1)
+      .meta({ hint: 'fileId' })
+      .describe('Attachment id to delete (from `dooray task file-list`)'),
+    yes: confirmField,
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    'file-id': {
-      description: taskFileDeleteArgsSchema.shape.fileId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'fileId',
-    },
-    id: {
-      description: taskFileDeleteArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'taskId',
-    },
-    ref: { ...globalArgs.ref, description: taskFileDeleteArgsSchema.shape.ref.description, required: false },
-    yes: { description: taskFileDeleteArgsSchema.shape.yes.description, type: 'boolean' },
-  },
+  args: argsFromSchema(taskFileDeleteArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete an attachment from a task (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
@@ -54,7 +34,7 @@ export default defineSubcommand({
       skip: yes,
     });
 
-    const { id, projectId } = resolveTaskId({ id: args.id, ref: args.ref });
+    const { id, projectId } = resolveTaskId(scopeRef(args));
     const result = await runTaskFileDelete({ api, args: { fileId, id, projectId } });
 
     formatter.printData(result, renderPretty);

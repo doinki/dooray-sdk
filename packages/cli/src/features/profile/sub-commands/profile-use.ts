@@ -1,17 +1,16 @@
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 import { runProfileUse } from '../operations/profile-use';
 
 export const profileUseArgsSchema = z.object({
-  name: z.string().min(1).describe('Profile name to activate'),
+  name: z.string().min(1).meta({ positional: true }).describe('Profile name to activate'),
 });
 
 export default defineSubcommand({
-  args: {
-    name: { description: profileUseArgsSchema.shape.name.description, required: true, type: 'positional' },
-  },
+  args: argsFromSchema(profileUseArgsSchema),
   globalArgs: [],
   meta: { description: 'Switch the active profile', name: 'use' },
   mode: 'local',

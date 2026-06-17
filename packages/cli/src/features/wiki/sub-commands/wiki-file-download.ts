@@ -2,55 +2,25 @@ import { runWikiFileDownload } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { globalArgs } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
 
-export const wikiFileDownloadArgsSchema = z
-  .object({
-    fileId: z.string().min(1).describe('Page file id (from `dooray wiki view`)'),
-    id: z
-      .string()
-      .optional()
-      .describe('Wiki page ID (19-digit). Looked up across all accessible wikis when given alone.'),
+export const wikiFileDownloadArgsSchema = requireWikiRef(
+  z.object({
+    ...wikiRefShape,
+    fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Page file id (from `dooray wiki view`)'),
     outputPath: z
       .string()
       .min(1)
+      .meta({ hint: 'path' })
       .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
-    ref: z
-      .string()
-      .optional()
-      .describe(
-        'Wiki page to target instead of <pageId>: a 19-digit page ID, `<projectId>/<id>`, or a Dooray wiki URL.',
-      ),
-  })
-  .refine((args) => args.id !== undefined || args.ref !== undefined, {
-    message: 'Provide the wiki page: pass <pageId> or --ref (page ID, `<projectId>/<id>`, or a Dooray wiki URL).',
-    path: ['id'],
-  });
+  }),
+);
 
 export default defineSubcommand({
-  args: {
-    'file-id': {
-      description: wikiFileDownloadArgsSchema.shape.fileId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'fileId',
-    },
-    id: {
-      description: wikiFileDownloadArgsSchema.shape.id.description,
-      required: false,
-      type: 'positional',
-      valueHint: 'pageId',
-    },
-    'output-path': {
-      description: wikiFileDownloadArgsSchema.shape.outputPath.description,
-      required: true,
-      type: 'string',
-      valueHint: 'path',
-    },
-    ref: { ...globalArgs.ref, description: wikiFileDownloadArgsSchema.shape.ref.description, required: false },
-  },
+  args: argsFromSchema(wikiFileDownloadArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Download a wiki page attachment to a local file', name: 'file-download' },
   async run({ api, args, formatter }) {

@@ -4,47 +4,19 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { splitCsv } from '../../../shared/schema/csv';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { csvField } from '../../../shared/schema/fields';
 
 export const wikiCreateArgsSchema = z.object({
-  body: z.string().min(1).describe('Page body (Markdown)'),
-  cc: z.string().transform(splitCsv).optional().describe('Referrers (comma-separated — `@me` or member ids)'),
-  fileIds: z
-    .string()
-    .transform(splitCsv)
-    .optional()
-    .describe('File ids to attach (comma-separated; from `dooray wiki project-file-upload`)'),
-  parentId: z.string().min(1).describe('Parent page id (from `dooray wiki list`)'),
-  title: z.string().trim().min(1, 'Page title must not be empty.').describe('Page title'),
+  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),
+  cc: csvField('Referrers (comma-separated — `@me` or member ids)', 'user[,user...]'),
+  fileIds: csvField('File ids to attach (comma-separated; from `dooray wiki project-file-upload`)', 'id[,id...]'),
+  parentId: z.string().min(1).meta({ hint: 'pageId' }).describe('Parent page id (from `dooray wiki list`)'),
+  title: z.string().trim().min(1, 'Page title must not be empty.').meta({ hint: 'text' }).describe('Page title'),
 });
 
 export default defineSubcommand({
-  args: {
-    body: {
-      description: wikiCreateArgsSchema.shape.body.description,
-      required: true,
-      type: 'string',
-      valueHint: 'text',
-    },
-    cc: { description: wikiCreateArgsSchema.shape.cc.description, type: 'string', valueHint: 'user[,user...]' },
-    'file-ids': {
-      description: wikiCreateArgsSchema.shape.fileIds.description,
-      type: 'string',
-      valueHint: 'id[,id...]',
-    },
-    'parent-id': {
-      description: wikiCreateArgsSchema.shape.parentId.description,
-      required: true,
-      type: 'string',
-      valueHint: 'pageId',
-    },
-    title: {
-      description: wikiCreateArgsSchema.shape.title.description,
-      required: true,
-      type: 'string',
-      valueHint: 'text',
-    },
-  },
+  args: argsFromSchema(wikiCreateArgsSchema),
   meta: { description: 'Create a wiki page under a parent page', name: 'create' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({

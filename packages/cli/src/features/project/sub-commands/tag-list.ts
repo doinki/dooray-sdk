@@ -6,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const tagListArgsSchema = z.object({
   page: pageSchema,
@@ -13,10 +14,7 @@ export const tagListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    page: { description: tagListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    size: { description: tagListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-  },
+  args: argsFromSchema(tagListArgsSchema),
   meta: {
     description: 'List tags with their tag-group constraints (required, single-select)',
     name: 'tag-list',

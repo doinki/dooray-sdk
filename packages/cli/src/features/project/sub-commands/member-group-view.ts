@@ -5,20 +5,18 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const memberGroupViewArgsSchema = z.object({
-  id: z.string().min(1).describe('Member group id (from `member-group-list`)'),
+  id: z
+    .string()
+    .min(1)
+    .meta({ hint: 'memberGroupId', positional: true })
+    .describe('Member group id (from `member-group-list`)'),
 });
 
 export default defineSubcommand({
-  args: {
-    id: {
-      description: memberGroupViewArgsSchema.shape.id.description,
-      required: true,
-      type: 'positional',
-      valueHint: 'memberGroupId',
-    },
-  },
+  args: argsFromSchema(memberGroupViewArgsSchema),
   meta: {
     description: 'Show a member group and its organization members',
     name: 'member-group-view',

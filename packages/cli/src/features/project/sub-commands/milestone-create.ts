@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 const optionalDate = (describe: string) =>
   z
@@ -11,12 +12,18 @@ const optionalDate = (describe: string) =>
     .trim()
     .optional()
     .transform((value) => value || undefined)
+    .meta({ hint: 'YYYY-MM-DD±HH:MM' })
     .describe(describe);
 
 export const milestoneCreateArgsSchema = z
   .object({
     endDate: optionalDate('End date with timezone offset (e.g. `2026-08-22+09:00`)'),
-    name: z.string().trim().min(1, 'Milestone name must not be empty.').describe('Milestone name (e.g. `1단계`)'),
+    name: z
+      .string()
+      .trim()
+      .min(1, 'Milestone name must not be empty.')
+      .meta({ hint: 'text' })
+      .describe('Milestone name (e.g. `1단계`)'),
     startDate: optionalDate('Start date with timezone offset (e.g. `2026-06-22+09:00`)'),
   })
   .refine(
@@ -25,24 +32,7 @@ export const milestoneCreateArgsSchema = z
   );
 
 export default defineSubcommand({
-  args: {
-    'end-date': {
-      description: milestoneCreateArgsSchema.shape.endDate.description,
-      type: 'string',
-      valueHint: 'YYYY-MM-DD±HH:MM',
-    },
-    name: {
-      description: milestoneCreateArgsSchema.shape.name.description,
-      required: true,
-      type: 'string',
-      valueHint: 'text',
-    },
-    'start-date': {
-      description: milestoneCreateArgsSchema.shape.startDate.description,
-      type: 'string',
-      valueHint: 'YYYY-MM-DD±HH:MM',
-    },
-  },
+  args: argsFromSchema(milestoneCreateArgsSchema),
   meta: { description: 'Create a milestone (dated phase; always starts open)', name: 'milestone-create' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({

@@ -1,6 +1,16 @@
 import type { ArgsDef } from 'citty';
 
 export const globalArgs = {
+  fields: {
+    description: 'output only these JSON fields, comma-separated — projects each item (implies --json)',
+    type: 'string',
+    valueHint: 'a[,b...]',
+  },
+  jq: {
+    description: 'filter the JSON output through jq (implies --json; requires the `jq` binary on PATH)',
+    type: 'string',
+    valueHint: 'expr',
+  },
   json: {
     default: process.env.DOORAY_JSON === 'true',
     description: 'output as JSON (stable contract; defaults to $DOORAY_JSON)',

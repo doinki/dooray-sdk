@@ -8,6 +8,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/formatter/table';
 import { formatDate } from '../../../shared/formatter/text';
+import { argsFromSchema } from '../../../shared/schema/derive-args';
 
 export const milestoneListArgsSchema = z.object({
   page: pageSchema,
@@ -19,15 +20,7 @@ export const milestoneListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: {
-    page: { description: milestoneListArgsSchema.shape.page.description, type: 'string', valueHint: 'n' },
-    size: { description: milestoneListArgsSchema.shape.size.description, type: 'string', valueHint: 'n' },
-    state: {
-      description: milestoneListArgsSchema.shape.state.description,
-      options: [...MILESTONE_STATES],
-      type: 'enum',
-    },
-  },
+  args: argsFromSchema(milestoneListArgsSchema),
   meta: { description: 'List milestones in a project (filter by state; paginated)', name: 'milestone-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
