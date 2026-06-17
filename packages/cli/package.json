@@ -1,0 +1,71 @@
+{
+  "name": "@dooray-sdk/cli",
+  "version": "0.0.0",
+  "description": "Manage Dooray projects, tasks, and members from your terminal",
+  "keywords": [
+    "cli",
+    "command-line",
+    "dooray",
+    "project-management",
+    "task-management",
+    "terminal"
+  ],
+  "homepage": "https://github.com/doinki/dooray-sdk/tree/main/packages/cli#readme",
+  "bugs": "https://github.com/doinki/dooray-sdk/issues",
+  "license": "MIT",
+  "author": {
+    "name": "doinki",
+    "email": "doinki94@gmail.com",
+    "url": "https://github.com/doinki"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/doinki/dooray-sdk.git",
+    "directory": "packages/cli"
+  },
+  "bin": {
+    "dooray": "index.js"
+  },
+  "files": [
+    "dist",
+    "index.js",
+    "CHANGELOG.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && rollup -c ../../tools/rollup.config.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "lint:fix": "oxfmt && oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "publint": "publint"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.5.1",
+    "@dooray-sdk/client": "workspace:^",
+    "@dooray-sdk/core": "workspace:^",
+    "chalk": "^5.6.2",
+    "citty": "^0.2.2",
+    "columnify": "^1.6.0",
+    "conf": "^15.1.0",
+    "date-fns": "^4.4.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/columnify": "^1.5.4",
+    "typescript": "^6.0.3"
+  },
+  "browserslist": [
+    "node 22.12"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  }
+}

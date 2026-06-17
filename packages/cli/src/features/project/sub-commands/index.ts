@@ -1,0 +1,40 @@
+import { defineCommand } from 'citty';
+
+export default defineCommand({
+  meta: {
+    description:
+      'Manage projects and their sub-resources (members, milestones, tags, templates, statuses, hooks, email)',
+    name: 'project',
+  },
+  subCommands: {
+    'category-list': () => import('./category-list').then((m) => m.default),
+    'check-name': () => import('./project-check-name').then((m) => m.default),
+    create: () => import('./project-create').then((m) => m.default),
+    'email-create': () => import('./email-create').then((m) => m.default),
+    'email-view': () => import('./email-view').then((m) => m.default),
+    'hook-create': () => import('./hook-create').then((m) => m.default),
+    list: () => import('./project-list').then((m) => m.default),
+    'member-add': () => import('./member-add').then((m) => m.default),
+    'member-group-list': () => import('./member-group-list').then((m) => m.default),
+    'member-group-view': () => import('./member-group-view').then((m) => m.default),
+    'member-list': () => import('./member-list').then((m) => m.default),
+    'member-view': () => import('./member-view').then((m) => m.default),
+    'milestone-create': () => import('./milestone-create').then((m) => m.default),
+    'milestone-delete': () => import('./milestone-delete').then((m) => m.default),
+    'milestone-list': () => import('./milestone-list').then((m) => m.default),
+    'milestone-update': () => import('./milestone-update').then((m) => m.default),
+    'milestone-view': () => import('./milestone-view').then((m) => m.default),
+    'status-create': () => import('./status-create').then((m) => m.default),
+    'status-delete': () => import('./status-delete').then((m) => m.default),
+    'status-list': () => import('./status-list').then((m) => m.default),
+    'status-update': () => import('./status-update').then((m) => m.default),
+    'tag-create': () => import('./tag-create').then((m) => m.default),
+    'tag-group-update': () => import('./tag-group-update').then((m) => m.default),
+    'tag-list': () => import('./tag-list').then((m) => m.default),
+    'tag-view': () => import('./tag-view').then((m) => m.default),
+    'template-delete': () => import('./template-delete').then((m) => m.default),
+    'template-list': () => import('./template-list').then((m) => m.default),
+    'template-view': () => import('./template-view').then((m) => m.default),
+    view: () => import('./project-view').then((m) => m.default),
+  },
+});
