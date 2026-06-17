@@ -57,25 +57,25 @@ Project-, task-, and wiki-scoped commands target a Dooray entity. Pass it as a p
 
 Project-scoped commands (e.g. `task create`, `wiki list`) take the project via `--ref`. Task/wiki-scoped commands accept the entity id as a positional argument and fall back to `--ref`.
 
-## Output (`--json`, `--fields`, `--jq`)
+## Output (`--json`, `--jq`)
 
 Commands print a human-readable table by default. For scripting:
 
-| Flag             | Effect                                                                         |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `--json`         | Emit the full result as JSON (stable contract; also via `$DOORAY_JSON=true`).  |
-| `--fields a,b,c` | Emit JSON with only these fields, projected over each item (implies `--json`). |
-| `--jq <expr>`    | Filter the JSON through `jq` (implies `--json`; requires the `jq` binary).     |
+| Flag           | Effect                                                                        |
+| -------------- | ----------------------------------------------------------------------------- |
+| `--json`       | Emit the full result as JSON (stable contract; also via `$DOORAY_JSON=true`). |
+| `--json=a,b,c` | Emit JSON with only these fields, projected over each item.                   |
+| `--jq <expr>`  | Filter the JSON through `jq` (implies `--json`; requires the `jq` binary).    |
 
 ```sh
 dooray task list --ref <project> --json
-dooray task list --ref <project> --fields taskNumber,subject
+dooray task list --ref <project> --json=taskNumber,subject
 dooray task list --ref <project> --jq '.data[] | {id, subject, status: .workflow.name}'
 ```
 
 ## Global flags
 
-`--json`, `--fields`, `--jq`, `--profile <name>`, `--ref <ref>`, and `--verbose` are available wherever they apply. Destructive commands prompt for confirmation; pass `--yes` to skip it (required for non-interactive use).
+`--json`, `--jq`, `--profile <name>`, `--ref <ref>`, and `--verbose` are available wherever they apply. Destructive commands prompt for confirmation; pass `--yes` to skip it (required for non-interactive use).
 
 ## Contributing — adding a command
 

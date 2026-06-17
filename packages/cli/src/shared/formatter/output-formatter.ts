@@ -30,7 +30,7 @@ export function createOutputFormatter(options: OutputFormatterOptions = {}): Out
   const stdout = options.stdout ?? process.stdout;
   const stderr = options.stderr ?? process.stderr;
   const { fields, jq } = options;
-  // Rendered text is the default; JSON is opt-in via `--json` (and implied by `--jq`/`--fields`).
+  // Rendered text is the default; JSON is opt-in via `--json` (bare or a field list) and `--jq`.
   // Piping (non-TTY) keeps the table so `dooray ... | grep` stays composable, like gh.
   const json = (options.json ?? false) || jq !== undefined || fields !== undefined;
   const colors = createColorScheme(Boolean(stdout.isTTY) && !json);

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { isJsonOutput } from '../../../shared/command/json-output';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { confirmField } from '../../../shared/schema/fields';
@@ -29,7 +30,7 @@ export default defineSubcommand({
     const { id, moveTo, yes } = parseArgsOrThrow(statusDeleteArgsSchema, args);
 
     await confirmDeletion({
-      json: args.json,
+      json: isJsonOutput(args.json),
       message: `Delete status \`${id}\`? Tasks in it move to \`${moveTo}\`.`,
       skip: yes,
     });

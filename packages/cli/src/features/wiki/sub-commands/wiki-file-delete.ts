@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { isJsonOutput } from '../../../shared/command/json-output';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
@@ -25,7 +26,7 @@ export default defineSubcommand({
     const { fileId, yes } = parseArgsOrThrow(wikiFileDeleteArgsSchema, args);
 
     await confirmDeletion({
-      json: args.json,
+      json: isJsonOutput(args.json),
       message: `Delete attachment \`${fileId}\`?`,
       skip: yes,
     });

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { isJsonOutput } from '../../../shared/command/json-output';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { confirmField } from '../../../shared/schema/fields';
@@ -23,7 +24,7 @@ export default defineSubcommand({
   async run({ api, args, formatter }) {
     const { id, yes } = parseArgsOrThrow(milestoneDeleteArgsSchema, args);
 
-    await confirmDeletion({ json: args.json, message: `Delete milestone \`${id}\`?`, skip: yes });
+    await confirmDeletion({ json: isJsonOutput(args.json), message: `Delete milestone \`${id}\`?`, skip: yes });
 
     const projectId = await resolveProjectId({ api, ref: args.ref });
     const result = await runProjectMilestoneDelete({
