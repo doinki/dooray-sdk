@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
 
 const schema = z.object({
   body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),

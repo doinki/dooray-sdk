@@ -5,9 +5,9 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { splitCsv } from '../../../shared/utils/csv';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
 const schema = z.object({

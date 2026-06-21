@@ -6,24 +6,20 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { confirmField } from '../../../shared/schemas/fields';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-    commentId: z
-      .string()
-      .min(1)
-      .meta({ hint: 'commentId' })
-      .describe('Comment id to delete (from `dooray task comment-list`)'),
-    yes: confirmField,
-  }),
-);
+const schema = z.object({
+  commentId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'commentId', positional: true })
+    .describe('Comment id to delete (from `dooray task comment-list`)'),
+  yes: confirmField,
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete a comment from a task (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithTaskScope({

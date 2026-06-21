@@ -6,23 +6,19 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { allField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { allField } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 
-const schema = requireWikiRef(
-  z.object({
-    ...wikiRefShape,
-    all: allField,
-    page: pageSchema,
-    size: sizeSchema,
-    state: z.enum(WIKI_SHARED_LINK_STATES).optional().describe('Filter by state: valid or invalid (default: valid)'),
-  }),
-);
+const schema = z.object({
+  all: allField,
+  page: pageSchema,
+  size: sizeSchema,
+  state: z.enum(WIKI_SHARED_LINK_STATES).optional().describe('Filter by state: valid or invalid (default: valid)'),
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a wiki page's external shared links", name: 'shared-link-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({

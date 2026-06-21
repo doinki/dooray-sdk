@@ -5,23 +5,19 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { allField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { allField } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
 
-const schema = requireWikiRef(
-  z.object({
-    ...wikiRefShape,
-    all: allField,
-    page: pageSchema,
-    size: sizeSchema,
-  }),
-);
+const schema = z.object({
+  all: allField,
+  page: pageSchema,
+  size: sizeSchema,
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a wiki page's comments", name: 'comment-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({

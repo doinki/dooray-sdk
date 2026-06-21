@@ -4,19 +4,13 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatUser } from '../../../shared/utils/user';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-  }),
-);
+const schema = z.object({});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'View a single task by id or reference (resolved across projects if needed)', name: 'view' },
   async run({ api, args, formatter }) {
     await runWithTaskScope({

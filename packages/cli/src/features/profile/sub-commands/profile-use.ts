@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { runProfileUse } from '../operations/profile-use';
 
 const schema = z.object({

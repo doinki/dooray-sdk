@@ -4,29 +4,24 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-    contentType: z
-      .string()
-      .trim()
-      .optional()
-      .meta({ hint: 'mime' })
-      .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream)'),
-    filePath: z
-      .string()
-      .min(1)
-      .meta({ hint: 'path' })
-      .describe("Path of the local file to attach; the attachment keeps this file's base name"),
-  }),
-);
+const schema = z.object({
+  contentType: z
+    .string()
+    .trim()
+    .optional()
+    .meta({ hint: 'mime' })
+    .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream)'),
+  filePath: z
+    .string()
+    .min(1)
+    .meta({ hint: 'path' })
+    .describe("Path of the local file to attach; the attachment keeps this file's base name"),
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Attach a local file to a task (the returned id can be passed as a --file-ids value)',
     name: 'file-upload',

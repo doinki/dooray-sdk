@@ -23,9 +23,9 @@ export const globalArgs = {
   },
   ref: {
     default: process.env.DOORAY_REF,
-    description: '19-digit project ID, `<projectId>/<id>`, or Dooray URL (defaults to $DOORAY_REF)',
+    description: '19-digit ID, `<projectId>/<id>`, or Dooray URL (defaults to $DOORAY_REF)',
     required: true,
-    type: 'string',
+    type: 'positional',
     valueHint: 'ref',
   },
   verbose: {

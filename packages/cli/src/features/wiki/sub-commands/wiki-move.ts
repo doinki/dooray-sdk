@@ -5,37 +5,29 @@ import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { confirmField } from '../../../shared/schemas/fields';
 
-const schema = requireWikiRef(
-  z.object({
-    ...wikiRefShape,
-    beforeId: z
-      .string()
-      .trim()
-      .optional()
-      .meta({ hint: 'pageId' })
-      .describe('Sibling page id to order this page after (from `dooray wiki list`)'),
-    includeSubPages: z.boolean().optional().describe('Move child pages along too (default: true)'),
-    parentId: z
-      .string()
-      .min(1)
-      .meta({ hint: 'pageId' })
-      .describe('Destination parent page id (from `dooray wiki list`)'),
-    targetProjectId: z
-      .string()
-      .trim()
-      .optional()
-      .meta({ hint: 'projectId' })
-      .describe('Destination project id when moving to another wiki (from `dooray wiki project-list`)'),
-    yes: confirmField,
-  }),
-);
+const schema = z.object({
+  beforeId: z
+    .string()
+    .trim()
+    .optional()
+    .meta({ hint: 'pageId' })
+    .describe('Sibling page id to order this page after (from `dooray wiki list`)'),
+  includeSubPages: z.boolean().optional().describe('Move child pages along too (default: true)'),
+  parentId: z.string().min(1).meta({ hint: 'pageId' }).describe('Destination parent page id (from `dooray wiki list`)'),
+  targetProjectId: z
+    .string()
+    .trim()
+    .optional()
+    .meta({ hint: 'projectId' })
+    .describe('Destination project id when moving to another wiki (from `dooray wiki project-list`)'),
+  yes: confirmField,
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Reparent a wiki page, optionally ordering it or moving it into another wiki (irreversible)',
     name: 'move',

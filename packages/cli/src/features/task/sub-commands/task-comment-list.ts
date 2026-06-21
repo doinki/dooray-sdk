@@ -6,29 +6,25 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { allField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { allField } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-    all: allField,
-    page: pageSchema,
-    size: sizeSchema,
-    sort: z
-      .enum(COMMENT_SORTS)
-      .optional()
-      .describe('Sort by created date (prefix with `-` to reverse; default oldest first)'),
-  }),
-);
+const schema = z.object({
+  all: allField,
+  page: pageSchema,
+  size: sizeSchema,
+  sort: z
+    .enum(COMMENT_SORTS)
+    .optional()
+    .describe('Sort by created date (prefix with `-` to reverse; default oldest first)'),
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "List a task's comments and system events (oldest-first; --all fetches every page)",
     name: 'comment-list',

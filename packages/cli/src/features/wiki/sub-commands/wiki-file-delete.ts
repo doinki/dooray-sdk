@@ -6,20 +6,20 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { confirmField } from '../../../shared/schemas/fields';
 
-const schema = requireWikiRef(
-  z.object({
-    ...wikiRefShape,
-    fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Page file id to delete (from `dooray wiki view`)'),
-    yes: confirmField,
-  }),
-);
+const schema = z.object({
+  fileId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'fileId', positional: true })
+    .describe('Page file id to delete (from `dooray wiki view`)'),
+  yes: confirmField,
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Remove an attached file from a wiki page (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithWikiScope({

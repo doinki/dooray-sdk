@@ -3,20 +3,14 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime } from '../../../shared/utils/text';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-  }),
-);
+const schema = z.object({});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a task's attached files", name: 'file-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({

@@ -4,24 +4,23 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = requireWikiRef(
-  z.object({
-    ...wikiRefShape,
-    fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Page file id (from `dooray wiki view`)'),
-    outputPath: z
-      .string()
-      .min(1)
-      .meta({ hint: 'path' })
-      .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
-  }),
-);
+const schema = z.object({
+  fileId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'fileId', positional: true })
+    .describe('Page file id (from `dooray wiki view`)'),
+  outputPath: z
+    .string()
+    .min(1)
+    .meta({ hint: 'path' })
+    .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Download a wiki page attachment to a local file', name: 'file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({

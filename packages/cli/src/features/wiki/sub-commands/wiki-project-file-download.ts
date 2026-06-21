@@ -4,10 +4,14 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
-  attachFileId: z.string().min(1).meta({ hint: 'attachFileId' }).describe('Attach file id (from `dooray wiki view`)'),
+  attachFileId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'attachFileId', positional: true })
+    .describe('Attach file id (from `dooray wiki view`)'),
   outputPath: z
     .string()
     .min(1)

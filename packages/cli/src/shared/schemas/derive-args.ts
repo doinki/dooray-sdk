@@ -5,6 +5,17 @@ import { globalArgs } from '../command/global-args';
 
 type ArgDef = ArgsDef[string];
 
+/**
+ * Expected shape of a command's zod schema object, asserted with `satisfies`.
+ *
+ * Every core operation arg must be present and typed by its matching zod field —
+ * EXCEPT `id`/`projectId`, which the global positional `ref` resolves. Extra
+ * CLI-only fields (e.g. `yes`, `all`) are allowed via the index signature, so
+ * commands stay extensible without weakening the per-field type check.
+ */
+export type CommandSchemaShape<TArgs> = Omit<{ [K in keyof TArgs]: z.ZodType<TArgs[K]> }, 'id' | 'projectId'> &
+  Record<string, z.ZodType>;
+
 /** citty-specific metadata attached to a zod field via `.meta()`. */
 export interface ArgMeta {
   /** Short alias(es) for the flag (e.g. `s` → `-s`). Ignored for positionals. */

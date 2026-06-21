@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
   color: z.string().trim().min(1).meta({ hint: 'rrggbb' }).describe('6-digit hex color without `#` (e.g. `ffffff`)'),

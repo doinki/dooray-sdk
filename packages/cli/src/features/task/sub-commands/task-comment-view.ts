@@ -4,24 +4,19 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-    commentId: z
-      .string()
-      .min(1)
-      .meta({ hint: 'commentId' })
-      .describe('Comment id to view (from `dooray task comment-list`)'),
-  }),
-);
+const schema = z.object({
+  commentId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'commentId', positional: true })
+    .describe('Comment id to view (from `dooray task comment-list`)'),
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a task comment's full detail", name: 'comment-view' },
   async run({ api, args, formatter }) {
     await runWithTaskScope({

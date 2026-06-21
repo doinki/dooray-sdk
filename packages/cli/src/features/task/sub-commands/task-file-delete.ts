@@ -6,24 +6,20 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { confirmField } from '../../../shared/schemas/fields';
 
-const schema = requireTaskRef(
-  z.object({
-    ...taskRefShape,
-    fileId: z
-      .string()
-      .min(1)
-      .meta({ hint: 'fileId' })
-      .describe('Attachment id to delete (from `dooray task file-list`)'),
-    yes: confirmField,
-  }),
-);
+const schema = z.object({
+  fileId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'fileId', positional: true })
+    .describe('Attachment id to delete (from `dooray task file-list`)'),
+  yes: confirmField,
+});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete an attachment from a task (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithTaskScope({
