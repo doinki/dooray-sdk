@@ -10,7 +10,7 @@ import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { renderList } from '../../../shared/utils/table';
 
-export const memberListArgsSchema = z.object({
+const schema = z.object({
   page: pageSchema,
   roles: z
     .string()
@@ -29,7 +29,7 @@ export const memberListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(memberListArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'List project members (organizationMemberId + role)',
     name: 'member-list',
@@ -41,7 +41,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectMemberList,
-      schema: memberListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No members.' : renderPagingFooter(result.paging));

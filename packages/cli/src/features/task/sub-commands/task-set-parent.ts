@@ -7,7 +7,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskSetParentArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     parentId: z
@@ -19,7 +19,7 @@ export const taskSetParentArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskSetParentArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Re-parent a task as a subtask of another task in the same project', name: 'set-parent' },
   async run({ api, args, formatter }) {
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskSetParent,
-      schema: taskSetParentArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Re-parented task \`${result.data.post.id}\`.`);

@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskCommentDeleteArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     commentId: z
@@ -22,7 +22,7 @@ export const taskCommentDeleteArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskCommentDeleteArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete a comment from a task (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
@@ -34,7 +34,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskCommentDelete,
-      schema: taskCommentDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted comment \`${data.commentId}\`.`);

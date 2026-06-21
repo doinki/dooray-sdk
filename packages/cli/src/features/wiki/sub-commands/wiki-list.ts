@@ -7,7 +7,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { truncate } from '../../../shared/utils/text';
 
-export const wikiListArgsSchema = z.object({
+const schema = z.object({
   parentId: z
     .string()
     .trim()
@@ -17,7 +17,7 @@ export const wikiListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiListArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: "List a wiki's pages one level deep (pass --parent-id for a page's children)",
     name: 'list',
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiList,
-      schema: wikiListArgsSchema,
+      schema,
     });
 
     if (result.data.length === 0) formatter.printInfo('No pages.');

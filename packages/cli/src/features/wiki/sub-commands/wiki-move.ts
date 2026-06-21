@@ -8,7 +8,7 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiMoveArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     beforeId: z
@@ -34,7 +34,7 @@ export const wikiMoveArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiMoveArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Reparent a wiki page, optionally ordering it or moving it into another wiki (irreversible)',
@@ -49,7 +49,7 @@ export default defineSubcommand({
       formatter,
       render: () => null,
       run: runWikiMove,
-      schema: wikiMoveArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Moved wiki page \`${id}\`.`);

@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiFileDeleteArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Page file id to delete (from `dooray wiki view`)'),
@@ -18,7 +18,7 @@ export const wikiFileDeleteArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiFileDeleteArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Remove an attached file from a wiki page (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runWikiFileDelete,
-      schema: wikiFileDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted attachment \`${data.fileId}\`.`);

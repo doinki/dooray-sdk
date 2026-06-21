@@ -5,26 +5,31 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { csvField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 import { mimeTypeField } from '../utils/fields';
 
-export const taskUpdateArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
-    assignees: csvField(
-      'Assignees (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.',
-      'user[,user...]',
-    ),
+    assignees: z
+      .string()
+      .transform(splitCsv)
+      .optional()
+      .describe('Assignees (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.')
+      .meta({ hint: 'user[,user...]' }),
     body: z
       .string()
       .optional()
       .meta({ hint: 'text' })
       .describe('New body (Markdown unless --mime-type is text/html). Omit to keep current.'),
-    cc: csvField(
-      'CC (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.',
-      'user[,user...]',
-    ),
+    cc: z
+      .string()
+      .transform(splitCsv)
+      .optional()
+      .describe('CC (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.')
+      .meta({ hint: 'user[,user...]' }),
     dueDate: z
       .string()
       .trim()
@@ -43,7 +48,12 @@ export const taskUpdateArgsSchema = requireTaskRef(
       .enum(TASK_PRIORITIES)
       .optional()
       .describe('Priority — highest, high, normal, low, lowest, or none. Omit to keep current.'),
-    tagIds: csvField('Tag ids (comma-separated). Replaces the whole list; omit to keep current.', 'id[,id...]'),
+    tagIds: z
+      .string()
+      .transform(splitCsv)
+      .optional()
+      .describe('Tag ids (comma-separated). Replaces the whole list; omit to keep current.')
+      .meta({ hint: 'id[,id...]' }),
     title: z.string().optional().meta({ hint: 'text' }).describe('New title. Omit to keep current.'),
     version: z.coerce
       .number()
@@ -56,7 +66,7 @@ export const taskUpdateArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskUpdateArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Edit a task's title, body, assignees, due date, priority, milestone, or tags",
@@ -69,7 +79,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskUpdate,
-      schema: taskUpdateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated task \`${result.data.id}\`.`);

@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskFileDeleteArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     fileId: z
@@ -22,7 +22,7 @@ export const taskFileDeleteArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskFileDeleteArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete an attachment from a task (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
@@ -34,7 +34,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskFileDelete,
-      schema: taskFileDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted attachment \`${data.fileId}\`.`);

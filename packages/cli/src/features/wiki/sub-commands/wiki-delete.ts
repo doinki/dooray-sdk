@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiDeleteArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     yes: confirmField,
@@ -17,7 +17,7 @@ export const wikiDeleteArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiDeleteArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete a wiki page along with its child pages and attachments (irreversible)', name: 'delete' },
   async run({ api, args, formatter }) {
@@ -33,7 +33,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runWikiDelete,
-      schema: wikiDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted wiki page \`${id}\`.`);

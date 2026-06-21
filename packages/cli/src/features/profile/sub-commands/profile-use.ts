@@ -5,17 +5,17 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { runProfileUse } from '../operations/profile-use';
 
-export const profileUseArgsSchema = z.object({
-  name: z.string().min(1).meta({ positional: true }).describe('Profile name to activate'),
+const schema = z.object({
+  name: z.string().trim().min(1).meta({ positional: true }).describe('Profile name to activate'),
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(profileUseArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: [],
   meta: { description: 'Switch the active profile', name: 'use' },
   mode: 'local',
   run({ args, formatter, profileStore }) {
-    const data = parseArgsOrThrow(profileUseArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     runProfileUse({ name: data.name, profileStore });
 

@@ -6,12 +6,12 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const tagViewArgsSchema = z.object({
+const schema = z.object({
   id: z.string().min(1).meta({ hint: 'tagId', positional: true }).describe('Tag id (from `tag-list`)'),
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(tagViewArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Show a tag with its color and parent tag-group constraints', name: 'tag-view' },
   async run({ api, args, formatter }) {
     await runWithProjectScope({
@@ -20,7 +20,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectTagView,
-      schema: tagViewArgsSchema,
+      schema,
     });
   },
 });

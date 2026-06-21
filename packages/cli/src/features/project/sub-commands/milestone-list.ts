@@ -10,7 +10,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatDate } from '../../../shared/utils/text';
 
-export const milestoneListArgsSchema = z.object({
+const schema = z.object({
   page: pageSchema,
   size: sizeSchema,
   state: z
@@ -20,7 +20,7 @@ export const milestoneListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(milestoneListArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'List milestones in a project (filter by state; paginated)', name: 'milestone-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectMilestoneList,
-      schema: milestoneListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No milestones.' : renderPagingFooter(result.paging));

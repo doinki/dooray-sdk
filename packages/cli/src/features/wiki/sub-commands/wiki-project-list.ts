@@ -1,3 +1,4 @@
+import type { WikiProjectListArgs } from '@dooray-sdk/core';
 import { runWikiProjectList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
@@ -9,18 +10,18 @@ import { allField } from '../../../shared/utils/fields';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
-export const wikiProjectListArgsSchema = z.object({
+const schema = z.object({
   all: allField,
   page: pageSchema,
   size: sizeSchema,
-});
+} satisfies Record<keyof WikiProjectListArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiProjectListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'List the wikis you can access (each is tied to a project)', name: 'project-list' },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(wikiProjectListArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runWikiProjectList({ api, args: data });
 

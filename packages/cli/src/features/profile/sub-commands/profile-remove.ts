@@ -5,17 +5,17 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { runProfileRemove } from '../operations/profile-remove';
 
-export const profileRemoveArgsSchema = z.object({
-  name: z.string().min(1).meta({ positional: true }).describe('Profile name to remove'),
+const schema = z.object({
+  name: z.string().trim().min(1).meta({ positional: true }).describe('Profile name to remove'),
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(profileRemoveArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: [],
   meta: { description: 'Unregister a profile', name: 'remove' },
   mode: 'local',
   run({ args, formatter, profileStore }) {
-    const data = parseArgsOrThrow(profileRemoveArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     runProfileRemove({ name: data.name, profileStore });
 

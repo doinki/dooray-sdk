@@ -7,7 +7,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskFileDownloadArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Attachment id (from `dooray task file-list`)'),
@@ -20,7 +20,7 @@ export const taskFileDownloadArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskFileDownloadArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "Download a task attachment's bytes to a local file", name: 'file-download' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskFileDownload,
-      schema: taskFileDownloadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Downloaded to \`${result.data.path}\`.`);

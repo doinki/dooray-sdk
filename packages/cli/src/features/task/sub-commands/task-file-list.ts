@@ -8,14 +8,14 @@ import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime } from '../../../shared/utils/text';
 
-export const taskFileListArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
   }),
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskFileListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a task's attached files", name: 'file-list' },
   async run({ api, args, formatter }) {
@@ -25,7 +25,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskFileList,
-      schema: taskFileListArgsSchema,
+      schema,
     });
 
     if (result.data.length === 0) formatter.printInfo('No files.');

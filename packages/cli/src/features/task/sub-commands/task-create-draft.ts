@@ -5,18 +5,28 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { csvField } from '../../../shared/utils/fields';
 import { mimeTypeField } from '../utils/fields';
 
-export const taskCreateDraftArgsSchema = z.object({
-  assignees: csvField('Assignees (comma-separated — `@me` or member ids; default: @me)', 'user[,user...]'),
+const schema = z.object({
+  assignees: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Assignees (comma-separated — `@me` or member ids; default: @me)')
+    .meta({ hint: 'user[,user...]' }),
   body: z
     .string()
     .optional()
     .meta({ hint: 'text' })
     .describe('Draft body (Markdown unless --mime-type is text/html; default: empty)'),
-  cc: csvField('CC (comma-separated — `@me` or member ids)', 'user[,user...]'),
+  cc: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('CC (comma-separated — `@me` or member ids)')
+    .meta({ hint: 'user[,user...]' }),
   dueDate: z
     .string()
     .trim()
@@ -32,12 +42,17 @@ export const taskCreateDraftArgsSchema = z.object({
     .describe('Milestone id (from `dooray project milestone-list`)'),
   mimeType: mimeTypeField(),
   priority: z.enum(TASK_PRIORITIES).optional().describe('Priority — highest, high, normal, low, lowest, or none'),
-  tagIds: csvField('Tag ids (comma-separated; from `dooray project tag-list`)', 'id[,id...]'),
+  tagIds: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Tag ids (comma-separated; from `dooray project tag-list`)')
+    .meta({ hint: 'id[,id...]' }),
   title: z.string().trim().min(1, 'Draft title must not be empty.').meta({ hint: 'text' }).describe('Draft title'),
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(taskCreateDraftArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Create a draft task (not a real task until submitted in the Dooray UI)',
     name: 'create-draft',
@@ -49,7 +64,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskCreateDraft,
-      schema: taskCreateDraftArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created draft \`${result.data.id}\`.`);

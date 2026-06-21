@@ -7,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { optionalDate } from '../utils/fields';
 
-export const milestoneCreateArgsSchema = z
+const schema = z
   .object({
     endDate: optionalDate('End date with timezone offset (e.g. `2026-08-22+09:00`)'),
     name: z
@@ -24,7 +24,7 @@ export const milestoneCreateArgsSchema = z
   });
 
 export default defineSubcommand({
-  args: argsFromSchema(milestoneCreateArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Create a milestone (dated phase; always starts open)', name: 'milestone-create' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -33,7 +33,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectMilestoneCreate,
-      schema: milestoneCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created milestone \`${data.name}\`.`);

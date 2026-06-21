@@ -7,7 +7,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const memberAddArgsSchema = z.object({
+const schema = z.object({
   id: z
     .string()
     .min(1)
@@ -19,7 +19,7 @@ export const memberAddArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(memberAddArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Add an existing organization member to the project', name: 'member-add' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -28,7 +28,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectMemberAdd,
-      schema: memberAddArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Added member \`${data.id}\` as \`${data.role}\`.`);

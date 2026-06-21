@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { splitCsv } from './csv';
-
 interface ScopeRefInput {
   id?: string;
   ref?: string;
@@ -55,16 +53,6 @@ export function requireWikiRef<T extends z.ZodObject>(schema: T): T {
     message: 'Provide the wiki page: pass <pageId> or --ref (page ID, `<projectId>/<id>`, or a Dooray wiki URL).',
     path: ['id'],
   }) as unknown as T;
-}
-
-/** An optional comma-separated list flag (`a,b,c`), parsed to a string array. */
-export function csvField(description: string, hint = 'a[,b...]') {
-  return z.string().transform(splitCsv).optional().describe(description).meta({ hint });
-}
-
-/** A required comma-separated list flag (`a,b,c`), parsed to a string array. */
-export function requiredCsvField(description: string, hint = 'a[,b...]') {
-  return z.string().transform(splitCsv).describe(description).meta({ hint });
 }
 
 /** The standard `--yes` flag that skips a destructive command's confirmation prompt. */

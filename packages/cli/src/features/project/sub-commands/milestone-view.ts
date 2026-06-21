@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const milestoneViewArgsSchema = z.object({
+const schema = z.object({
   id: z
     .string()
     .min(1)
@@ -15,7 +15,7 @@ export const milestoneViewArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(milestoneViewArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: "Show a milestone's date range and state", name: 'milestone-view' },
   async run({ api, args, formatter }) {
     await runWithProjectScope({
@@ -24,7 +24,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectMilestoneView,
-      schema: milestoneViewArgsSchema,
+      schema,
     });
   },
 });

@@ -10,7 +10,7 @@ import { allField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fi
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
 
-export const wikiCommentListArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     all: allField,
@@ -20,7 +20,7 @@ export const wikiCommentListArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiCommentListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a wiki page's comments", name: 'comment-list' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiCommentList,
-      schema: wikiCommentListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No comments.' : renderPagingFooter(result.paging));

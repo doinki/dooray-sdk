@@ -7,7 +7,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const memberGroupViewArgsSchema = z.object({
+const schema = z.object({
   id: z
     .string()
     .min(1)
@@ -16,7 +16,7 @@ export const memberGroupViewArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(memberGroupViewArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Show a member group and its organization members',
     name: 'member-group-view',
@@ -28,7 +28,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectMemberGroupView,
-      schema: memberGroupViewArgsSchema,
+      schema,
     });
   },
 });

@@ -1,3 +1,4 @@
+import type { ProjectCheckNameArgs } from '@dooray-sdk/core';
 import { runProjectCheckName } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -6,7 +7,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 
-export const projectCheckNameArgsSchema = z.object({
+const schema = z.object({
   name: z
     .string()
     .trim()
@@ -15,17 +16,17 @@ export const projectCheckNameArgsSchema = z.object({
     .describe(
       'Candidate project name to validate. Must be unique in the tenant and use allowed characters (Korean/Chinese/Japanese/English/digits and limited symbols)',
     ),
-});
+} satisfies Record<keyof ProjectCheckNameArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(projectCheckNameArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Check whether a project name can be created (available / invalid / taken)',
     name: 'check-name',
   },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(projectCheckNameArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runProjectCheckName({
       api,

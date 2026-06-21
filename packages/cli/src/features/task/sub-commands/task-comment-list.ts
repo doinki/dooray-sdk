@@ -13,7 +13,7 @@ import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
-export const taskCommentListArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     all: allField,
@@ -27,7 +27,7 @@ export const taskCommentListArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskCommentListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "List a task's comments and system events (oldest-first; --all fetches every page)",
@@ -40,7 +40,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskCommentList,
-      schema: taskCommentListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No comments.' : renderPagingFooter(result.paging));

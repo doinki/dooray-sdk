@@ -7,7 +7,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const wikiProjectFileUploadArgsSchema = z.object({
+const schema = z.object({
   contentType: z
     .string()
     .trim()
@@ -19,7 +19,7 @@ export const wikiProjectFileUploadArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiProjectFileUploadArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Upload a file to a wiki itself (the returned id can be passed to `wiki create --file-ids`)',
     name: 'project-file-upload',
@@ -31,7 +31,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiProjectFileUpload,
-      schema: wikiProjectFileUploadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Uploaded file \`${result.data.id}\`.`);

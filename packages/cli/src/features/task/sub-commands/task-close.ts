@@ -7,14 +7,14 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskCloseArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
   }),
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskCloseArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Mark a task done (resolves the project automatically)', name: 'close' },
   async run({ api, args, formatter }) {
@@ -24,7 +24,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskClose,
-      schema: taskCloseArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Closed task \`${result.data.id}\`.`);

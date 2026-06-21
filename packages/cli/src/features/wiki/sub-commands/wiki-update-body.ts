@@ -6,7 +6,7 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiUpdateBodyArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),
@@ -14,7 +14,7 @@ export const wikiUpdateBodyArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiUpdateBodyArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "Replace a wiki page's body, leaving its title and referrers unchanged", name: 'update-body' },
   async run({ api, args, formatter }) {
@@ -24,7 +24,7 @@ export default defineSubcommand({
       formatter,
       render: () => null,
       run: runWikiUpdateBody,
-      schema: wikiUpdateBodyArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated body of wiki page \`${id}\`.`);

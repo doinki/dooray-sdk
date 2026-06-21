@@ -6,7 +6,7 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiUpdateTitleArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     title: z.string().trim().min(1, 'Page title must not be empty.').meta({ hint: 'text' }).describe('Page title'),
@@ -14,7 +14,7 @@ export const wikiUpdateTitleArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiUpdateTitleArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "Replace a wiki page's title, leaving its body and referrers unchanged", name: 'update-title' },
   async run({ api, args, formatter }) {
@@ -24,7 +24,7 @@ export default defineSubcommand({
       formatter,
       render: () => null,
       run: runWikiUpdateTitle,
-      schema: wikiUpdateTitleArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated title of wiki page \`${id}\`.`);

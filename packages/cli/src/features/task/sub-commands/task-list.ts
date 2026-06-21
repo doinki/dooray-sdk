@@ -8,23 +8,36 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { csvField } from '../../../shared/utils/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDate, truncate } from '../../../shared/utils/text';
 import { formatUser } from '../../../shared/utils/user';
 
-export const taskListArgsSchema = z.object({
-  assignee: csvField(
-    'Filter by assignee (comma-separated — `@me`, member ids, or `none` for unassigned; `none` overrides any ids)',
-    'user[,user...]',
-  ),
-  author: csvField('Filter by author (comma-separated — `@me` or a member id)', 'user[,user...]'),
+const schema = z.object({
+  assignee: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe(
+      'Filter by assignee (comma-separated — `@me`, member ids, or `none` for unassigned; `none` overrides any ids)',
+    )
+    .meta({ hint: 'user[,user...]' }),
+  author: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by author (comma-separated — `@me` or a member id)')
+    .meta({ hint: 'user[,user...]' }),
   authorEmail: z
     .string()
     .optional()
     .meta({ hint: 'email' })
     .describe('Filter by the email address that created the task (for tasks created via email)'),
-  cc: csvField('Filter by CC (comma-separated — `@me` or a member id)', 'user[,user...]'),
+  cc: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by CC (comma-separated — `@me` or a member id)')
+    .meta({ hint: 'user[,user...]' }),
   created: datePatternSchema
     .optional()
     .meta({ hint: 'pattern' })
@@ -33,7 +46,12 @@ export const taskListArgsSchema = z.object({
     .optional()
     .meta({ hint: 'pattern' })
     .describe('Filter by due date — today, thisweek, prev-Nd, next-Nd, or <startISO>~<endISO>'),
-  milestone: csvField('Filter by milestone id (comma-separated)', 'id[,id...]'),
+  milestone: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by milestone id (comma-separated)')
+    .meta({ hint: 'id[,id...]' }),
   number: z.coerce
     .number()
     .int()
@@ -42,10 +60,20 @@ export const taskListArgsSchema = z.object({
     .describe('Filter by task number — the numeric part of the task key (e.g. 123 for ABC-123)'),
   page: pageSchema,
   parent: z.string().optional().meta({ hint: 'id' }).describe('Filter by parent task id'),
-  search: csvField('Filter by exact task title (subject); comma-separated; not body text', 'title[,title...]'),
+  search: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by exact task title (subject); comma-separated; not body text')
+    .meta({ hint: 'title[,title...]' }),
   size: sizeSchema,
   sort: z.enum(SORT_OPTIONS).optional().describe('Sort by due, updated, or created date (prefix with `-` to reverse)'),
-  status: csvField('Filter by status id (not name); comma-separated; ids from project status list', 'id[,id...]'),
+  status: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by status id (not name); comma-separated; ids from project status list')
+    .meta({ hint: 'id[,id...]' }),
   statusClass: z
     .string()
     .transform(splitCsv)
@@ -53,7 +81,12 @@ export const taskListArgsSchema = z.object({
     .optional()
     .meta({ hint: 'class[,class...]' })
     .describe('Filter by status class (comma-separated — backlog, registered, working, closed)'),
-  tagIds: csvField('Filter by tag id (comma-separated)', 'id[,id...]'),
+  tagIds: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Filter by tag id (comma-separated)')
+    .meta({ hint: 'id[,id...]' }),
   updated: datePatternSchema
     .optional()
     .meta({ hint: 'pattern' })
@@ -61,7 +94,7 @@ export const taskListArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(taskListArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'List tasks in a project with filters, sorting, and pagination',
     name: 'list',
@@ -73,7 +106,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskList,
-      schema: taskListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No tasks.' : renderPagingFooter(result.paging));

@@ -8,14 +8,14 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 import { formatUser } from '../../../shared/utils/user';
 
-export const taskViewArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
   }),
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskViewArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'View a single task by id or reference (resolved across projects if needed)', name: 'view' },
   async run({ api, args, formatter }) {
@@ -25,7 +25,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskView,
-      schema: taskViewArgsSchema,
+      schema,
     });
   },
 });

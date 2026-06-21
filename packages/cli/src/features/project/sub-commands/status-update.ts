@@ -8,7 +8,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { localeNamesSchema } from '../utils/status-locale';
 
-export const statusUpdateArgsSchema = z.object({
+const schema = z.object({
   class: statusClassSchema.optional(),
   id: z.string().trim().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to update'),
   localeNames: localeNamesSchema
@@ -23,7 +23,7 @@ export const statusUpdateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(statusUpdateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description:
       "Replace a status's class, name, order, and locale names (PUT semantics — omitted fields may be reset)",
@@ -36,7 +36,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectStatusUpdate,
-      schema: statusUpdateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated status \`${data.id}\`.`);

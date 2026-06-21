@@ -8,13 +8,13 @@ import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { renderList } from '../../../shared/utils/table';
 
-export const tagListArgsSchema = z.object({
+const schema = z.object({
   page: pageSchema,
   size: sizeSchema,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(tagListArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'List tags with their tag-group constraints (required, single-select)',
     name: 'tag-list',
@@ -26,7 +26,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectTagList,
-      schema: tagListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No tags.' : renderPagingFooter(result.paging));

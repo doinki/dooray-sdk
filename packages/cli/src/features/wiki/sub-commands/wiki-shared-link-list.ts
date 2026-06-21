@@ -10,7 +10,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { allField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 import { renderList } from '../../../shared/utils/table';
 
-export const wikiSharedLinkListArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     all: allField,
@@ -21,7 +21,7 @@ export const wikiSharedLinkListArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiSharedLinkListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "List a wiki page's external shared links", name: 'shared-link-list' },
   async run({ api, args, formatter }) {
@@ -31,7 +31,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiSharedLinkList,
-      schema: wikiSharedLinkListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No shared links.' : renderPagingFooter(result.paging));

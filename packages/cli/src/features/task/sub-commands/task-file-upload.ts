@@ -7,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskFileUploadArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     contentType: z
@@ -25,7 +25,7 @@ export const taskFileUploadArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskFileUploadArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Attach a local file to a task (the returned id can be passed as a --file-ids value)',
@@ -38,7 +38,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskFileUpload,
-      schema: taskFileUploadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Uploaded file \`${result.data.id}\`.`);

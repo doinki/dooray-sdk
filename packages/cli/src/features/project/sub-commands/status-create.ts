@@ -8,7 +8,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { localeNamesSchema } from '../utils/status-locale';
 
-export const statusCreateArgsSchema = z.object({
+const schema = z.object({
   class: statusClassSchema,
   localeNames: localeNamesSchema
     .meta({ hint: 'locale=name[,...]' })
@@ -29,7 +29,7 @@ export const statusCreateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(statusCreateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Add a task status (API returns no id; verify with status-list)',
     name: 'status-create',
@@ -41,7 +41,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectStatusCreate,
-      schema: statusCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created status \`${data.name}\`.`);

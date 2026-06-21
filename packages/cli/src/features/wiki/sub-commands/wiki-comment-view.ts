@@ -8,7 +8,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 import { formatDateTime } from '../../../shared/utils/text';
 
-export const wikiCommentViewArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     commentId: z
@@ -20,7 +20,7 @@ export const wikiCommentViewArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiCommentViewArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a wiki comment's full body and metadata", name: 'comment-view' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiCommentView,
-      schema: wikiCommentViewArgsSchema,
+      schema,
     });
   },
 });

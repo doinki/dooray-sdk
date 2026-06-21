@@ -9,13 +9,13 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField } from '../../../shared/utils/fields';
 
-export const milestoneDeleteArgsSchema = z.object({
+const schema = z.object({
   id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id to delete'),
   yes: confirmField,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(milestoneDeleteArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Delete a milestone (its tasks lose the milestone reference; irreversible)',
     name: 'milestone-delete',
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectMilestoneDelete,
-      schema: milestoneDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted milestone \`${data.id}\`.`);

@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const emailCreateArgsSchema = z.object({
+const schema = z.object({
   email: z
     .email('Enter a valid email address.')
     .meta({ hint: 'email' })
@@ -21,7 +21,7 @@ export const emailCreateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(emailCreateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Create an inbound email address (incoming mail becomes a task; address must be unique)',
     name: 'email-create',
@@ -33,7 +33,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectEmailCreate,
-      schema: emailCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created inbound email address \`${data.email}\`.`);

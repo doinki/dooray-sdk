@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const tagCreateArgsSchema = z.object({
+const schema = z.object({
   color: z.string().trim().min(1).meta({ hint: 'rrggbb' }).describe('6-digit hex color without `#` (e.g. `ffffff`)'),
   name: z
     .string()
@@ -17,7 +17,7 @@ export const tagCreateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(tagCreateArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Create a tag (use `group:tag` to nest it under a tag group)', name: 'tag-create' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -26,7 +26,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectTagCreate,
-      schema: tagCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created tag \`${data.name}\`.`);

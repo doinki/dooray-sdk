@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const emailViewArgsSchema = z.object({
+const schema = z.object({
   id: z
     .string()
     .min(1)
@@ -15,7 +15,7 @@ export const emailViewArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(emailViewArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Show a project inbound email address by id',
     name: 'email-view',
@@ -27,7 +27,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectEmailView,
-      schema: emailViewArgsSchema,
+      schema,
     });
   },
 });

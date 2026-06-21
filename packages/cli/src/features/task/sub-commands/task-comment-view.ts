@@ -8,7 +8,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 import { formatDateTime } from '../../../shared/utils/text';
 
-export const taskCommentViewArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     commentId: z
@@ -20,7 +20,7 @@ export const taskCommentViewArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskCommentViewArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a task comment's full detail", name: 'comment-view' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskCommentView,
-      schema: taskCommentViewArgsSchema,
+      schema,
     });
   },
 });

@@ -7,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskSetAssigneeStatusArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     memberId: z
@@ -24,7 +24,7 @@ export const taskSetAssigneeStatusArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskSetAssigneeStatusArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Set one assignee's personal status on a task (not the task's overall status)",
@@ -37,7 +37,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskSetAssigneeStatus,
-      schema: taskSetAssigneeStatusArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated assignee status on task \`${result.data.id}\`.`);

@@ -7,7 +7,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiFileDownloadArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Page file id (from `dooray wiki view`)'),
@@ -20,7 +20,7 @@ export const wikiFileDownloadArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiFileDownloadArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Download a wiki page attachment to a local file', name: 'file-download' },
   async run({ api, args, formatter }) {
@@ -30,7 +30,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiFileDownload,
-      schema: wikiFileDownloadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Downloaded to \`${result.data.path}\`.`);

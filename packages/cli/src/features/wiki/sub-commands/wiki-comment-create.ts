@@ -7,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiCommentCreateArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     body: z.string().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown)'),
@@ -15,7 +15,7 @@ export const wikiCommentCreateArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiCommentCreateArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Add a comment to a wiki page', name: 'comment-create' },
   async run({ api, args, formatter }) {
@@ -25,7 +25,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runWikiCommentCreate,
-      schema: wikiCommentCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created comment \`${result.data.id}\`.`);

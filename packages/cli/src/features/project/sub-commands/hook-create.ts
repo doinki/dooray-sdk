@@ -8,7 +8,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const hookCreateArgsSchema = z
+const schema = z
   .object({
     embedInlineImages: z
       .boolean()
@@ -51,7 +51,7 @@ export const hookCreateArgsSchema = z
   });
 
 export default defineSubcommand({
-  args: argsFromSchema(hookCreateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Create an outbound webhook (one URL, multiple events; events depend on --type)',
     name: 'hook-create',
@@ -63,7 +63,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectHookCreate,
-      schema: hookCreateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Created webhook \`${data.url}\`.`);

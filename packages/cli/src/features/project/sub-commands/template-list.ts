@@ -10,13 +10,13 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatUser } from '../../../shared/utils/user';
 
-export const templateListArgsSchema = z.object({
+const schema = z.object({
   page: pageSchema,
   size: sizeSchema,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(templateListArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'List task templates (body/guide omitted; use template-view)',
     name: 'template-list',
@@ -28,7 +28,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectTemplateList,
-      schema: templateListArgsSchema,
+      schema,
     });
 
     formatter.printInfo(result.data.length === 0 ? 'No templates.' : renderPagingFooter(result.paging));

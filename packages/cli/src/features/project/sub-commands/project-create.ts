@@ -1,3 +1,4 @@
+import type { ProjectCreateArgs } from '@dooray-sdk/core';
 import { runProjectCreate } from '@dooray-sdk/core';
 import { PROJECT_SCOPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
@@ -7,7 +8,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 
-export const projectCreateArgsSchema = z.object({
+const schema = z.object({
   categoryId: z
     .string()
     .trim()
@@ -24,17 +25,17 @@ export const projectCreateArgsSchema = z.object({
   scope: z
     .enum(PROJECT_SCOPES)
     .describe('private: only project members can access; public: any non-guest member of the organization can access'),
-});
+} satisfies Record<keyof ProjectCreateArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(projectCreateArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Create a new project in the caller's organization (name = API project code)",
     name: 'create',
   },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(projectCreateArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runProjectCreate({
       api,

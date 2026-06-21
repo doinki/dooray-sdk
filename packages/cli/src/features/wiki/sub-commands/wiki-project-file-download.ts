@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const wikiProjectFileDownloadArgsSchema = z.object({
+const schema = z.object({
   attachFileId: z.string().min(1).meta({ hint: 'attachFileId' }).describe('Attach file id (from `dooray wiki view`)'),
   outputPath: z
     .string()
@@ -16,7 +16,7 @@ export const wikiProjectFileDownloadArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiProjectFileDownloadArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Download a wiki-level attach file to a local file', name: 'project-file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -25,7 +25,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiProjectFileDownload,
-      schema: wikiProjectFileDownloadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Downloaded to \`${result.data.path}\`.`);

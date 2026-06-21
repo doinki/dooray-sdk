@@ -9,13 +9,13 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField } from '../../../shared/utils/fields';
 
-export const templateDeleteArgsSchema = z.object({
+const schema = z.object({
   id: z.string().min(1).meta({ hint: 'templateId', positional: true }).describe('Template id to delete'),
   yes: confirmField,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(templateDeleteArgsSchema),
+  args: argsFromSchema(schema),
   meta: { description: 'Delete a task template from the project (irreversible)', name: 'template-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -26,7 +26,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectTemplateDelete,
-      schema: templateDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted template \`${data.id}\`.`);

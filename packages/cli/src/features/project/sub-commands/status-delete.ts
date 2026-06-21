@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField } from '../../../shared/utils/fields';
 
-export const statusDeleteArgsSchema = z.object({
+const schema = z.object({
   id: z.string().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to delete'),
   moveTo: z
     .string()
@@ -20,7 +20,7 @@ export const statusDeleteArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(statusDeleteArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Delete a status; its tasks move to `--move-to` (irreversible)',
     name: 'status-delete',
@@ -38,7 +38,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectStatusDelete,
-      schema: statusDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted status \`${data.id}\`.`);

@@ -8,7 +8,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { optionalDate } from '../utils/fields';
 
-export const milestoneUpdateArgsSchema = z
+const schema = z
   .object({
     endDate: optionalDate('New end date with timezone offset (e.g. `2026-08-22+09:00`)'),
     id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id'),
@@ -40,7 +40,7 @@ export const milestoneUpdateArgsSchema = z
   });
 
 export default defineSubcommand({
-  args: argsFromSchema(milestoneUpdateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: 'Update a milestone (supplied fields only; state toggles open/close)',
     name: 'milestone-update',
@@ -52,7 +52,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectMilestoneUpdate,
-      schema: milestoneUpdateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated milestone \`${data.id}\`.`);

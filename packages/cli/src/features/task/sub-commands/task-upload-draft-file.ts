@@ -1,3 +1,4 @@
+import type { TaskUploadDraftFileArgs } from '@dooray-sdk/core';
 import { runTaskUploadDraftFile } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -6,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 
-export const taskUploadDraftFileArgsSchema = z.object({
+const schema = z.object({
   contentType: z
     .string()
     .trim()
@@ -19,17 +20,17 @@ export const taskUploadDraftFileArgsSchema = z.object({
     .meta({ hint: 'draftId' })
     .describe('Draft id (from `dooray task create-draft`; not a task id)'),
   filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
-});
+} satisfies Record<keyof TaskUploadDraftFileArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(taskUploadDraftFileArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Attach a local file to a draft task (use `task file-upload` for a real task)',
     name: 'upload-draft-file',
   },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(taskUploadDraftFileArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runTaskUploadDraftFile({ api, args: data });
 

@@ -6,7 +6,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const tagGroupUpdateArgsSchema = z.object({
+const schema = z.object({
   id: z
     .string()
     .min(1)
@@ -20,7 +20,7 @@ export const tagGroupUpdateArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(tagGroupUpdateArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     description: "Update a tag group's constraints (required / single-select)",
     name: 'tag-group-update',
@@ -32,7 +32,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runProjectTagGroupUpdate,
-      schema: tagGroupUpdateArgsSchema,
+      schema,
     });
   },
 });

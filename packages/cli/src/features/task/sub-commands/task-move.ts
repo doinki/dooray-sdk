@@ -9,7 +9,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskMoveArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     includeSubTasks: z.boolean().optional().describe("Move the task's subtasks along with it (default: true)"),
@@ -23,7 +23,7 @@ export const taskMoveArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskMoveArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Move a task to another project (clears the task's status and tags; irreversible)",
@@ -42,7 +42,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskMove,
-      schema: taskMoveArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Moved task \`${result.data.post.id}\` to project \`${result.data.project.id}\`.`);

@@ -8,7 +8,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { formatUser } from '../../../shared/utils/user';
 
-export const templateViewArgsSchema = z.object({
+const schema = z.object({
   expand: z
     .boolean()
     .optional()
@@ -20,7 +20,7 @@ export const templateViewArgsSchema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(templateViewArgsSchema),
+  args: argsFromSchema(schema),
   meta: {
     // oxlint-disable-next-line no-template-curly-in-string
     description: "Show a task template's full content; expand substitutes ${...} macros",
@@ -33,7 +33,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runProjectTemplateView,
-      schema: templateViewArgsSchema,
+      schema,
     });
   },
 });

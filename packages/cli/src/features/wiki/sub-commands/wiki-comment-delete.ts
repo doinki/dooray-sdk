@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiCommentDeleteArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     commentId: z
@@ -22,7 +22,7 @@ export const wikiCommentDeleteArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiCommentDeleteArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete a wiki comment (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
@@ -34,7 +34,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runWikiCommentDelete,
-      schema: wikiCommentDeleteArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Deleted comment \`${data.commentId}\`.`);

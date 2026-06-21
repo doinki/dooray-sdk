@@ -8,7 +8,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 import { formatDateTime } from '../../../shared/utils/text';
 
-export const taskFileViewArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     fileId: z.string().min(1).meta({ hint: 'fileId' }).describe('Attachment file id (from `dooray task file-list`)'),
@@ -16,7 +16,7 @@ export const taskFileViewArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskFileViewArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "View a task attachment's metadata (use file-download for the bytes)", name: 'file-view' },
   async run({ api, args, formatter }) {
@@ -26,7 +26,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runTaskFileView,
-      schema: taskFileViewArgsSchema,
+      schema,
     });
   },
 });

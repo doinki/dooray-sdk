@@ -1,3 +1,4 @@
+import type { MemberSearchArgs } from '@dooray-sdk/core';
 import { runMemberSearch } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import columnify from 'columnify';
@@ -5,29 +6,34 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
-import { csvField } from '../../../shared/utils/fields';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 
-export const memberSearchArgsSchema = z.object({
-  email: csvField('Search by external email address (exact match; comma-separated for multiple)', 'email[,email...]'),
+const schema = z.object({
+  email: z
+    .string()
+    .transform(splitCsv)
+    .optional()
+    .describe('Search by external email address (exact match; comma-separated for multiple)')
+    .meta({ hint: 'email[,email...]' }),
   exactUserCode: z.string().optional().meta({ hint: 'code' }).describe('Search by user code (exact match)'),
   name: z.string().optional().meta({ hint: 'name' }).describe('Search by display name'),
   page: pageSchema,
   size: sizeSchema,
   ssoId: z.string().optional().meta({ hint: 'id' }).describe('Search by SSO-provided user id (e.g., employee number)'),
   userCode: z.string().optional().meta({ hint: 'code' }).describe('Search by user code (substring match)'),
-});
+} satisfies Record<keyof MemberSearchArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(memberSearchArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: 'Search tenant members by email, user code, name, or SSO id (at least one; paginated)',
     name: 'search',
   },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(memberSearchArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runMemberSearch({
       api,

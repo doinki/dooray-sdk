@@ -1,3 +1,4 @@
+import type { ProjectListArgs } from '@dooray-sdk/core';
 import { runProjectList } from '@dooray-sdk/core';
 import { PROJECT_SCOPES, PROJECT_STATES, PROJECT_TYPES } from '@dooray-sdk/core/constants';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
@@ -9,7 +10,7 @@ import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
-export const projectListArgsSchema = z.object({
+const schema = z.object({
   member: z
     .string()
     .default('me')
@@ -30,14 +31,14 @@ export const projectListArgsSchema = z.object({
     .describe(
       'Project type filter — `private` includes 1-on-1 personal projects (which always appear first); `public` excludes them (default: public)',
     ),
-});
+} satisfies Record<keyof ProjectListArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(projectListArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'List projects accessible to the caller, with filters and pagination', name: 'list' },
   async run({ api, args, formatter }) {
-    const data = parseArgsOrThrow(projectListArgsSchema, args);
+    const data = parseArgsOrThrow(schema, args);
 
     const result = await runProjectList({
       api,

@@ -7,7 +7,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
-export const taskSetStatusArgsSchema = requireTaskRef(
+const schema = requireTaskRef(
   z.object({
     ...taskRefShape,
     statusId: z
@@ -19,7 +19,7 @@ export const taskSetStatusArgsSchema = requireTaskRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(taskSetStatusArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Set a task to any project status, including reopening a closed task', name: 'set-status' },
   async run({ api, args, formatter }) {
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: renderId,
       run: runTaskSetStatus,
-      schema: taskSetStatusArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated status of task \`${result.data.id}\`.`);

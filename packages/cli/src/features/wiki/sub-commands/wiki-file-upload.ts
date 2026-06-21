@@ -8,7 +8,7 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiFileUploadArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     contentType: z
@@ -23,7 +23,7 @@ export const wikiFileUploadArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiFileUploadArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Attach a local file to a wiki page', name: 'file-upload' },
   async run({ api, args, formatter }) {
@@ -33,7 +33,7 @@ export default defineSubcommand({
       formatter,
       render: renderPretty,
       run: runWikiFileUpload,
-      schema: wikiFileUploadArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Uploaded file \`${result.data.id}\`.`);

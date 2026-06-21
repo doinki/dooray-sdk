@@ -6,7 +6,7 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
-export const wikiCommentUpdateArgsSchema = requireWikiRef(
+const schema = requireWikiRef(
   z.object({
     ...wikiRefShape,
     body: z.string().min(1).meta({ hint: 'text' }).describe('New comment body (Markdown). Replaces the whole body.'),
@@ -19,7 +19,7 @@ export const wikiCommentUpdateArgsSchema = requireWikiRef(
 );
 
 export default defineSubcommand({
-  args: argsFromSchema(wikiCommentUpdateArgsSchema),
+  args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: "Replace a wiki comment's body", name: 'comment-update' },
   async run({ api, args, formatter }) {
@@ -29,7 +29,7 @@ export default defineSubcommand({
       formatter,
       render: () => null,
       run: runWikiCommentUpdate,
-      schema: wikiCommentUpdateArgsSchema,
+      schema,
     });
 
     formatter.printInfo(`Updated comment \`${data.commentId}\`.`);
