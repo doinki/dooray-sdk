@@ -3,9 +3,9 @@ import { relative, resolve } from 'node:path';
 
 import json from '@rollup/plugin-json';
 import nodeResolve from '@rollup/plugin-node-resolve';
+import swc from '@rollup/plugin-swc';
 import { defineConfig } from 'rollup';
 import dts from 'rollup-plugin-dts';
-import esbuild from 'rollup-plugin-esbuild';
 
 const packageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
 
@@ -21,7 +21,7 @@ const inputFiles = Object.fromEntries(
   ]),
 );
 const extensions = ['.ts', '.js'];
-const target = (packageJson.browserslist ?? []).map((entry) => entry.replaceAll(' ', ''));
+const targets = packageJson.browserslist;
 
 const emitTypes =
   Boolean(packageJson.types) ||
@@ -42,7 +42,18 @@ export default defineConfig([
         sourcemap: true,
       },
     ],
-    plugins: [json(), nodeResolve({ extensions }), esbuild({ target })],
+    plugins: [
+      json(),
+      nodeResolve({ extensions }),
+      swc({
+        swc: {
+          jsc: {
+            parser: { syntax: 'typescript' },
+          },
+          ...(targets ? { env: { targets } } : {}),
+        },
+      }),
+    ],
     treeshake: true,
   },
   ...(emitTypes
@@ -58,7 +69,7 @@ export default defineConfig([
               preserveModulesRoot: sourceDirectory,
             },
           ],
-          plugins: [json(), dts()],
+          plugins: [dts()],
         },
       ]
     : []),
