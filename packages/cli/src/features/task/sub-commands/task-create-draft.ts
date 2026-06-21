@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { csvField } from '../../../shared/schema/fields';
 
@@ -49,7 +49,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runTaskCreateDraft,
       schema: taskCreateDraftArgsSchema,
     });
@@ -57,7 +57,3 @@ export default defineSubcommand({
     formatter.printInfo(`Created draft \`${result.data.id}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCreateDraft>>): string {
-  return renderKeyValue([['ID', data.id]]);
-}

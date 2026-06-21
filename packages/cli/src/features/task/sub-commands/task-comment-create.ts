@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { csvField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
 
@@ -32,7 +32,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runTaskCommentCreate,
       schema: taskCommentCreateArgsSchema,
     });
@@ -40,7 +40,3 @@ export default defineSubcommand({
     formatter.printInfo(`Created comment \`${result.data.id}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCommentCreate>>): string {
-  return renderKeyValue([['ID', data.id]]);
-}

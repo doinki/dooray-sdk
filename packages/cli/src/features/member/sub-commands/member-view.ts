@@ -2,9 +2,9 @@ import { runMemberView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
+import { renderMember } from '../render';
 
 export const memberViewArgsSchema = z.object({
   id: z.string().min(1).meta({ hint: 'memberId', positional: true }).describe('Dooray member id'),
@@ -19,17 +19,6 @@ export default defineSubcommand({
 
     const result = await runMemberView({ api, args: data });
 
-    formatter.printData(result, renderPretty);
+    formatter.printData(result, renderMember);
   },
 });
-
-function renderPretty({ data: member }: Awaited<ReturnType<typeof runMemberView>>): string {
-  return renderKeyValue([
-    ['ID', member.id],
-    ['Name', member.name],
-    ['User Code', member.userCode],
-    ['External Email', member.externalEmailAddress],
-    ['Locale', member.locale],
-    ['Timezone', member.timezoneName],
-  ]);
-}

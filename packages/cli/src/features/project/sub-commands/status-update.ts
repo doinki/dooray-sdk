@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { localeNamesSchema } from '../../../shared/schema/status-locale';
 
@@ -34,7 +34,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runProjectStatusUpdate,
       schema: statusUpdateArgsSchema,
     });
@@ -42,7 +42,3 @@ export default defineSubcommand({
     formatter.printInfo(`Updated status \`${data.name}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runProjectStatusUpdate>>): string {
-  return renderKeyValue([['ID', data.id]]);
-}

@@ -2,7 +2,7 @@ import { runTaskUploadDraftFile } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
 
@@ -33,11 +33,7 @@ export default defineSubcommand({
 
     const result = await runTaskUploadDraftFile({ api, args: data });
 
-    formatter.printData(result, renderPretty);
+    formatter.printData(result, renderId);
     formatter.printInfo(`Uploaded file \`${result.data.id}\` to draft \`${data.draftId}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runTaskUploadDraftFile>>): string {
-  return renderKeyValue([['ID', data.id]]);
-}

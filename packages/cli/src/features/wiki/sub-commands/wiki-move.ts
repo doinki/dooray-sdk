@@ -1,10 +1,12 @@
 import { runWikiMove } from '@dooray-sdk/core';
 import { z } from 'zod';
 
+import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
+import { confirmField, requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
 
 export const wikiMoveArgsSchema = requireWikiRef(
   z.object({
@@ -27,6 +29,7 @@ export const wikiMoveArgsSchema = requireWikiRef(
       .optional()
       .meta({ hint: 'projectId' })
       .describe('Destination project id when moving to another wiki (from `dooray wiki project-list`)'),
+    yes: confirmField,
   }),
 );
 
@@ -41,6 +44,8 @@ export default defineSubcommand({
     const { id } = await runWithWikiScope({
       api,
       args,
+      confirm: ({ args: a, id }) =>
+        confirmDeletion({ json: isJsonOutput(args.json), message: `Move wiki page \`${id}\`?`, skip: a.yes }),
       formatter,
       render: () => null,
       run: runWikiMove,

@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
 
@@ -22,7 +22,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runTaskClose,
       schema: taskCloseArgsSchema,
     });
@@ -30,7 +30,3 @@ export default defineSubcommand({
     formatter.printInfo(`Closed task \`${result.data.id}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runTaskClose>>) {
-  return renderKeyValue([['ID', data.id]]);
-}

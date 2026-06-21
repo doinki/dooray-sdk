@@ -1,14 +1,13 @@
 import { runTaskFileDelete } from '@dooray-sdk/core';
-import { resolveTaskId } from '@dooray-sdk/core/resolve';
 import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
 import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
-import { parseArgsOrThrow, scopeRef } from '../../../shared/schema/parse-args';
 
 export const taskFileDeleteArgsSchema = requireTaskRef(
   z.object({
@@ -27,22 +26,17 @@ export default defineSubcommand({
   globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Delete an attachment from a task (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
-    const { fileId, yes } = parseArgsOrThrow(taskFileDeleteArgsSchema, args);
-
-    await confirmDeletion({
-      json: isJsonOutput(args.json),
-      message: `Delete attachment \`${fileId}\`?`,
-      skip: yes,
+    const { data } = await runWithTaskScope({
+      api,
+      args,
+      confirm: ({ args: a }) =>
+        confirmDeletion({ json: isJsonOutput(args.json), message: `Delete attachment \`${a.fileId}\`?`, skip: a.yes }),
+      formatter,
+      render: renderId,
+      run: runTaskFileDelete,
+      schema: taskFileDeleteArgsSchema,
     });
 
-    const { id, projectId } = resolveTaskId(scopeRef(args));
-    const result = await runTaskFileDelete({ api, args: { fileId, id, projectId } });
-
-    formatter.printData(result, renderPretty);
-    formatter.printInfo(`Deleted attachment \`${fileId}\`.`);
+    formatter.printInfo(`Deleted attachment \`${data.fileId}\`.`);
   },
 });
-
-function renderPretty({ data }: Awaited<ReturnType<typeof runTaskFileDelete>>): string {
-  return renderKeyValue([['ID', data.id]]);
-}

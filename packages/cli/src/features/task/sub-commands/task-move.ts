@@ -1,11 +1,13 @@
 import { runTaskMove } from '@dooray-sdk/core';
 import { z } from 'zod';
 
+import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
 
 export const taskMoveArgsSchema = requireTaskRef(
   z.object({
@@ -16,6 +18,7 @@ export const taskMoveArgsSchema = requireTaskRef(
       .min(1)
       .meta({ hint: 'projectId' })
       .describe('Destination project id (from `dooray project list`)'),
+    yes: confirmField,
   }),
 );
 
@@ -30,6 +33,12 @@ export default defineSubcommand({
     const { result } = await runWithTaskScope({
       api,
       args,
+      confirm: ({ args: a, id }) =>
+        confirmDeletion({
+          json: isJsonOutput(args.json),
+          message: `Move task \`${id}\` to project \`${a.targetProjectId}\`? This clears its status and tags.`,
+          skip: a.yes,
+        }),
       formatter,
       render: renderPretty,
       run: runTaskMove,

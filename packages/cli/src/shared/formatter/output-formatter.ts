@@ -117,6 +117,14 @@ export function renderPagingFooter(paging: Paging): string {
   return `page ${currentPage}/${totalPages}, size: ${paging.size}${nextHint}`;
 }
 
+/**
+ * The ubiquitous "just the id" detail render shared by create/update/delete results,
+ * whose payload is a bare `{ id }`. Pass directly as a command's `render`.
+ */
+export function renderId(result: { data: { id: string } }): string {
+  return renderKeyValue([['ID', result.data.id]]);
+}
+
 export function renderKeyValue(rows: KeyValueRows): string {
   return columnify(
     rows.map(([key, value]) => ({
