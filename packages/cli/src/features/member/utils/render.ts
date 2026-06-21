@@ -1,15 +1,8 @@
+import type { Member } from '@dooray-sdk/client/common';
+
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 
-interface MemberDetail {
-  externalEmailAddress?: null | string;
-  id: string;
-  locale?: null | string;
-  name: string;
-  timezoneName?: null | string;
-  userCode?: null | string;
-}
-
-export function renderMember({ data }: { data: MemberDetail }): string {
+export function renderMember({ data }: { data: Member }): string {
   return renderKeyValue([
     ['ID', data.id],
     ['Name', data.name],

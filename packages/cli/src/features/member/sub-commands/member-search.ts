@@ -1,7 +1,6 @@
 import type { MemberSearchArgs } from '@dooray-sdk/core';
 import { runMemberSearch } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
-import columnify from 'columnify';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
@@ -9,6 +8,7 @@ import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { splitCsv } from '../../../shared/utils/csv';
 import { argsFromSchema } from '../../../shared/utils/derive-args';
 import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
+import { renderList } from '../../../shared/utils/table';
 
 const schema = z.object({
   email: z
@@ -48,15 +48,10 @@ export default defineSubcommand({
 function renderPretty({ data }: Awaited<ReturnType<typeof runMemberSearch>>): null | string {
   if (data.length === 0) return null;
 
-  return columnify(
-    data.map((member) => ({
-      email: member.externalEmailAddress,
-      id: member.id,
-      name: member.name,
-      user_code: member.userCode,
-    })),
-    {
-      columns: ['id', 'name', 'user_code', 'email'],
-    },
-  );
+  return renderList(data, [
+    { header: 'id', value: (member) => member.id },
+    { header: 'name', value: (member) => member.name },
+    { header: 'user_code', value: (member) => member.userCode },
+    { header: 'email', value: (member) => member.externalEmailAddress },
+  ]);
 }
