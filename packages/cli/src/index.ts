@@ -1,10 +1,12 @@
 import { defineCommand } from 'citty';
 
+import packageJson from '../package.json';
+
 export default defineCommand({
   meta: {
-    description: 'Dooray CLI — terminal access to Dooray Project & Task',
+    description: packageJson.description,
     name: 'dooray',
-    version: '0.0.0',
+    version: packageJson.version,
   },
   subCommands: {
     auth: () => import('./features/auth/sub-commands').then((m) => m.default),

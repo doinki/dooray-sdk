@@ -9,30 +9,18 @@ export function runProfileList(context: { profileStore: ProfileStore }) {
   return serializeProfileList(profiles, activeName);
 }
 
-interface ProfileListItemOutput {
-  active: boolean;
-  baseUrl: string;
-  environmentId: string;
-  environmentLabel: string;
-  memberName: null | string;
-  name: string;
-}
-
-interface ProfileListOutput {
-  activeProfile: null | string;
-  profiles: ProfileListItemOutput[];
-}
-
-export function serializeProfileList(profiles: ProfileRecord[], activeName: string | undefined): ProfileListOutput {
+export function serializeProfileList(profiles: ProfileRecord[], activeName: string | undefined) {
   return {
-    activeProfile: activeName ?? null,
-    profiles: profiles.map((profile) => ({
-      active: profile.name === activeName,
-      baseUrl: profile.baseUrl,
-      environmentId: profile.environmentId,
-      environmentLabel: findEnvironmentById(profile.environmentId)?.label ?? profile.environmentId,
-      memberName: profile.memberName ?? null,
-      name: profile.name,
-    })),
+    data: {
+      activeProfile: activeName ?? null,
+      profiles: profiles.map((profile) => ({
+        active: profile.name === activeName,
+        baseUrl: profile.baseUrl,
+        environmentId: profile.environmentId,
+        environmentLabel: findEnvironmentById(profile.environmentId)?.label ?? profile.environmentId,
+        memberName: profile.memberName ?? null,
+        name: profile.name,
+      })),
+    },
   };
 }

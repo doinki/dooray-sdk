@@ -1,6 +1,7 @@
-import { confirm, isCancel } from '@clack/prompts';
+import { confirm } from '@clack/prompts';
 
 import { cancelledError, confirmationRequiredError } from '../error/cli-errors';
+import { assertInteractive, unwrapPrompt } from '../prompts/interactive';
 
 export interface ConfirmDeletionOptions {
   json?: boolean;
@@ -19,9 +20,8 @@ export interface ConfirmDeletionOptions {
 export async function confirmDeletion(options: ConfirmDeletionOptions): Promise<void> {
   if (options.skip) return;
 
-  const stdin = options.stdin ?? process.stdin;
-  if (options.json === true || stdin.isTTY !== true) throw confirmationRequiredError();
+  assertInteractive(options, confirmationRequiredError);
 
-  const answer = await confirm({ initialValue: false, message: options.message });
-  if (isCancel(answer) || !answer) throw cancelledError();
+  const answer = unwrapPrompt(await confirm({ initialValue: false, message: options.message }));
+  if (!answer) throw cancelledError();
 }
