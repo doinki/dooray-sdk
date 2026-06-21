@@ -6,8 +6,8 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { confirmField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
 export const taskMoveArgsSchema = requireTaskRef(
   z.object({

@@ -4,10 +4,10 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { allField } from '../../../shared/schema/fields';
-import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { allField } from '../../../shared/utils/fields';
+import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
+import { renderList } from '../../../shared/utils/table';
 
 export const wikiProjectListArgsSchema = z.object({
   all: allField,

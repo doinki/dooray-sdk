@@ -3,8 +3,8 @@ import { resolveTaskId } from '@dooray-sdk/core/resolve';
 import type { z } from 'zod';
 
 import type { OutputFormatter, Render } from '../formatter/output-formatter';
-import type { ArgInput } from '../schema/parse-args';
-import { parseArgsOrThrow, scopeRef } from '../schema/parse-args';
+import type { ArgInput } from '../utils/parse-args';
+import { parseArgsOrThrow, scopeRef } from '../utils/parse-args';
 
 interface TaskScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;

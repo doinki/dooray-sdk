@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { formatDateTime } from '../../../shared/formatter/text';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { formatDateTime } from '../../../shared/utils/text';
 
 export const wikiViewArgsSchema = requireWikiRef(
   z.object({

@@ -3,9 +3,9 @@ import { PROJECT_SCOPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
+import { renderId } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 
 export const projectCreateArgsSchema = z.object({
   categoryId: z
@@ -41,11 +41,7 @@ export default defineSubcommand({
       args: data,
     });
 
-    formatter.printData(result, renderPretty);
+    formatter.printData(result, renderId);
     formatter.printInfo(`Created project \`${data.name}\`.`);
   },
 });
-
-function renderPretty({ data: result }: Awaited<ReturnType<typeof runProjectCreate>>): string {
-  return renderKeyValue([['ID', result.id]]);
-}

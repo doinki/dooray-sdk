@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
 
 export const taskCloseArgsSchema = requireTaskRef(
   z.object({

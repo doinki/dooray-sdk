@@ -1,7 +1,7 @@
 import { runMemberMe } from '@dooray-sdk/core';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderMember } from '../render';
+import { renderMember } from '../utils/render';
 
 export default defineSubcommand({
   globalArgs: ['json', 'profile', 'verbose'],

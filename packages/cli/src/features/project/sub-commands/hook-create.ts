@@ -5,36 +5,50 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { splitCsv } from '../../../shared/schema/csv';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { splitCsv } from '../../../shared/utils/csv';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
 
-export const hookCreateArgsSchema = z.object({
-  embedInlineImages: z
-    .boolean()
-    .default(false)
-    .describe(
-      'Replace inline image URLs in the payload body with base64-encoded images (only applies to postCreated, postBodyChanged, postCommentCreated, postCommentUpdated)',
-    ),
-  events: z
-    .string()
-    .transform(splitCsv)
-    .pipe(z.array(z.enum(PROJECT_HOOK_EVENTS)).min(1))
-    .meta({ hint: 'event[,event...]' })
-    .describe(
-      `Comma-separated hook events. Allowed values depend on --type — task: ${TASK_EVENTS.join(', ')}; project: ${PROJECT_EVENTS.join(', ')}`,
-    ),
-  includeBody: z
-    .boolean()
-    .default(false)
-    .describe(
-      'Include the post body content in the hook payload (only applies to postCreated, postBodyChanged, postCommentCreated, postCommentUpdated)',
-    ),
-  type: z
-    .enum(PROJECT_HOOK_TYPES)
-    .optional()
-    .describe('Hook type — task triggers on tasks, project triggers on project metadata (default: task)'),
-  url: z.url().meta({ hint: 'url' }).describe('Webhook endpoint URL that will receive the events'),
-});
+export const hookCreateArgsSchema = z
+  .object({
+    embedInlineImages: z
+      .boolean()
+      .default(false)
+      .describe(
+        'Replace inline image URLs in the payload body with base64-encoded images (only applies to postCreated, postBodyChanged, postCommentCreated, postCommentUpdated)',
+      ),
+    events: z
+      .string()
+      .transform(splitCsv)
+      .pipe(z.array(z.enum(PROJECT_HOOK_EVENTS)).min(1))
+      .meta({ hint: 'event[,event...]' })
+      .describe(
+        `Comma-separated hook events. Allowed values depend on --type — task: ${TASK_EVENTS.join(', ')}; project: ${PROJECT_EVENTS.join(', ')}`,
+      ),
+    includeBody: z
+      .boolean()
+      .default(false)
+      .describe(
+        'Include the post body content in the hook payload (only applies to postCreated, postBodyChanged, postCommentCreated, postCommentUpdated)',
+      ),
+    type: z
+      .enum(PROJECT_HOOK_TYPES)
+      .optional()
+      .describe('Hook type — task triggers on tasks, project triggers on project metadata (default: task)'),
+    url: z.url().meta({ hint: 'url' }).describe('Webhook endpoint URL that will receive the events'),
+  })
+  .superRefine((args, ctx) => {
+    // `--events` are validated against the full union above; here we enforce that each one belongs
+    // to the selected `--type` (defaults to task), matching the API's per-type event constraint.
+    const allowed: readonly string[] = (args.type ?? 'task') === 'project' ? PROJECT_EVENTS : TASK_EVENTS;
+    const invalid = args.events.filter((event) => !allowed.includes(event));
+    if (invalid.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `${invalid.join(', ')} — not valid for --type ${args.type ?? 'task'}. Allowed: ${allowed.join(', ')}`,
+        path: ['events'],
+      });
+    }
+  });
 
 export default defineSubcommand({
   args: argsFromSchema(hookCreateArgsSchema),

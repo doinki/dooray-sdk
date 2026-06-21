@@ -1,7 +1,7 @@
 import { runProjectCategoryList } from '@dooray-sdk/core';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderList } from '../../../shared/formatter/table';
+import { renderList } from '../../../shared/utils/table';
 
 export default defineSubcommand({
   globalArgs: ['json', 'profile', 'verbose'],

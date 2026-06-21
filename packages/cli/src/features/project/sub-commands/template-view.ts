@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { formatUser } from '../../../shared/formatter/user';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { formatUser } from '../../../shared/utils/user';
 
 export const templateViewArgsSchema = z.object({
   expand: z

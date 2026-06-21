@@ -1,4 +1,4 @@
-import { renderKeyValue } from '../../shared/formatter/output-formatter';
+import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 
 /** Structural view over the member detail shared by `member me` and `member view`. */
 interface MemberDetail {

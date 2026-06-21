@@ -4,7 +4,7 @@ import { resolveProjectId } from '@dooray-sdk/core/resolve';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
+import { renderList } from '../../../shared/utils/table';
 
 export default defineSubcommand({
   meta: {

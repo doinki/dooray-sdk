@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { renderId } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
 
 export const tagCreateArgsSchema = z.object({
   color: z.string().trim().min(1).meta({ hint: 'rrggbb' }).describe('6-digit hex color without `#` (e.g. `ffffff`)'),
@@ -24,7 +24,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runProjectTagCreate,
       schema: tagCreateArgsSchema,
     });
@@ -32,7 +32,3 @@ export default defineSubcommand({
     formatter.printInfo(`Created tag \`${data.name}\`.`);
   },
 });
-
-function renderPretty({ data: result }: Awaited<ReturnType<typeof runProjectTagCreate>>): string {
-  return renderKeyValue([['ID', result.id]]);
-}

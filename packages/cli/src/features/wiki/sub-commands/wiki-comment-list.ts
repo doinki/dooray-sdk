@@ -5,10 +5,10 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
-import { formatDateTime, truncate } from '../../../shared/formatter/text';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { allField, requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { allField, requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
+import { renderList } from '../../../shared/utils/table';
+import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 export const wikiCommentListArgsSchema = requireWikiRef(
   z.object({

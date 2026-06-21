@@ -6,9 +6,9 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
-import { splitCsv } from '../../../shared/schema/csv';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { splitCsv } from '../../../shared/utils/csv';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { renderList } from '../../../shared/utils/table';
 
 export const memberListArgsSchema = z.object({
   page: pageSchema,

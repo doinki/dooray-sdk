@@ -1,4 +1,4 @@
-import { splitCsv } from '../schema/csv';
+import { splitCsv } from '../utils/csv';
 
 /**
  * `--json` is a string selector, not a boolean (citty coerces a value-less string flag to `''`):

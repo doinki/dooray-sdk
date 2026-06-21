@@ -1,12 +1,13 @@
 import { runTaskUpdate } from '@dooray-sdk/core';
-import { BODY_MIME_TYPES, TASK_PRIORITIES } from '@dooray-sdk/core/constants';
+import { TASK_PRIORITIES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { csvField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { csvField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { mimeTypeField } from '../utils/fields';
 
 export const taskUpdateArgsSchema = requireTaskRef(
   z.object({
@@ -37,10 +38,7 @@ export const taskUpdateArgsSchema = requireTaskRef(
       .optional()
       .meta({ hint: 'milestoneId' })
       .describe('Milestone id (from `dooray project milestone-list`).'),
-    mimeType: z
-      .enum(BODY_MIME_TYPES)
-      .optional()
-      .describe('Body content type — text/x-markdown or text/html. Pass alongside --body.'),
+    mimeType: mimeTypeField('Body content type — text/x-markdown or text/html. Pass alongside --body.'),
     priority: z
       .enum(TASK_PRIORITIES)
       .optional()

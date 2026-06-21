@@ -6,9 +6,9 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
-import { formatUser } from '../../../shared/formatter/user';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { renderList } from '../../../shared/utils/table';
+import { formatUser } from '../../../shared/utils/user';
 
 export const templateListArgsSchema = z.object({
   page: pageSchema,

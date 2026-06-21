@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { csvField } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { csvField } from '../../../shared/utils/fields';
 
 export const wikiCreateArgsSchema = z.object({
   body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),

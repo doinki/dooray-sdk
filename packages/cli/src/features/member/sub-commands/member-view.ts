@@ -2,9 +2,9 @@ import { runMemberView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { parseArgsOrThrow } from '../../../shared/schema/parse-args';
-import { renderMember } from '../render';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
+import { renderMember } from '../utils/render';
 
 export const memberViewArgsSchema = z.object({
   id: z.string().min(1).meta({ hint: 'memberId', positional: true }).describe('Dooray member id'),

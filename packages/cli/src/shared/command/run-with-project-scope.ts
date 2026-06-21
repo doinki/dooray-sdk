@@ -3,8 +3,8 @@ import { resolveProjectId } from '@dooray-sdk/core/resolve';
 import type { z } from 'zod';
 
 import type { OutputFormatter, Render } from '../formatter/output-formatter';
-import type { ArgInput } from '../schema/parse-args';
-import { parseArgsOrThrow } from '../schema/parse-args';
+import type { ArgInput } from '../utils/parse-args';
+import { parseArgsOrThrow } from '../utils/parse-args';
 
 interface ProjectScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;

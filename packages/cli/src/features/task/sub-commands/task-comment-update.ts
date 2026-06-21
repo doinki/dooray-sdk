@@ -1,12 +1,12 @@
 import { runTaskCommentUpdate } from '@dooray-sdk/core';
-import { BODY_MIME_TYPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { csvField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { csvField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { mimeTypeField } from '../utils/fields';
 
 export const taskCommentUpdateArgsSchema = requireTaskRef(
   z.object({
@@ -25,10 +25,7 @@ export const taskCommentUpdateArgsSchema = requireTaskRef(
       'Attachment file ids (comma-separated). Replaces the whole list; omit to keep current.',
       'id[,id...]',
     ),
-    mimeType: z
-      .enum(BODY_MIME_TYPES)
-      .optional()
-      .describe('Body content type — text/x-markdown or text/html (default: text/x-markdown)'),
+    mimeType: mimeTypeField(),
   }),
 );
 

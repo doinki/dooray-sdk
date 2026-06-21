@@ -3,10 +3,10 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
-import { renderList } from '../../../shared/formatter/table';
-import { formatDateTime } from '../../../shared/formatter/text';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { renderList } from '../../../shared/utils/table';
+import { formatDateTime } from '../../../shared/utils/text';
 
 export const taskFileListArgsSchema = requireTaskRef(
   z.object({

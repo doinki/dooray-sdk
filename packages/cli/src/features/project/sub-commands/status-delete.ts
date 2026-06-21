@@ -6,8 +6,8 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { confirmField } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { confirmField } from '../../../shared/utils/fields';
 
 export const statusDeleteArgsSchema = z.object({
   id: z.string().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to delete'),

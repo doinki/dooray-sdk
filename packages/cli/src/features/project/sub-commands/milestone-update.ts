@@ -5,33 +5,39 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { optionalDate } from '../utils/fields';
 
 export const milestoneUpdateArgsSchema = z
   .object({
-    endDate: z
-      .string()
-      .optional()
-      .meta({ hint: 'YYYY-MM-DD±HH:MM' })
-      .describe('New end date with timezone offset (e.g. `2026-08-22+09:00`)'),
+    endDate: optionalDate('New end date with timezone offset (e.g. `2026-08-22+09:00`)'),
     id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id'),
     name: z
       .string()
       .trim()
       .min(1, 'Milestone name must not be empty.')
+      .optional()
       .meta({ hint: 'text' })
       .describe('New milestone name'),
-    startDate: z
-      .string()
-      .optional()
-      .meta({ hint: 'YYYY-MM-DD±HH:MM' })
-      .describe('New start date with timezone offset (e.g. `2026-07-22+09:00`)'),
-    state: z.enum(MILESTONE_STATES).describe('open/closed lifecycle; closed milestones are still listed'),
+    startDate: optionalDate('New start date with timezone offset (e.g. `2026-07-22+09:00`)'),
+    state: z.enum(MILESTONE_STATES).optional().describe('open/closed lifecycle; closed milestones are still listed'),
   })
-  .refine(
-    (args) => (args.startDate === undefined) === (args.endDate === undefined),
-    'Provide both --start-date and --end-date, or neither.',
-  );
+  .superRefine((args, ctx) => {
+    if ((args.startDate === undefined) !== (args.endDate === undefined)) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Provide both --start-date and --end-date, or neither.',
+        path: ['startDate'],
+      });
+    }
+    if (args.name === undefined && args.state === undefined && args.startDate === undefined) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Nothing to update — pass at least one of --name, --state, or --start-date/--end-date.',
+        path: ['name'],
+      });
+    }
+  });
 
 export default defineSubcommand({
   args: argsFromSchema(milestoneUpdateArgsSchema),
@@ -40,7 +46,7 @@ export default defineSubcommand({
     name: 'milestone-update',
   },
   async run({ api, args, formatter }) {
-    await runWithProjectScope({
+    const { data } = await runWithProjectScope({
       api,
       args,
       formatter,
@@ -48,5 +54,7 @@ export default defineSubcommand({
       run: runProjectMilestoneUpdate,
       schema: milestoneUpdateArgsSchema,
     });
+
+    formatter.printInfo(`Updated milestone \`${data.id}\`.`);
   },
 });

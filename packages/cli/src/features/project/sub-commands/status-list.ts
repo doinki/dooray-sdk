@@ -2,7 +2,7 @@ import { runProjectStatusList } from '@dooray-sdk/core';
 import { resolveProjectId } from '@dooray-sdk/core/resolve';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { renderList } from '../../../shared/formatter/table';
+import { renderList } from '../../../shared/utils/table';
 
 export default defineSubcommand({
   meta: {

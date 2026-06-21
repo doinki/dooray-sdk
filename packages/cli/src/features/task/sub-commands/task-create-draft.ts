@@ -1,12 +1,13 @@
 import { runTaskCreateDraft } from '@dooray-sdk/core';
-import { BODY_MIME_TYPES, TASK_PRIORITIES } from '@dooray-sdk/core/constants';
+import { TASK_PRIORITIES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { csvField } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { csvField } from '../../../shared/utils/fields';
+import { mimeTypeField } from '../utils/fields';
 
 export const taskCreateDraftArgsSchema = z.object({
   assignees: csvField('Assignees (comma-separated — `@me` or member ids; default: @me)', 'user[,user...]'),
@@ -29,10 +30,7 @@ export const taskCreateDraftArgsSchema = z.object({
     .optional()
     .meta({ hint: 'milestoneId' })
     .describe('Milestone id (from `dooray project milestone-list`)'),
-  mimeType: z
-    .enum(BODY_MIME_TYPES)
-    .optional()
-    .describe('Body content type — text/x-markdown or text/html (default: text/x-markdown)'),
+  mimeType: mimeTypeField(),
   priority: z.enum(TASK_PRIORITIES).optional().describe('Priority — highest, high, normal, low, lowest, or none'),
   tagIds: csvField('Tag ids (comma-separated; from `dooray project tag-list`)', 'id[,id...]'),
   title: z.string().trim().min(1, 'Draft title must not be empty.').meta({ hint: 'text' }).describe('Draft title'),

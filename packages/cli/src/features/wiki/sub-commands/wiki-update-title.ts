@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { requireWikiRef, wikiRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { requireWikiRef, wikiRefShape } from '../../../shared/utils/fields';
 
 export const wikiUpdateTitleArgsSchema = requireWikiRef(
   z.object({

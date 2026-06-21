@@ -5,8 +5,8 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { localeNamesSchema } from '../../../shared/schema/status-locale';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { localeNamesSchema } from '../utils/status-locale';
 
 export const statusUpdateArgsSchema = z.object({
   class: statusClassSchema.optional(),
@@ -39,6 +39,6 @@ export default defineSubcommand({
       schema: statusUpdateArgsSchema,
     });
 
-    formatter.printInfo(`Updated status \`${data.name}\`.`);
+    formatter.printInfo(`Updated status \`${data.id}\`.`);
   },
 });

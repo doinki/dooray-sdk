@@ -2,7 +2,7 @@ import type { StatusLocaleName } from '@dooray-sdk/core/constants';
 import { STATUS_LOCALES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
-import { splitCsv } from './csv';
+import { splitCsv } from '../../../shared/utils/csv';
 
 /**
  * Parse a `locale=name,locale=name` CLI value into the SDK's per-locale name list.

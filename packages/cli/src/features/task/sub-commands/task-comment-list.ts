@@ -6,10 +6,10 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { renderList } from '../../../shared/formatter/table';
-import { formatDateTime, truncate } from '../../../shared/formatter/text';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-import { allField, requireTaskRef, taskRefShape } from '../../../shared/schema/fields';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { allField, requireTaskRef, taskRefShape } from '../../../shared/utils/fields';
+import { renderList } from '../../../shared/utils/table';
+import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
@@ -29,7 +29,10 @@ export const taskCommentListArgsSchema = requireTaskRef(
 export default defineSubcommand({
   args: argsFromSchema(taskCommentListArgsSchema),
   globalArgs: ['json', 'profile', 'verbose'],
-  meta: { description: "List a task's comments and system events (oldest-first; --all fetches every page)" },
+  meta: {
+    description: "List a task's comments and system events (oldest-first; --all fetches every page)",
+    name: 'comment-list',
+  },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
       api,

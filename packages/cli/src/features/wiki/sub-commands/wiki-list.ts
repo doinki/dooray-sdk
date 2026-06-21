@@ -3,9 +3,9 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderList } from '../../../shared/formatter/table';
-import { truncate } from '../../../shared/formatter/text';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { renderList } from '../../../shared/utils/table';
+import { truncate } from '../../../shared/utils/text';
 
 export const wikiListArgsSchema = z.object({
   parentId: z

@@ -3,17 +3,9 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schema/derive-args';
-
-const optionalDate = (describe: string) =>
-  z
-    .string()
-    .trim()
-    .optional()
-    .transform((value) => value || undefined)
-    .meta({ hint: 'YYYY-MM-DD±HH:MM' })
-    .describe(describe);
+import { renderId } from '../../../shared/formatter/output-formatter';
+import { argsFromSchema } from '../../../shared/utils/derive-args';
+import { optionalDate } from '../utils/fields';
 
 export const milestoneCreateArgsSchema = z
   .object({
@@ -26,10 +18,10 @@ export const milestoneCreateArgsSchema = z
       .describe('Milestone name (e.g. `1단계`)'),
     startDate: optionalDate('Start date with timezone offset (e.g. `2026-06-22+09:00`)'),
   })
-  .refine(
-    (args) => (args.startDate === undefined) === (args.endDate === undefined),
-    'Provide both --start-date and --end-date, or pass only --name.',
-  );
+  .refine((args) => (args.startDate === undefined) === (args.endDate === undefined), {
+    message: 'Provide both --start-date and --end-date, or pass only --name.',
+    path: ['startDate'],
+  });
 
 export default defineSubcommand({
   args: argsFromSchema(milestoneCreateArgsSchema),
@@ -39,7 +31,7 @@ export default defineSubcommand({
       api,
       args,
       formatter,
-      render: renderPretty,
+      render: renderId,
       run: runProjectMilestoneCreate,
       schema: milestoneCreateArgsSchema,
     });
@@ -47,7 +39,3 @@ export default defineSubcommand({
     formatter.printInfo(`Created milestone \`${data.name}\`.`);
   },
 });
-
-function renderPretty({ data: result }: Awaited<ReturnType<typeof runProjectMilestoneCreate>>): string {
-  return renderKeyValue([['ID', result.id]]);
-}
