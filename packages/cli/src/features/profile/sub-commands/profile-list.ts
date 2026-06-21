@@ -4,7 +4,7 @@ import { runProfileList } from '../operations/profile-list';
 
 export default defineSubcommand({
   globalArgs: ['json'],
-  meta: { description: 'List registered profiles', name: 'list' },
+  meta: { description: 'List saved profiles', name: 'list' },
   mode: 'local',
   run({ formatter, profileStore }) {
     const result = runProfileList({ profileStore });

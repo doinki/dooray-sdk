@@ -1,7 +1,7 @@
 import { defineCommand } from 'citty';
 
 export default defineCommand({
-  meta: { description: 'Manage profiles', name: 'profile' },
+  meta: { description: 'Manage saved login profiles', name: 'profile' },
   subCommands: {
     add: () => import('./profile-add').then((m) => m.default),
     list: () => import('./profile-list').then((m) => m.default),

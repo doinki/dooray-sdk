@@ -12,7 +12,7 @@ const schema = z.object({
 export default defineSubcommand({
   args: argsFromSchema(schema),
   globalArgs: [],
-  meta: { description: 'Unregister a profile', name: 'remove' },
+  meta: { description: 'Remove a saved profile', name: 'remove' },
   mode: 'local',
   run({ args, formatter, profileStore }) {
     const data = parseArgsOrThrow(schema, args);

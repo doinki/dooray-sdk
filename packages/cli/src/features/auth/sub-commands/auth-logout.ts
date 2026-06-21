@@ -3,7 +3,7 @@ import { runAuthLogout } from '../operations/auth-logout';
 
 export default defineSubcommand({
   globalArgs: [],
-  meta: { description: 'Log out the active profile', name: 'logout' },
+  meta: { description: 'Log out the active profile (clears its stored token)', name: 'logout' },
   mode: 'local',
   run({ formatter, profileStore }) {
     const result = runAuthLogout({ profileStore });

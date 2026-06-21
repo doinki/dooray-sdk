@@ -15,14 +15,14 @@ const schema = z.object({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Search by external email address (exact match; comma-separated for multiple)')
+    .describe('Filter by external email (exact match; comma-separated)')
     .meta({ hint: 'email[,email...]' }),
-  exactUserCode: z.string().optional().meta({ hint: 'code' }).describe('Search by user code (exact match)'),
-  name: z.string().optional().meta({ hint: 'name' }).describe('Search by display name'),
+  exactUserCode: z.string().optional().meta({ hint: 'code' }).describe('Filter by user code (exact match)'),
+  name: z.string().optional().describe('Filter by display name'),
   page: pageSchema,
   size: sizeSchema,
-  ssoId: z.string().optional().meta({ hint: 'id' }).describe('Search by SSO-provided user id (e.g., employee number)'),
-  userCode: z.string().optional().meta({ hint: 'code' }).describe('Search by user code (substring match)'),
+  ssoId: z.string().optional().meta({ hint: 'id' }).describe('Filter by SSO/IdP user id (e.g. employee number)'),
+  userCode: z.string().optional().meta({ hint: 'code' }).describe('Filter by user code (substring match)'),
 } satisfies Record<keyof MemberSearchArgs, any>);
 
 export default defineSubcommand({

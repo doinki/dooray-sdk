@@ -8,7 +8,12 @@ import { parseArgsOrThrow } from '../../../shared/utils/parse-args';
 import { renderMember } from '../utils/render';
 
 const schema = z.object({
-  id: z.string().trim().min(1).meta({ hint: 'memberId', positional: true }).describe('Dooray member id'),
+  id: z
+    .string()
+    .trim()
+    .min(1)
+    .meta({ hint: 'memberId', positional: true })
+    .describe('Member id (from `dooray member search`)'),
 } satisfies Record<keyof MemberViewArgs, any>);
 
 export default defineSubcommand({

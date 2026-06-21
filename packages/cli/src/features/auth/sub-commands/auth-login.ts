@@ -7,7 +7,7 @@ import { AuthLoginPrompt } from '../prompts/auth-login';
 
 export default defineSubcommand({
   globalArgs: ['verbose'],
-  meta: { description: 'Select an environment and log in with a Personal API Token', name: 'login' },
+  meta: { description: 'Log in with a Personal API Token and save it as a profile', name: 'login' },
   mode: 'local',
   async run({ formatter, profileStore }) {
     const prompt = new AuthLoginPrompt();

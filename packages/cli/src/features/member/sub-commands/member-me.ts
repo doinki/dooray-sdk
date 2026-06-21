@@ -5,7 +5,7 @@ import { renderMember } from '../utils/render';
 
 export default defineSubcommand({
   globalArgs: ['json', 'profile', 'verbose'],
-  meta: { description: 'Show the member tied to the active profile token', name: 'me' },
+  meta: { description: 'Show the authenticated member for the active profile', name: 'me' },
   async run({ api, formatter }) {
     const result = await runMemberMe({ api });
 
