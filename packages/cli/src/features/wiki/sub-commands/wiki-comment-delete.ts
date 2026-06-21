@@ -9,7 +9,7 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
   commentId: z
@@ -18,14 +18,14 @@ const schema = z.object({
     .min(1)
     .meta({ hint: 'commentId', positional: true })
     .describe('Comment id to delete (from `dooray wiki comment-list`)'),
-  yes: confirmField,
+  yes: yesSchema,
 } satisfies CommandSchemaShape<WikiCommentDeleteArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   meta: { description: 'Delete a wiki comment (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
-    const { data } = await runWithWikiScope({
+    const { result } = await runWithWikiScope({
       api,
       args,
       confirm: ({ args: a }) =>
@@ -36,6 +36,6 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(`Deleted comment \`${data.commentId}\`.`);
+    formatter.printInfo(`Deleted comment \`${result.data.id}\`.`);
   },
 });

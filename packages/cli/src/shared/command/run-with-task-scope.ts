@@ -4,7 +4,7 @@ import type { z } from 'zod';
 
 import type { OutputFormatter, Render } from '../formatter/output-formatter';
 import type { ArgInput } from '../schemas/parse-args';
-import { parseArgsOrThrow, scopeRef } from '../schemas/parse-args';
+import { parseArgsOrThrow } from '../schemas/parse-args';
 
 interface TaskScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;
@@ -23,7 +23,7 @@ export async function runWithTaskScope<Args extends Record<string, unknown>, Res
   const { api, args, confirm, formatter, render, run, schema } = context;
 
   const data = parseArgsOrThrow(schema, args);
-  const { id, projectId } = resolveTaskId(scopeRef(args));
+  const { id, projectId } = resolveTaskId(args);
   await confirm?.({ args: data, id, projectId });
   const result = await run({ api, args: { ...data, id, projectId } });
 

@@ -17,10 +17,10 @@ interface WikiCommentUpdateContext {
 export async function runWikiCommentUpdate({ api, args }: WikiCommentUpdateContext) {
   const projectId = await resolveWikiProjectId(api, args);
 
-  const { result } = await api.wikiComment.update({
+  await api.wikiComment.update({
     body: { body: { content: args.body } },
     path: { commentId: args.commentId, pageId: args.id, wikiId: projectId },
   });
 
-  return { data: result };
+  return { data: { id: args.commentId } };
 }

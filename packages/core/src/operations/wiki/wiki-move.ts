@@ -19,7 +19,7 @@ interface WikiMoveContext {
 export async function runWikiMove({ api, args }: WikiMoveContext) {
   const projectId = await resolveWikiProjectId(api, args);
 
-  const { result } = await api.wikiPage.move({
+  await api.wikiPage.move({
     body: {
       beforePageId: args.beforeId,
       targetParentPageId: args.parentId,
@@ -29,5 +29,5 @@ export async function runWikiMove({ api, args }: WikiMoveContext) {
     path: { pageId: args.id, wikiId: projectId },
   });
 
-  return { data: result };
+  return { data: { id: args.id } };
 }

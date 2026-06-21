@@ -7,7 +7,7 @@ import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
   id: z.string().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to delete'),
@@ -16,7 +16,7 @@ const schema = z.object({
     .min(1)
     .meta({ hint: 'id' })
     .describe('Required — id of the status that orphaned tasks are moved to'),
-  yes: confirmField,
+  yes: yesSchema,
 });
 
 export default defineSubcommand({

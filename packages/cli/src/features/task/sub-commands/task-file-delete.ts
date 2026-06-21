@@ -7,7 +7,7 @@ import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
   fileId: z
@@ -15,7 +15,7 @@ const schema = z.object({
     .min(1)
     .meta({ hint: 'fileId', positional: true })
     .describe('Attachment id to delete (from `dooray task file-list`)'),
-  yes: confirmField,
+  yes: yesSchema,
 });
 
 export default defineSubcommand({

@@ -1,3 +1,4 @@
+import type { WikiCommentListArgs } from '@dooray-sdk/core';
 import { runWikiCommentList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
@@ -5,16 +6,17 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { allField } from '../../../shared/schemas/fields';
+import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 const schema = z.object({
-  all: allField,
+  all: allSchema,
   page: pageSchema,
   size: sizeSchema,
-});
+} satisfies CommandSchemaShape<WikiCommentListArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
@@ -38,7 +40,9 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCommentList>>):
 
   return renderList(data, [
     { header: 'id', value: (c) => c.id },
-    { header: 'created', value: (c) => formatDateTime(c.createdAt) },
+    { header: 'author', value: (c) => `${c.creator.member.name}(${c.creator.member.organizationMemberId})` },
     { header: 'body', value: (c) => truncate(c.body.content.replaceAll(/\s+/g, ' ').trim(), 60) },
+    { header: 'created', value: (c) => formatDateTime(c.createdAt) },
+    { header: 'updatedAt', value: (c) => formatDateTime(c.modifiedAt) },
   ]);
 }

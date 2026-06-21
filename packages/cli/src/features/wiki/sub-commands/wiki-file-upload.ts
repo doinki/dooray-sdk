@@ -1,3 +1,4 @@
+import type { WikiFileUploadArgs } from '@dooray-sdk/core';
 import { runWikiFileUpload } from '@dooray-sdk/core';
 import { WIKI_FILE_TYPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
@@ -5,6 +6,7 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
@@ -16,7 +18,7 @@ const schema = z.object({
     .describe('MIME type; omit to infer from the file extension'),
   filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
   type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: general or inline_image (default: general)'),
-});
+} satisfies CommandSchemaShape<WikiFileUploadArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

@@ -1,8 +1,10 @@
+import type { WikiListArgs } from '@dooray-sdk/core';
 import { runWikiList } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { truncate } from '../../../shared/utils/text';
@@ -14,7 +16,7 @@ const schema = z.object({
     .optional()
     .meta({ hint: 'pageId' })
     .describe('Parent page id (from `dooray wiki list`); omit for the top level'),
-});
+} satisfies CommandSchemaShape<WikiListArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

@@ -1,8 +1,10 @@
+import type { WikiUpdateCcArgs } from '@dooray-sdk/core';
 import { runWikiUpdateCc } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
@@ -12,7 +14,7 @@ const schema = z.object({
     .transform(splitCsv)
     .describe('Referrers (comma-separated — `@me` or member ids). Replaces the whole list.')
     .meta({ hint: 'user[,user...]' }),
-});
+} satisfies CommandSchemaShape<WikiUpdateCcArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

@@ -1,3 +1,4 @@
+import type { WikiSharedLinkListArgs } from '@dooray-sdk/core';
 import { runWikiSharedLinkList } from '@dooray-sdk/core';
 import { WIKI_SHARED_LINK_STATES } from '@dooray-sdk/core/constants';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
@@ -6,16 +7,17 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { allField } from '../../../shared/schemas/fields';
+import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 
 const schema = z.object({
-  all: allField,
+  all: allSchema,
   page: pageSchema,
   size: sizeSchema,
   state: z.enum(WIKI_SHARED_LINK_STATES).optional().describe('Filter by state: valid or invalid (default: valid)'),
-});
+} satisfies CommandSchemaShape<WikiSharedLinkListArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

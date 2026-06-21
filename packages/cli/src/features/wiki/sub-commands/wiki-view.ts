@@ -1,13 +1,15 @@
+import type { WikiViewArgs } from '@dooray-sdk/core';
 import { runWikiView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 
-const schema = z.object({});
+const schema = z.object({} satisfies CommandSchemaShape<WikiViewArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

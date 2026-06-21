@@ -1,9 +1,11 @@
+import type { WikiProjectFileDownloadArgs } from '@dooray-sdk/core';
 import { runWikiProjectFileDownload } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
@@ -17,7 +19,7 @@ const schema = z.object({
     .min(1)
     .meta({ hint: 'path' })
     .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
-});
+} satisfies CommandSchemaShape<WikiProjectFileDownloadArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

@@ -1,3 +1,4 @@
+import type { WikiMoveArgs } from '@dooray-sdk/core';
 import { runWikiMove } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,8 +6,9 @@ import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
   beforeId: z
@@ -23,8 +25,8 @@ const schema = z.object({
     .optional()
     .meta({ hint: 'projectId' })
     .describe('Destination project id when moving to another wiki (from `dooray wiki project-list`)'),
-  yes: confirmField,
-});
+  yes: yesSchema,
+} satisfies CommandSchemaShape<WikiMoveArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

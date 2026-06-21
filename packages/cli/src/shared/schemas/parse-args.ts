@@ -15,14 +15,6 @@ function camelize(key: string): string {
 
 export type ArgInput = Record<string, boolean | number | string | string[] | undefined>;
 
-/** Extract the `id`/`ref` scope pair from raw args as strings (citty values are loosely typed). */
-export function scopeRef(args: ArgInput): { id?: string; ref?: string } {
-  return {
-    id: typeof args.id === 'string' ? args.id : undefined,
-    ref: typeof args.ref === 'string' ? args.ref : undefined,
-  };
-}
-
 function camelizeKeys(input: ArgInput): ArgInput {
   const out: ArgInput = {};
   for (const key of Object.keys(input)) out[camelize(key)] = input[key];

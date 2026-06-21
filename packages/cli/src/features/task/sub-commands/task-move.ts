@@ -7,7 +7,7 @@ import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
   includeSubTasks: z.boolean().optional().describe("Move the task's subtasks along with it (default: true)"),
@@ -16,7 +16,7 @@ const schema = z.object({
     .min(1)
     .meta({ hint: 'projectId' })
     .describe('Destination project id (from `dooray project list`)'),
-  yes: confirmField,
+  yes: yesSchema,
 });
 
 export default defineSubcommand({

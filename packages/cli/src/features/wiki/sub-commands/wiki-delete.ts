@@ -1,3 +1,4 @@
+import type { WikiDeleteArgs } from '@dooray-sdk/core';
 import { runWikiDelete } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -6,12 +7,13 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { confirmField } from '../../../shared/schemas/fields';
+import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
-  yes: confirmField,
-});
+  yes: yesSchema,
+} satisfies CommandSchemaShape<WikiDeleteArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

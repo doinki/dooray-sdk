@@ -22,7 +22,7 @@ export async function runWikiUpdate({ api, args }: WikiUpdateContext) {
 
   const cc = args.cc ? await buildWikiCc(api, args.cc) : page.referrers;
 
-  const { result } = await api.wikiPage.update({
+  await api.wikiPage.update({
     body: {
       body: { content: args.body ?? page.body.content, mimeType: page.body.mimeType },
       referrers: cc,
@@ -31,5 +31,5 @@ export async function runWikiUpdate({ api, args }: WikiUpdateContext) {
     path: { pageId: args.id, wikiId: projectId },
   });
 
-  return { data: result };
+  return { data: { id: args.id } };
 }

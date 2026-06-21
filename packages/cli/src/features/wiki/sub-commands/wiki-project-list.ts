@@ -5,16 +5,17 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { allField } from '../../../shared/schemas/fields';
+import { allSchema } from '../../../shared/schemas/fields';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
 const schema = z.object({
-  all: allField,
+  all: allSchema,
   page: pageSchema,
   size: sizeSchema,
-} satisfies Record<keyof WikiProjectListArgs, any>);
+} satisfies CommandSchemaShape<WikiProjectListArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),

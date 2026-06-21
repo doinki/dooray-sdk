@@ -7,14 +7,14 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
-import { allField } from '../../../shared/schemas/fields';
+import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
 const schema = z.object({
-  all: allField,
+  all: allSchema,
   page: pageSchema,
   size: sizeSchema,
   sort: z
