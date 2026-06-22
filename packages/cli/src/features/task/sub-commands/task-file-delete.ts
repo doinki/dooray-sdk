@@ -14,13 +14,13 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
-    .describe('Attachment id to delete (from `dooray task file-list`)'),
+    .describe('Attachment id (from `dooray task file-list`).'),
   yes: yesSchema,
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Delete an attachment from a task (irreversible)', name: 'file-delete' },
+  meta: { description: 'Delete a task attachment (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithTaskScope({
       api,

@@ -11,12 +11,12 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'memberId' })
-    .describe('Assignee member id or `@me` (from `dooray member search`)'),
+    .describe('Assignee member id or `@me` (from `dooray member search`).'),
   statusId: z
     .string()
     .min(1)
     .meta({ hint: 'statusId' })
-    .describe('Status id to set for this assignee (from `dooray project status-list`)'),
+    .describe('Status id to set for this assignee (from `dooray project status-list`).'),
 });
 
 export default defineSubcommand({

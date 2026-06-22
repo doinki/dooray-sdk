@@ -6,18 +6,22 @@ import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
+import { formatCreator } from '../../../shared/utils/user';
 
 const schema = z.object({
   fileId: z
     .string()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
-    .describe('Attachment file id (from `dooray task file-list`)'),
+    .describe('Attachment id (from `dooray task file-list`).'),
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: "View a task attachment's metadata (use file-download for the bytes)", name: 'file-view' },
+  meta: {
+    description: "View a task attachment's metadata (use `dooray task file-download` for the bytes)",
+    name: 'file-view',
+  },
   async run({ api, args, formatter }) {
     await runWithTaskScope({
       api,
@@ -34,8 +38,9 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runTaskFileView>>): st
   return renderKeyValue([
     ['id', data.id],
     ['name', data.name],
+    ['mimeType', data.mimeType],
     ['size', data.size],
-    ['type', data.mimeType],
-    ['created', formatDateTime(data.createdAt)],
+    ['author', formatCreator(data.creator)],
+    ['createdAt', formatDateTime(data.createdAt)],
   ]);
 }

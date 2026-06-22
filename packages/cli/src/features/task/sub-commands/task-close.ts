@@ -10,7 +10,10 @@ const schema = z.object({});
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Mark a task done (resolves the project automatically)', name: 'close' },
+  meta: {
+    description: "Close a task (set the project's closed status and complete every assignee)",
+    name: 'close',
+  },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
       api,

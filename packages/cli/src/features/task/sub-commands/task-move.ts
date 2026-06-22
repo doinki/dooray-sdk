@@ -10,12 +10,12 @@ import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = z.object({
-  includeSubTasks: z.boolean().optional().describe("Move the task's subtasks along with it (default: true)"),
+  includeSubTasks: z.boolean().optional().describe("Move the task's subtasks along with it (default: true)."),
   targetProjectId: z
     .string()
     .min(1)
     .meta({ hint: 'projectId' })
-    .describe('Destination project id (from `dooray project list`)'),
+    .describe('Destination project id (from `dooray project list`).'),
   yes: yesSchema,
 });
 

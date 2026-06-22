@@ -11,7 +11,7 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'parentId' })
-    .describe('Parent task id, in the same project (from `dooray task list`)'),
+    .describe('Parent task id, in the same project (from `dooray task list`).'),
 });
 
 export default defineSubcommand({
@@ -32,5 +32,8 @@ export default defineSubcommand({
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskSetParent>>): string {
-  return renderKeyValue([['id', data.post.id]]);
+  return renderKeyValue([
+    ['taskId', data.post.id],
+    ['projectId', data.project.id],
+  ]);
 }

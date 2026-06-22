@@ -10,6 +10,7 @@ import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
+import { formatCreator } from '../../../shared/utils/user';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
@@ -20,13 +21,13 @@ const schema = z.object({
   sort: z
     .enum(COMMENT_SORTS)
     .optional()
-    .describe('Sort by created date (prefix with `-` to reverse; default oldest first)'),
+    .describe('Sort by created date: `created` (oldest first, default) or `-created` (newest first).'),
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   meta: {
-    description: "List a task's comments and system events (oldest-first; --all fetches every page)",
+    description: "List a task's comments and system events (oldest-first)",
     name: 'comment-list',
   },
   async run({ api, args, formatter }) {
@@ -48,8 +49,19 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCommentList>>):
 
   return renderList(data, [
     { header: 'id', value: (c) => c.id },
+    { header: 'author', value: (c) => formatCreator(c.creator) },
+    {
+      header: 'from',
+      value: (c) => (c.mailUsers?.from ? `${c.mailUsers.from.name}(${c.mailUsers.from.emailAddress})` : ''),
+    },
+    { header: 'to', value: (c) => (c.mailUsers?.to ?? []).map((u) => `${u.name}(${u.emailAddress})`).join(', ') },
+    { header: 'cc', value: (c) => (c.mailUsers?.cc ?? []).map((u) => `${u.name}(${u.emailAddress})`).join(', ') },
+    { header: 'attachments', value: (c) => (c.files ?? []).map((file) => `${file.name ?? ''}(${file.id})`).join(', ') },
     { header: 'type', value: (c) => c.type },
-    { header: 'created', value: (c) => formatDateTime(c.createdAt) },
+    { header: 'subtype', value: (c) => c.subtype },
+    { header: 'mimeType', value: (c) => c.body.mimeType },
+    { header: 'createdAt', value: (c) => formatDateTime(c.createdAt) },
+    { header: 'updatedAt', value: (c) => (c.modifiedAt ? formatDateTime(c.modifiedAt) : '') },
     { header: 'body', value: (c) => truncate(c.body.content.replaceAll(/\s+/g, ' ').trim(), 60) },
   ]);
 }

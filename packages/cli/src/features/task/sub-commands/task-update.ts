@@ -14,37 +14,41 @@ const schema = z.object({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Assignees (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.')
+    .describe('Assignees (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.')
     .meta({ hint: 'user[,user...]' }),
   body: z
     .string()
     .optional()
     .meta({ hint: 'text' })
-    .describe('New body (Markdown unless --mime-type is text/html). Omit to keep current.'),
+    .describe('New body (Markdown unless --mime-type is `text/html`). Omit to keep current.'),
   cc: z
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('CC (comma-separated — `@me` or member ids). Replaces the whole list; omit to keep current.')
+    .describe('cc (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.')
     .meta({ hint: 'user[,user...]' }),
   dueDate: z
     .string()
     .trim()
     .optional()
     .meta({ hint: 'YYYY-MM-DD±HH:MM' })
-    .describe('Due date with timezone offset (e.g. `2026-06-20+09:00`); applied only with --due-date-flag.'),
-  dueDateFlag: z.boolean().optional().describe('Apply --due-date. Omit to keep current.'),
+    .describe(
+      'Due date with timezone offset (e.g. `2026-06-20+09:00`); applies only with --due-date-flag. Omit to keep current.',
+    ),
+  dueDateFlag: z.boolean().optional().describe('Set with --due-date to apply it. Omit to keep current.'),
   milestoneId: z
     .string()
     .trim()
     .optional()
     .meta({ hint: 'milestoneId' })
-    .describe('Milestone id (from `dooray project milestone-list`).'),
-  mimeType: mimeTypeField('Body content type — text/x-markdown or text/html. Pass alongside --body.'),
+    .describe('Milestone id (from `dooray project milestone-list`). Omit to keep current.'),
+  mimeType: mimeTypeField(
+    'Body content type: `text/x-markdown` or `text/html` (default: `text/x-markdown`). Pass alongside --body.',
+  ),
   priority: z
     .enum(TASK_PRIORITIES)
     .optional()
-    .describe('Priority — highest, high, normal, low, lowest, or none. Omit to keep current.'),
+    .describe('Priority: highest, high, normal, low, lowest, or none. Omit to keep current.'),
   tagIds: z
     .string()
     .transform(splitCsv)

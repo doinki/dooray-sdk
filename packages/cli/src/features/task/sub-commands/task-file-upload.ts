@@ -12,18 +12,18 @@ const schema = z.object({
     .trim()
     .optional()
     .meta({ hint: 'mime' })
-    .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream)'),
+    .describe('Attachment MIME type (default: inferred from the extension, else `application/octet-stream`).'),
   filePath: z
     .string()
     .min(1)
     .meta({ hint: 'path' })
-    .describe("Path of the local file to attach; the attachment keeps this file's base name"),
+    .describe("Local file to attach; the attachment keeps this file's base name."),
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   meta: {
-    description: 'Attach a local file to a task (the returned id can be passed as a --file-ids value)',
+    description: 'Attach a local file to a task (pass the returned id as a --file-ids value)',
     name: 'file-upload',
   },
   async run({ api, args, formatter }) {

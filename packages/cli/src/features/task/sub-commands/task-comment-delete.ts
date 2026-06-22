@@ -14,13 +14,13 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
-    .describe('Comment id to delete (from `dooray task comment-list`)'),
+    .describe('Comment id (from `dooray task comment-list`).'),
   yes: yesSchema,
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Delete a comment from a task (irreversible)', name: 'comment-delete' },
+  meta: { description: 'Delete a task comment (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithTaskScope({
       api,

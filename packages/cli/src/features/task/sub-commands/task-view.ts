@@ -5,6 +5,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { formatDateTime } from '../../../shared/utils/text';
 import { formatUser } from '../../../shared/utils/user';
 
 const schema = z.object({});
@@ -28,13 +29,26 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runTaskView>>): string
   const content = renderKeyValue([
     ['id', data.id],
     ['taskNumber', data.taskNumber],
+    ['projectId', data.project.id],
+    ['parentId', data.parent?.id],
+    ['parent', data.parent?.subject],
     ['title', data.subject],
-    ['milestone', data.milestone?.name],
+    ['author', formatUser(data.users.from, { withId: true })],
+    ['assignees', data.users.to.map((user) => formatUser(user, { withId: true })).join(', ')],
+    ['cc', data.users.cc.map((user) => formatUser(user, { withId: true })).join(', ')],
     ['status', `${data.workflow.name}(${data.workflowClass})`],
+    ['closed', data.closed],
     ['priority', data.priority],
-    ['author', formatUser(data.users.from)],
-    ['assignees', data.users.to.map((user) => formatUser(user)).join(', ')],
-    ['cc', data.users.cc.map((user) => formatUser(user)).join(', ')],
+    ['milestoneId', data.milestone?.id],
+    ['milestone', data.milestone?.name],
+    ['tags', data.tags.map((tag) => tag.id).join(', ')],
+    ['dueDate', formatDateTime(data.dueDate)],
+    ['dueDateFlag', data.dueDateFlag],
+    ['attachments', (data.files ?? []).map((file) => `${file.name}(${file.id})`).join(', ')],
+    ['mimeType', data.body.mimeType],
+    ['createdAt', formatDateTime(data.createdAt)],
+    ['endedAt', formatDateTime(data.endedAt)],
+    ['updatedAt', formatDateTime(data.updatedAt)],
   ]);
 
   return `${content}\nBody:\n${data.body.content.trim()}`;

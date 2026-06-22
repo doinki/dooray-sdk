@@ -11,12 +11,12 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'statusId' })
-    .describe('Status id to move the task to (from `dooray project status-list`)'),
+    .describe('Status id to move the task to (from `dooray project status-list`).'),
 });
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Set a task to any project status, including reopening a closed task', name: 'set-status' },
+  meta: { description: "Set a task's status to any project status (also reopens a closed task)", name: 'set-status' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
       api,

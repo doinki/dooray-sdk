@@ -31,3 +31,17 @@ export function formatUser(user: UserLike, options: FormatUserOptions = {}): str
 function formatMember(member: MemberRef, options: FormatUserOptions): string {
   return options.withId && member.organizationMemberId ? `${member.name}(${member.organizationMemberId})` : member.name;
 }
+
+/**
+ * Structural view over a task comment/file `creator` — a member (id only, no name) or an email user.
+ * Kept loose so every comment/file response variant is assignable without casts.
+ */
+export type CreatorLike =
+  | { emailUser: { emailAddress: string; name?: null | string }; type: 'emailUser' }
+  | { member: { organizationMemberId: number | string }; type: 'member' };
+
+/** Display rule for a comment/file creator: email user name (address fallback), member shows its org member id. */
+export function formatCreator(creator: CreatorLike): string {
+  if (creator.type === 'emailUser') return creator.emailUser.name ?? creator.emailUser.emailAddress;
+  return String(creator.member.organizationMemberId);
+}

@@ -13,12 +13,14 @@ const schema = z.object({
     .string()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
-    .describe('Attachment id (from `dooray task file-list`)'),
+    .describe('Attachment id (from `dooray task file-list`).'),
   output: z
     .string()
     .min(1)
     .meta({ alias: 'o', hint: 'path' })
-    .describe('Path including the filename to write (e.g. ./report.pdf); overwrites any existing file'),
+    .describe(
+      'Path including filename to write (e.g. `./report.pdf`). Overwrites any existing file; the attachment name is not applied.',
+    ),
 } satisfies { output: z.ZodType<TaskFileDownloadArgs['outputPath']> } & Omit<
   CommandSchemaShape<TaskFileDownloadArgs>,
   'outputPath'
@@ -26,7 +28,7 @@ const schema = z.object({
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: "Download a task attachment's bytes to a local file", name: 'file-download' },
+  meta: { description: 'Download a task attachment to a local file', name: 'file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
       api,

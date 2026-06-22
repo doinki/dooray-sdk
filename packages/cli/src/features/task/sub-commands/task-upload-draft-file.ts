@@ -13,20 +13,20 @@ const schema = z.object({
     .trim()
     .optional()
     .meta({ hint: 'mime' })
-    .describe('MIME type for the attachment (default: inferred from the extension, else application/octet-stream)'),
+    .describe('Attachment MIME type (default: inferred from the extension, else `application/octet-stream`).'),
   draftId: z
     .string()
     .min(1)
     .meta({ hint: 'draftId' })
-    .describe('Draft id (from `dooray task create-draft`; not a task id)'),
-  filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
+    .describe('Draft id (from `dooray task create-draft`). Not a task id.'),
+  filePath: z.string().min(1).meta({ hint: 'path' }).describe('Local file to upload.'),
 } satisfies Record<keyof TaskUploadDraftFileArgs, any>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
   meta: {
-    description: 'Attach a local file to a draft task (use `task file-upload` for a real task)',
+    description: 'Attach a local file to a draft task (use `dooray task file-upload` for a real task)',
     name: 'upload-draft-file',
   },
   async run({ api, args, formatter }) {

@@ -6,13 +6,14 @@ import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
+import { formatCreator } from '../../../shared/utils/user';
 
 const schema = z.object({
   commentId: z
     .string()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
-    .describe('Comment id to view (from `dooray task comment-list`)'),
+    .describe('Comment id (from `dooray task comment-list`).'),
 });
 
 export default defineSubcommand({
@@ -33,9 +34,17 @@ export default defineSubcommand({
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCommentView>>): string {
   const content = renderKeyValue([
     ['id', data.id],
+    ['taskId', data.post.id],
+    ['author', formatCreator(data.creator)],
+    ['from', data.mailUsers?.from ? `${data.mailUsers.from.name}(${data.mailUsers.from.emailAddress})` : undefined],
+    ['to', (data.mailUsers?.to ?? []).map((u) => `${u.name}(${u.emailAddress})`).join(', ')],
+    ['cc', (data.mailUsers?.cc ?? []).map((u) => `${u.name}(${u.emailAddress})`).join(', ')],
+    ['attachments', (data.files ?? []).map((file) => `${file.name ?? ''}(${file.id})`).join(', ')],
     ['type', data.type],
-    ['created', formatDateTime(data.createdAt)],
-    ['updated', formatDateTime(data.modifiedAt)],
+    ['subtype', data.subtype],
+    ['mimeType', data.body.mimeType],
+    ['createdAt', formatDateTime(data.createdAt)],
+    ['updatedAt', formatDateTime(data.modifiedAt)],
   ]);
 
   return `${content}\nBody:\n${data.body.content.trim()}`;
