@@ -8,12 +8,12 @@ import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
-  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),
+  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
 } satisfies CommandSchemaShape<WikiUpdateBodyArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: "Replace a wiki page's body, leaving its title and referrers unchanged", name: 'update-body' },
+  meta: { description: "Replace a wiki page's body (leaves title and cc unchanged)", name: 'update-body' },
   async run({ api, args, formatter }) {
     const { id } = await runWithWikiScope({
       api,

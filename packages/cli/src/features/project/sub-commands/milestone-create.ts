@@ -10,12 +10,7 @@ import { optionalDate } from '../utils/fields';
 const schema = z
   .object({
     endDate: optionalDate('End date with timezone offset (e.g. `2026-08-22+09:00`)'),
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Milestone name must not be empty.')
-      .meta({ hint: 'text' })
-      .describe('Milestone name (e.g. `1단계`)'),
+    name: z.string().trim().min(1).meta({ hint: 'text' }).describe('Milestone name (e.g. `1단계`)'),
     startDate: optionalDate('Start date with timezone offset (e.g. `2026-06-22+09:00`)'),
   })
   .refine((args) => (args.startDate === undefined) === (args.endDate === undefined), {

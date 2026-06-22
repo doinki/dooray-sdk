@@ -17,7 +17,7 @@ const schema = z.object({
     .trim()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
-    .describe('Comment id to delete (from `dooray wiki comment-list`)'),
+    .describe('Comment id to delete (from `dooray wiki comment-list`).'),
   yes: yesSchema,
 } satisfies CommandSchemaShape<WikiCommentDeleteArgs>);
 

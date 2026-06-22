@@ -27,12 +27,12 @@ export default defineSubcommand({
 
 function renderPretty({ data: tag }: Awaited<ReturnType<typeof runProjectTagView>>): string {
   return renderKeyValue([
-    ['ID', tag.id],
-    ['Name', tag.name],
-    ['Color', tag.color],
-    ['Group ID', tag.tagGroup?.id],
-    ['Group Name', tag.tagGroup?.name],
-    ['Group Required', tag.tagGroup?.mandatory],
-    ['Group Single-Select', tag.tagGroup?.selectOne],
+    ['id', tag.id],
+    ['name', tag.name],
+    ['color', tag.color],
+    ['groupId', tag.tagGroup?.id],
+    ['groupName', tag.tagGroup?.name],
+    ['groupRequired', tag.tagGroup?.mandatory],
+    ['groupSingleSelect', tag.tagGroup?.selectOne],
   ]);
 }

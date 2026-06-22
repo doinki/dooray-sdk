@@ -42,7 +42,7 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCommentList>>):
     { header: 'id', value: (c) => c.id },
     { header: 'author', value: (c) => `${c.creator.member.name}(${c.creator.member.organizationMemberId})` },
     { header: 'body', value: (c) => truncate(c.body.content.replaceAll(/\s+/g, ' ').trim(), 60) },
-    { header: 'created', value: (c) => formatDateTime(c.createdAt) },
+    { header: 'createdAt', value: (c) => formatDateTime(c.createdAt) },
     { header: 'updatedAt', value: (c) => formatDateTime(c.modifiedAt) },
   ]);
 }

@@ -4,11 +4,11 @@ import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 
 export function renderMember({ data }: { data: Member }): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.name],
-    ['User Code', data.userCode],
-    ['External Email', data.externalEmailAddress],
-    ['Locale', data.locale],
-    ['Timezone', data.timezoneName],
+    ['id', data.id],
+    ['name', data.name],
+    ['userCode', data.userCode],
+    ['externalEmail', data.externalEmailAddress],
+    ['locale', data.locale],
+    ['timezone', data.timezoneName],
   ]);
 }

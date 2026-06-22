@@ -12,13 +12,13 @@ const schema = z.object({
   cc: z
     .string()
     .transform(splitCsv)
-    .describe('Referrers (comma-separated — `@me` or member ids). Replaces the whole list.')
+    .describe('cc as `@me` or member ids (comma-separated). Replaces the whole list.')
     .meta({ hint: 'user[,user...]' }),
 } satisfies CommandSchemaShape<WikiUpdateCcArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: "Replace a wiki page's referrers, leaving its title and body unchanged", name: 'update-cc' },
+  meta: { description: "Replace a wiki page's cc list (leaves title and body unchanged)", name: 'update-cc' },
   async run({ api, args, formatter }) {
     const { id } = await runWithWikiScope({
       api,
@@ -29,6 +29,6 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(`Updated referrers of wiki page \`${id}\`.`);
+    formatter.printInfo(`Updated cc of wiki page \`${id}\`.`);
   },
 });

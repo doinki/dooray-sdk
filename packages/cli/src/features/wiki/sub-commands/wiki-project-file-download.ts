@@ -11,26 +11,31 @@ import { argsFromSchema } from '../../../shared/schemas/derive-args';
 const schema = z.object({
   attachFileId: z
     .string()
+    .trim()
     .min(1)
     .meta({ hint: 'attachFileId', positional: true })
-    .describe('Attach file id (from `dooray wiki view`)'),
-  outputPath: z
+    .describe('Attach file id (from `dooray wiki view`).'),
+  output: z
     .string()
+    .trim()
     .min(1)
-    .meta({ hint: 'path' })
-    .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
-} satisfies CommandSchemaShape<WikiProjectFileDownloadArgs>);
+    .meta({ alias: 'o', hint: 'path' })
+    .describe('Local path including the filename to write (e.g. `./diagram.png`). Overwrites any existing file.'),
+} satisfies { output: z.ZodType<WikiProjectFileDownloadArgs['outputPath']> } & Omit<
+  CommandSchemaShape<WikiProjectFileDownloadArgs>,
+  'outputPath'
+>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Download a wiki-level attach file to a local file', name: 'project-file-download' },
+  meta: { description: 'Download a wiki-level attachment to a local file', name: 'project-file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
       api,
       args,
       formatter,
       render: renderPretty,
-      run: runWikiProjectFileDownload,
+      run: ({ api, args }) => runWikiProjectFileDownload({ api, args: { ...args, outputPath: args.output } }),
       schema,
     });
 
@@ -40,7 +45,7 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiProjectFileDownload>>): string {
   return renderKeyValue([
-    ['Path', data.path],
-    ['Size', data.size],
+    ['path', data.path],
+    ['size', data.size],
   ]);
 }

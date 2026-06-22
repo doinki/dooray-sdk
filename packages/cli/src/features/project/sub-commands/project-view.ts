@@ -36,17 +36,17 @@ function renderPretty({
   sections.push('', 'PROJECT');
   sections.push(
     renderKeyValue([
-      ['ID', project.id],
-      ['Name', project.code],
-      ['Description', project.description],
-      ['State', project.state],
-      ['Scope', project.scope],
-      ['Type', project.type],
-      ['Category', categoryPath],
-      ['Organization ID', project.organization.id],
-      ['Drive ID', project.drive?.id],
-      ['Wiki ID', project.wiki?.id],
-      ['Members', `${String(memberCount)} members`],
+      ['id', project.id],
+      ['name', project.code],
+      ['description', project.description],
+      ['state', project.state],
+      ['scope', project.scope],
+      ['type', project.type],
+      ['category', categoryPath],
+      ['organizationId', project.organization.id],
+      ['driveId', project.drive?.id],
+      ['wikiId', project.wiki?.id],
+      ['members', `${String(memberCount)} members`],
     ]),
   );
 

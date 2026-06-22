@@ -26,15 +26,15 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskView>>): string {
   const content = renderKeyValue([
-    ['ID', data.id],
-    ['Task Number', data.taskNumber],
-    ['Title', data.subject],
-    ['Milestone', data.milestone?.name],
-    ['Status', `${data.workflow.name}(${data.workflowClass})`],
-    ['Priority', data.priority],
-    ['Author', formatUser(data.users.from)],
-    ['Assignees', data.users.to.map((user) => formatUser(user)).join(', ')],
-    ['CC', data.users.cc.map((user) => formatUser(user)).join(', ')],
+    ['id', data.id],
+    ['taskNumber', data.taskNumber],
+    ['title', data.subject],
+    ['milestone', data.milestone?.name],
+    ['status', `${data.workflow.name}(${data.workflowClass})`],
+    ['priority', data.priority],
+    ['author', formatUser(data.users.from)],
+    ['assignees', data.users.to.map((user) => formatUser(user)).join(', ')],
+    ['cc', data.users.cc.map((user) => formatUser(user)).join(', ')],
   ]);
 
   return `${content}\nBody:\n${data.body.content.trim()}`;

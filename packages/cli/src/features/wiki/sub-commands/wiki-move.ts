@@ -13,18 +13,20 @@ import { yesSchema } from '../../../shared/schemas/fields';
 const schema = z.object({
   beforeId: z
     .string()
-    .trim()
     .optional()
     .meta({ hint: 'pageId' })
-    .describe('Sibling page id to order this page after (from `dooray wiki list`)'),
-  includeSubPages: z.boolean().optional().describe('Move child pages along too (default: true)'),
-  parentId: z.string().min(1).meta({ hint: 'pageId' }).describe('Destination parent page id (from `dooray wiki list`)'),
+    .describe('Sibling page id to order this page after (from `dooray wiki list`).'),
+  includeSubPages: z.boolean().optional().describe('Move child pages along too (default: true).'),
+  parentId: z
+    .string()
+    .min(1)
+    .meta({ hint: 'pageId' })
+    .describe('Destination parent page id (from `dooray wiki list`).'),
   targetProjectId: z
     .string()
-    .trim()
     .optional()
     .meta({ hint: 'projectId' })
-    .describe('Destination project id when moving to another wiki (from `dooray wiki project-list`)'),
+    .describe('Destination wiki id when moving the page into another wiki (from `dooray wiki project-list`).'),
   yes: yesSchema,
 } satisfies CommandSchemaShape<WikiMoveArgs>);
 

@@ -9,19 +9,20 @@ import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
 const schema = z.object({
-  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),
+  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
   cc: z
     .string()
     .transform(splitCsv)
-    .describe('Referrers (comma-separated — `@me` or member ids). Replaces the whole list.')
+    .describe('cc as `@me` or member ids (comma-separated). Replaces the whole list.')
     .meta({ hint: 'user[,user...]' }),
-  title: z.string().trim().min(1, 'Page title must not be empty.').meta({ hint: 'text' }).describe('Page title'),
+  title: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page title.'),
 } satisfies CommandSchemaShape<WikiUpdateArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   meta: {
-    description: "Replace a wiki page's title, body, and referrers together",
+    description:
+      "Replace a wiki page's title, body, and cc together (use `dooray wiki update-title`, `dooray wiki update-body`, or `dooray wiki update-cc` to change just one)",
     name: 'update',
   },
   async run({ api, args, formatter }) {

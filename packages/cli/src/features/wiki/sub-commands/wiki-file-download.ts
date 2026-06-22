@@ -11,15 +11,19 @@ import { argsFromSchema } from '../../../shared/schemas/derive-args';
 const schema = z.object({
   fileId: z
     .string()
+    .trim()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
-    .describe('Page file id (from `dooray wiki view`)'),
-  outputPath: z
+    .describe('Page file id (from `dooray wiki view`).'),
+  output: z
     .string()
+    .trim()
     .min(1)
-    .meta({ hint: 'path' })
-    .describe('Path including the filename to write (e.g. ./diagram.png); overwrites any existing file'),
-} satisfies CommandSchemaShape<WikiFileDownloadArgs>);
+    .meta({ alias: 'o', hint: 'path' })
+    .describe('Local path including the filename to write (e.g. `./diagram.png`). Overwrites any existing file.'),
+} satisfies {
+  output: z.ZodType<WikiFileDownloadArgs['outputPath']>;
+} & Omit<CommandSchemaShape<WikiFileDownloadArgs>, 'outputPath'>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
@@ -30,7 +34,7 @@ export default defineSubcommand({
       args,
       formatter,
       render: renderPretty,
-      run: runWikiFileDownload,
+      run: ({ api, args }) => runWikiFileDownload({ api, args: { ...args, outputPath: args.output } }),
       schema,
     });
 
@@ -40,7 +44,7 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiFileDownload>>): string {
   return renderKeyValue([
-    ['Path', data.path],
-    ['Size', data.size],
+    ['path', data.path],
+    ['size', data.size],
   ]);
 }

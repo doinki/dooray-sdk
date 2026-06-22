@@ -31,13 +31,13 @@ export default defineSubcommand({
 
 function renderPretty({ data: m }: Awaited<ReturnType<typeof runProjectMilestoneView>>): string {
   return renderKeyValue([
-    ['ID', m.id],
-    ['Name', m.name],
-    ['Status', m.status],
-    ['Started At', m.startedAt],
-    ['Ended At', m.endedAt],
-    ['Closed At', m.closedAt],
-    ['Created At', m.createdAt],
-    ['Updated At', m.updatedAt],
+    ['id', m.id],
+    ['name', m.name],
+    ['status', m.status],
+    ['startedAt', m.startedAt],
+    ['endedAt', m.endedAt],
+    ['closedAt', m.closedAt],
+    ['createdAt', m.createdAt],
+    ['updatedAt', m.updatedAt],
   ]);
 }

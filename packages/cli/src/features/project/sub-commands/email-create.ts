@@ -15,7 +15,7 @@ const schema = z.object({
     ),
   name: z
     .string()
-    .min(1, 'Display name must not be empty.')
+    .min(1)
     .meta({ hint: 'text' })
     .describe('Display name shown alongside the address (e.g. in mail clients)'),
 });

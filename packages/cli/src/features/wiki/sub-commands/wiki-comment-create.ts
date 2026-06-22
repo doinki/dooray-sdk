@@ -9,7 +9,7 @@ import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
 const schema = z.object({
-  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown)'),
+  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown).'),
 } satisfies CommandSchemaShape<WikiCommentCreateArgs>);
 
 export default defineSubcommand({

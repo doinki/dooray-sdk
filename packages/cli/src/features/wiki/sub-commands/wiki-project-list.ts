@@ -20,7 +20,7 @@ const schema = z.object({
 export default defineSubcommand({
   args: argsFromSchema(schema),
   globalArgs: ['json', 'profile', 'verbose'],
-  meta: { description: 'List the wikis you can access (each is tied to a project)', name: 'project-list' },
+  meta: { description: 'List the wikis you can access (one per project)', name: 'project-list' },
   async run({ api, args, formatter }) {
     const data = parseArgsOrThrow(schema, args);
 
@@ -38,6 +38,9 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiProjectList>>):
     { header: 'id', value: (w) => w.id },
     { header: 'name', value: (w) => w.name },
     { header: 'scope', value: (w) => w.scope },
-    { header: 'project', value: (w) => w.project.id },
+    { header: 'type', value: (w) => w.type },
+    { header: 'projectId', value: (w) => w.project.id },
+    { header: 'projectCategoryId', value: (w) => w.project.projectCategoryId },
+    { header: 'homePageId', value: (w) => w.home.pageId },
   ]);
 }

@@ -40,18 +40,18 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectTemplateView>>): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.templateName],
-    ['Default', data.isDefault],
-    ['Subject', data.subject],
-    ['Priority', data.priority],
-    ['Due', data.dueDate],
-    ['Milestone', data.milestone ? `${data.milestone.name} (${data.milestone.id})` : null],
-    ['Tag IDs', data.tags?.map((tag) => tag.id).join(', ')],
-    ['Body', data.body.content],
-    ['Body Mime', data.body.mimeType],
-    ['To', data.users.to.map(formatTemplateUser).join(', ')],
-    ['CC', data.users.cc?.map(formatTemplateUser).join(', ')],
+    ['id', data.id],
+    ['name', data.templateName],
+    ['default', data.isDefault],
+    ['subject', data.subject],
+    ['priority', data.priority],
+    ['due', data.dueDate],
+    ['milestone', data.milestone ? `${data.milestone.name} (${data.milestone.id})` : null],
+    ['tagIds', data.tags?.map((tag) => tag.id).join(', ')],
+    ['body', data.body.content],
+    ['bodyMime', data.body.mimeType],
+    ['to', data.users.to.map(formatTemplateUser).join(', ')],
+    ['cc', data.users.cc?.map(formatTemplateUser).join(', ')],
   ]);
 }
 

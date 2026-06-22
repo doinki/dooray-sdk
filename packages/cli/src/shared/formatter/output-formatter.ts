@@ -122,7 +122,7 @@ export function renderPagingFooter(paging: Paging): string {
  * whose payload is a bare `{ id }`. Pass directly as a command's `render`.
  */
 export function renderId(result: { data: { id: string } }): string {
-  return renderKeyValue([['ID', result.data.id]]);
+  return renderKeyValue([['id', result.data.id]]);
 }
 
 export function renderKeyValue(rows: KeyValueRows): string {

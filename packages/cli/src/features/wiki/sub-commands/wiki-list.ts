@@ -12,10 +12,9 @@ import { truncate } from '../../../shared/utils/text';
 const schema = z.object({
   parentId: z
     .string()
-    .trim()
     .optional()
     .meta({ hint: 'pageId' })
-    .describe('Parent page id (from `dooray wiki list`); omit for the top level'),
+    .describe('Parent page id (from `dooray wiki list`). Omit for the top level.'),
 } satisfies CommandSchemaShape<WikiListArgs>);
 
 export default defineSubcommand({
@@ -44,7 +43,14 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiList>>): null |
   return renderList(data, [
     { header: 'id', value: (p) => p.id },
     { header: 'title', value: (p) => truncate(p.subject, 60) },
-    { header: 'parent', value: (p) => p.parentPageId },
+    {
+      header: 'author',
+      value: (p) =>
+        p.creator.member.name
+          ? `${p.creator.member.name}(${p.creator.member.organizationMemberId})`
+          : p.creator.member.organizationMemberId,
+    },
+    { header: 'parentPageId', value: (p) => p.parentPageId },
     { header: 'root', value: (p) => p.root },
     { header: 'version', value: (p) => p.version },
   ]);

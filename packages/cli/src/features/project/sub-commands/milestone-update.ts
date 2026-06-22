@@ -12,13 +12,7 @@ const schema = z
   .object({
     endDate: optionalDate('New end date with timezone offset (e.g. `2026-08-22+09:00`)'),
     id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id'),
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Milestone name must not be empty.')
-      .optional()
-      .meta({ hint: 'text' })
-      .describe('New milestone name'),
+    name: z.string().trim().min(1).optional().meta({ hint: 'text' }).describe('New milestone name'),
     startDate: optionalDate('New start date with timezone offset (e.g. `2026-07-22+09:00`)'),
     state: z.enum(MILESTONE_STATES).optional().describe('open/closed lifecycle; closed milestones are still listed'),
   })

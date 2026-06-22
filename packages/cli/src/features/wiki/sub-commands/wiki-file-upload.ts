@@ -8,21 +8,30 @@ import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { formatDateTime } from '../../../shared/utils/text';
 
 const schema = z.object({
   contentType: z
     .string()
-    .trim()
     .optional()
     .meta({ hint: 'mime' })
-    .describe('MIME type; omit to infer from the file extension'),
-  filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
-  type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: general or inline_image (default: general)'),
+    .describe('MIME type. Omit to infer from the file extension.'),
+  filePath: z
+    .string()
+    .trim()
+    .min(1)
+    .meta({ hint: 'path', positional: true })
+    .describe('Path of the local file to upload.'),
+  type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: `general` or `inline_image` (default: `general`).'),
 } satisfies CommandSchemaShape<WikiFileUploadArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Attach a local file to a wiki page', name: 'file-upload' },
+  meta: {
+    description:
+      'Attach a local file to a wiki page (use `dooray wiki project-file-upload` for a wiki-level file not tied to a page)',
+    name: 'file-upload',
+  },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({
       api,
@@ -39,7 +48,14 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiFileUpload>>): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.name],
+    ['id', data.id],
+    ['name', data.name],
+    ['type', data.type],
+    ['extension', data.extension],
+    ['mimeType', data.mimeType],
+    ['size', data.size],
+    ['attachFileId', data.attachFileId],
+    ['pageFileId', data.pageFileId],
+    ['createdAt', formatDateTime(data.createdAt)],
   ]);
 }

@@ -47,7 +47,7 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskMove>>): string {
   return renderKeyValue([
-    ['Task ID', data.post.id],
-    ['Project ID', data.project.id],
+    ['taskId', data.post.id],
+    ['projectId', data.project.id],
   ]);
 }

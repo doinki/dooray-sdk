@@ -15,12 +15,12 @@ const schema = z.object({
     .trim()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
-    .describe('Comment id to view (from `dooray wiki comment-list`)'),
+    .describe('Comment id to view (from `dooray wiki comment-list`).'),
 } satisfies CommandSchemaShape<WikiCommentViewArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: "View a wiki comment's full body and metadata", name: 'comment-view' },
+  meta: { description: "View a wiki comment's body and metadata", name: 'comment-view' },
   async run({ api, args, formatter }) {
     await runWithWikiScope({
       api,
@@ -36,6 +36,9 @@ export default defineSubcommand({
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCommentView>>): string {
   const content = renderKeyValue([
     ['id', data.id],
+    ['pageId', data.page.id],
+    ['author', `${data.creator.member.name}(${data.creator.member.organizationMemberId})`],
+    ['mimeType', data.body.mimeType],
     ['createdAt', formatDateTime(data.createdAt)],
     ['updatedAt', formatDateTime(data.modifiedAt)],
   ]);

@@ -35,11 +35,11 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMemberGroupView>>): string {
   const content = renderKeyValue([
-    ['ID', data.id],
-    ['Code', data.code],
-    ['Project', `${data.project.code} (${data.project.id})`],
-    ['Created At', data.createdAt],
-    ['Updated At', data.updatedAt],
+    ['id', data.id],
+    ['code', data.code],
+    ['project', `${data.project.code} (${data.project.id})`],
+    ['createdAt', data.createdAt],
+    ['updatedAt', data.updatedAt],
   ]);
 
   const heading = `members (${String(data.members.length)})`;

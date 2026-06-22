@@ -34,8 +34,8 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectEmailView>>): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.name],
-    ['Email', data.emailAddress],
+    ['id', data.id],
+    ['name', data.name],
+    ['email', data.emailAddress],
   ]);
 }

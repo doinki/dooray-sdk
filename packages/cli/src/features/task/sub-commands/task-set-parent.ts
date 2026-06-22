@@ -32,5 +32,5 @@ export default defineSubcommand({
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskSetParent>>): string {
-  return renderKeyValue([['ID', data.post.id]]);
+  return renderKeyValue([['id', data.post.id]]);
 }

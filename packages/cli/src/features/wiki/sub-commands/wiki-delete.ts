@@ -17,7 +17,7 @@ const schema = z.object({
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Delete a wiki page along with its child pages and attachments (irreversible)', name: 'delete' },
+  meta: { description: 'Delete a wiki page with its children and attachments (irreversible)', name: 'delete' },
   async run({ api, args, formatter }) {
     const { id } = await runWithWikiScope({
       api,

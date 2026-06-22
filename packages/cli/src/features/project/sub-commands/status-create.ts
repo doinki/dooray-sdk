@@ -50,8 +50,8 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectStatusCreate>>): string {
   return renderKeyValue([
-    ['Name', data.name],
-    ['Class', data.class],
-    ['Order', data.order],
+    ['name', data.name],
+    ['class', data.class],
+    ['order', data.order],
   ]);
 }

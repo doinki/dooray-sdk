@@ -54,7 +54,7 @@ const schema = z.object({
     .optional()
     .describe('Tag ids (comma-separated; from `dooray project tag-list`)')
     .meta({ hint: 'id[,id...]' }),
-  title: z.string().trim().min(1, 'Task title must not be empty.').meta({ hint: 'text' }).describe('Task title'),
+  title: z.string().trim().min(1).meta({ hint: 'text' }).describe('Task title'),
 });
 
 export default defineSubcommand({

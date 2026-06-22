@@ -4,38 +4,38 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderId } from '../../../shared/formatter/output-formatter';
+import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
 const schema = z.object({
-  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown)'),
+  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
   cc: z
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Referrers (comma-separated — `@me` or member ids)')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('cc as `@me` or member ids (comma-separated).'),
   fileIds: z
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('File ids to attach (comma-separated; from `dooray wiki project-file-upload`)')
-    .meta({ hint: 'id[,id...]' }),
-  parentId: z.string().min(1).meta({ hint: 'pageId' }).describe('Parent page id (from `dooray wiki list`)'),
-  title: z.string().trim().min(1, 'Page title must not be empty.').meta({ hint: 'text' }).describe('Page title'),
+    .meta({ hint: 'id[,id...]' })
+    .describe('File ids to attach, comma-separated (from `dooray wiki project-file-upload`).'),
+  parentId: z.string().trim().min(1).meta({ hint: 'pageId' }).describe('Parent page id (from `dooray wiki list`).'),
+  title: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page title.'),
 } satisfies CommandSchemaShape<WikiCreateArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
-  meta: { description: 'Create a wiki page under a parent page', name: 'create' },
+  meta: { description: 'Create a wiki page under a parent', name: 'create' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
       api,
       args,
       formatter,
-      render: renderId,
+      render: renderPretty,
       run: runWikiCreate,
       schema,
     });
@@ -43,3 +43,12 @@ export default defineSubcommand({
     formatter.printInfo(`Created wiki page \`${result.data.id}\`.`);
   },
 });
+
+function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCreate>>): string {
+  return renderKeyValue([
+    ['id', data.id],
+    ['parentPageId', data.parentPageId],
+    ['wikiId', data.wikiId],
+    ['version', data.version],
+  ]);
+}

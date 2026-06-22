@@ -39,5 +39,5 @@ export default defineSubcommand({
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectCheckName>>): string {
-  return renderKeyValue([['Name', data.name]]);
+  return renderKeyValue([['name', data.name]]);
 }

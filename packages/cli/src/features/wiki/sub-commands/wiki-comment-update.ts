@@ -20,7 +20,7 @@ const schema = z.object({
     .trim()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
-    .describe('Comment id to update (from `dooray wiki comment-list`)'),
+    .describe('Comment id to update (from `dooray wiki comment-list`).'),
 } satisfies CommandSchemaShape<WikiCommentUpdateArgs>);
 
 export default defineSubcommand({

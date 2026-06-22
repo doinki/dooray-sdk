@@ -32,10 +32,10 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskFileView>>): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.name],
-    ['Size', data.size],
-    ['Type', data.mimeType],
-    ['Created', formatDateTime(data.createdAt)],
+    ['id', data.id],
+    ['name', data.name],
+    ['size', data.size],
+    ['type', data.mimeType],
+    ['created', formatDateTime(data.createdAt)],
   ]);
 }

@@ -16,7 +16,10 @@ const schema = z.object({
   all: allSchema,
   page: pageSchema,
   size: sizeSchema,
-  state: z.enum(WIKI_SHARED_LINK_STATES).optional().describe('Filter by state: valid or invalid (default: valid)'),
+  state: z
+    .enum(WIKI_SHARED_LINK_STATES)
+    .optional()
+    .describe('Filter by state: `valid` or `invalid` (default: `valid`).'),
 } satisfies CommandSchemaShape<WikiSharedLinkListArgs>);
 
 export default defineSubcommand({

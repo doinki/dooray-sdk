@@ -8,22 +8,23 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { formatDateTime } from '../../../shared/utils/text';
 
 const schema = z.object({
   contentType: z
     .string()
-    .trim()
     .optional()
     .meta({ hint: 'mime' })
-    .describe('MIME type; omit to infer from the file extension'),
-  filePath: z.string().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload'),
-  type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: general or inline_image (default: general)'),
+    .describe('MIME type. Omit to infer from the file extension.'),
+  filePath: z.string().trim().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload.'),
+  type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: `general` or `inline_image` (default: `general`).'),
 } satisfies CommandSchemaShape<WikiProjectFileUploadArgs>);
 
 export default defineSubcommand({
   args: argsFromSchema(schema),
   meta: {
-    description: 'Upload a file to a wiki itself (the returned id can be passed to `wiki create --file-ids`)',
+    description:
+      'Upload a file to a wiki itself, not a specific page (pass the returned id to `dooray wiki create --file-ids`)',
     name: 'project-file-upload',
   },
   async run({ api, args, formatter }) {
@@ -42,7 +43,14 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiProjectFileUpload>>): string {
   return renderKeyValue([
-    ['ID', data.id],
-    ['Name', data.name],
+    ['id', data.id],
+    ['name', data.name],
+    ['type', data.type],
+    ['extension', data.extension],
+    ['mimeType', data.mimeType],
+    ['size', data.size],
+    ['attachFileId', data.attachFileId],
+    ['pageFileId', data.pageFileId],
+    ['createdAt', formatDateTime(data.createdAt)],
   ]);
 }

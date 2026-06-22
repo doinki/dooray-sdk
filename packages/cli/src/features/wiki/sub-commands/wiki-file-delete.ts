@@ -14,9 +14,10 @@ import { yesSchema } from '../../../shared/schemas/fields';
 const schema = z.object({
   fileId: z
     .string()
+    .trim()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
-    .describe('Page file id to delete (from `dooray wiki view`)'),
+    .describe('Page file id to delete (from `dooray wiki view`).'),
   yes: yesSchema,
 } satisfies CommandSchemaShape<WikiFileDeleteArgs>);
 

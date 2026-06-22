@@ -34,7 +34,7 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMemberView>>): string {
   return renderKeyValue([
-    ['ID', data.organizationMemberId],
-    ['Role', data.role],
+    ['id', data.organizationMemberId],
+    ['role', data.role],
   ]);
 }

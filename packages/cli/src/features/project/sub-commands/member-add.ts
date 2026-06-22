@@ -36,5 +36,5 @@ export default defineSubcommand({
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMemberAdd>>): string {
-  return renderKeyValue([['Role', data.role]]);
+  return renderKeyValue([['role', data.role]]);
 }

@@ -32,10 +32,10 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCommentView>>): string {
   const content = renderKeyValue([
-    ['ID', data.id],
-    ['Type', data.type],
-    ['Created', formatDateTime(data.createdAt)],
-    ['Updated', formatDateTime(data.modifiedAt)],
+    ['id', data.id],
+    ['type', data.type],
+    ['created', formatDateTime(data.createdAt)],
+    ['updated', formatDateTime(data.modifiedAt)],
   ]);
 
   return `${content}\nBody:\n${data.body.content.trim()}`;
