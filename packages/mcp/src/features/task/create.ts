@@ -39,7 +39,8 @@ export function registerTaskCreate(server: McpServer, api: DoorayApi): void {
     'task_create',
     {
       annotations: { destructiveHint: false, idempotentHint: false, openWorldHint: false, readOnlyHint: false },
-      description: 'Create a task in a project. Omitting assignees assigns the caller (@me).',
+      description:
+        'Create a task in a project. Omitting assignees assigns the caller (@me). Include any required tags (see project_tag_list) or creation fails.',
       inputSchema,
       title: 'Create task',
     },
