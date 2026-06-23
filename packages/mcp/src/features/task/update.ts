@@ -54,7 +54,7 @@ export function registerTaskUpdate(server: McpServer, api: DoorayApi): void {
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
       description:
-        "Edit a task's title, body, assignees, due date, priority, milestone, or tags. Omit a field to keep it; assignees, cc, and tagIds replace the whole list. Status, project, and parent are not settable here.",
+        "Edit a task's title, body, assignees, due date, priority, milestone, or tags. Omit a field to keep it; assignees, cc, and tagIds replace the whole list. When setting tagIds, keep any required tags (see project_tag_list) or the update fails. Status, project, and parent are not settable here.",
       inputSchema,
       title: 'Update task',
     },
