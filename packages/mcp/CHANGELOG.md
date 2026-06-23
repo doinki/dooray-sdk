@@ -1,5 +1,11 @@
 # @dooray-sdk/mcp
 
+## 0.1.2
+
+### Patch Changes
+
+- 3bcdb01: Note in the `task_create` and `task_update` tool descriptions that projects may require tags. Point to `project_tag_list` so agents include any required tags and avoid creation/update failures.
+
 ## 0.1.1
 
 ### Patch Changes
