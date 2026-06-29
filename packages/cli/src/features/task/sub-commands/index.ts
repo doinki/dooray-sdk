@@ -10,7 +10,6 @@ export default defineCommand({
     'comment-update': () => import('./task-comment-update').then((m) => m.default),
     'comment-view': () => import('./task-comment-view').then((m) => m.default),
     create: () => import('./task-create').then((m) => m.default),
-    'create-draft': () => import('./task-create-draft').then((m) => m.default),
     'file-delete': () => import('./task-file-delete').then((m) => m.default),
     'file-download': () => import('./task-file-download').then((m) => m.default),
     'file-list': () => import('./task-file-list').then((m) => m.default),
@@ -22,7 +21,6 @@ export default defineCommand({
     'set-parent': () => import('./task-set-parent').then((m) => m.default),
     'set-status': () => import('./task-set-status').then((m) => m.default),
     update: () => import('./task-update').then((m) => m.default),
-    'upload-draft-file': () => import('./task-upload-draft-file').then((m) => m.default),
     view: () => import('./task-view').then((m) => m.default),
   },
 });

@@ -8,11 +8,9 @@ export default defineCommand({
   },
   subCommands: {
     'category-list': () => import('./category-list').then((m) => m.default),
-    'check-name': () => import('./project-check-name').then((m) => m.default),
     create: () => import('./project-create').then((m) => m.default),
     'email-create': () => import('./email-create').then((m) => m.default),
     'email-view': () => import('./email-view').then((m) => m.default),
-    'hook-create': () => import('./hook-create').then((m) => m.default),
     list: () => import('./project-list').then((m) => m.default),
     'member-add': () => import('./member-add').then((m) => m.default),
     'member-group-list': () => import('./member-group-list').then((m) => m.default),
