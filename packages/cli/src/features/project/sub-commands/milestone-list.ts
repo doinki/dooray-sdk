@@ -4,13 +4,13 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatDate } from '../../../shared/utils/text';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   page: pageSchema,
   size: sizeSchema,
   state: z
@@ -20,7 +20,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'List milestones in a project (filter by state; paginated)', name: 'milestone-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -34,6 +33,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No milestones.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMilestoneList>>): null | string {

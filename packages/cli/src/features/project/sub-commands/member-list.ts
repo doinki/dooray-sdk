@@ -4,13 +4,13 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { renderList } from '../../../shared/utils/table';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   page: pageSchema,
   roles: z
     .string()
@@ -29,7 +29,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'List project members (organizationMemberId + role)',
     name: 'member-list',
@@ -46,6 +45,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No members.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMemberList>>): null | string {

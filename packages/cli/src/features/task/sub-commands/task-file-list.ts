@@ -1,17 +1,15 @@
 import { runTaskFileList } from '@dooray-sdk/core';
-import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime } from '../../../shared/utils/text';
 import { formatCreator } from '../../../shared/utils/user';
 
-const schema = z.object({});
+const schema = globalArgsSchema;
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "List a task's attachments", name: 'file-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
@@ -25,6 +23,7 @@ export default defineSubcommand({
 
     if (result.data.length === 0) formatter.printInfo('No files.');
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskFileList>>): null | string {

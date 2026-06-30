@@ -3,12 +3,12 @@ import { runWikiCommentUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   body: z
     .string()
     .trim()
@@ -24,7 +24,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiCommentUpdateArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "Replace a wiki comment's body", name: 'comment-update' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({
@@ -38,4 +37,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated comment \`${result.data.id}\`.`);
   },
+  schema,
 });

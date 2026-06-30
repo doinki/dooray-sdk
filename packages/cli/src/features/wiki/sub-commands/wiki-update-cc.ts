@@ -3,12 +3,12 @@ import { runWikiUpdateCc } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   cc: z
     .string()
     .transform(splitCsv)
@@ -17,7 +17,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiUpdateCcArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "Replace a wiki page's cc list (leaves title and body unchanged)", name: 'update-cc' },
   async run({ api, args, formatter }) {
     const { id } = await runWithWikiScope({
@@ -31,4 +30,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated cc of wiki page \`${id}\`.`);
   },
+  schema,
 });

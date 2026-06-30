@@ -3,12 +3,12 @@ import { runProjectTemplateView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatUser } from '../../../shared/utils/user';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   expand: z
     .boolean()
     .optional()
@@ -20,7 +20,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     // oxlint-disable-next-line no-template-curly-in-string
     description: "Show a task template's full content; expand substitutes ${...} macros",
@@ -36,6 +35,7 @@ export default defineSubcommand({
       schema,
     });
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectTemplateView>>): string {

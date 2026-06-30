@@ -3,13 +3,13 @@ import { TASK_PRIORITIES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { mimeTypeField } from '../utils/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   assignees: z
     .string()
     .transform(splitCsv)
@@ -58,7 +58,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Create a task in a project (omit --assignees to assign yourself)', name: 'create' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -72,4 +71,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Created task \`${result.data.id}\`.`);
   },
+  schema,
 });

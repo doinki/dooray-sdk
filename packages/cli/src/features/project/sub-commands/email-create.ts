@@ -2,11 +2,11 @@ import { runProjectEmailCreate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   email: z
     .email('Enter a valid email address.')
     .meta({ hint: 'email' })
@@ -21,7 +21,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Create an inbound email address (incoming mail becomes a task; address must be unique)',
     name: 'email-create',
@@ -38,4 +37,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Created inbound email address \`${data.email}\`.`);
   },
+  schema,
 });

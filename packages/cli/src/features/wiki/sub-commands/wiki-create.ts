@@ -3,13 +3,13 @@ import { runWikiCreate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
   cc: z
     .string()
@@ -28,7 +28,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiCreateArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Create a wiki page under a parent', name: 'create' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -42,6 +41,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Created wiki page \`${result.data.id}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCreate>>): string {

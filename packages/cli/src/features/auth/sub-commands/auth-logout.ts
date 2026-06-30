@@ -2,7 +2,6 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { runAuthLogout } from '../operations/auth-logout';
 
 export default defineSubcommand({
-  globalArgs: [],
   meta: { description: 'Log out the active profile (clears its stored token)', name: 'logout' },
   mode: 'local',
   run({ formatter, profileStore }) {

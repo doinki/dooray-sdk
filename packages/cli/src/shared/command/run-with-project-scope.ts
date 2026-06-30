@@ -8,7 +8,7 @@ import { parseArgsOrThrow } from '../schemas/parse-args';
 
 interface ProjectScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;
-  args: { ref: string } & ArgInput;
+  args: { ref?: string } & ArgInput;
   /** Optional last-chance guard (e.g. a delete confirmation), run before the project ref is resolved over the network. */
   confirm?: (input: { args: Args }) => Promise<void> | void;
   formatter: OutputFormatter;
@@ -24,7 +24,7 @@ export async function runWithProjectScope<Args extends Record<string, unknown>, 
 
   const data = parseArgsOrThrow(schema, args);
   await confirm?.({ args: data });
-  const projectId = await resolveProjectId({ api, ref: args.ref });
+  const projectId = await resolveProjectId({ api, ref: args.ref ?? '' });
   const result = await run({ api, args: { ...data, projectId } });
 
   formatter.printData(result, render);

@@ -2,11 +2,11 @@ import { runTaskFileUpload } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   contentType: z
     .string()
     .trim()
@@ -21,7 +21,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Attach a local file to a task (pass the returned id as a --file-ids value)',
     name: 'file-upload',
@@ -38,4 +37,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Uploaded file \`${result.data.id}\`.`);
   },
+  schema,
 });

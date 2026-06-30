@@ -2,11 +2,11 @@ import { runProjectMilestoneView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   id: z
     .string()
     .min(1)
@@ -15,7 +15,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "Show a milestone's date range and state", name: 'milestone-view' },
   async run({ api, args, formatter }) {
     await runWithProjectScope({
@@ -27,6 +26,7 @@ export default defineSubcommand({
       schema,
     });
   },
+  schema,
 });
 
 function renderPretty({ data: m }: Awaited<ReturnType<typeof runProjectMilestoneView>>): string {

@@ -3,11 +3,11 @@ import { ASSIGNABLE_ROLES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   id: z
     .string()
     .min(1)
@@ -19,7 +19,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Add an existing organization member to the project', name: 'member-add' },
   async run({ api, args, formatter }) {
     const { data } = await runWithProjectScope({
@@ -33,6 +32,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Added member \`${data.id}\` as \`${data.role}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectMemberAdd>>): string {

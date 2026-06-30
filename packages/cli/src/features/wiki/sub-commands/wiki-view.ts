@@ -1,18 +1,14 @@
-import type { WikiViewArgs } from '@dooray-sdk/core';
 import { runWikiView } from '@dooray-sdk/core';
-import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 
-const schema = z.object({} satisfies CommandSchemaShape<WikiViewArgs>);
+const schema = globalArgsSchema;
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "View a wiki page's full detail (body, cc, and attached file metadata)", name: 'view' },
   async run({ api, args, formatter }) {
     await runWithWikiScope({
@@ -24,6 +20,7 @@ export default defineSubcommand({
       schema,
     });
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiView>>): string {

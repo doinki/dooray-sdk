@@ -3,19 +3,18 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id to delete'),
   yes: yesSchema,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Delete a milestone (its tasks lose the milestone reference; irreversible)',
     name: 'milestone-delete',
@@ -34,4 +33,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Deleted milestone \`${data.id}\`.`);
   },
+  schema,
 });

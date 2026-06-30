@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { runProfileRemove } from '../operations/profile-remove';
 
@@ -10,8 +9,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
-  globalArgs: [],
   meta: { description: 'Remove a saved profile', name: 'remove' },
   mode: 'local',
   run({ args, formatter, profileStore }) {
@@ -21,4 +18,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Removed profile \`${data.name}\`.`);
   },
+  schema,
 });

@@ -1,22 +1,20 @@
 import type { ProjectTemplateSummary } from '@dooray-sdk/client/project';
 import { runProjectTemplateList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
-import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatUser } from '../../../shared/utils/user';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   page: pageSchema,
   size: sizeSchema,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'List task templates (body/guide omitted; use template-view)',
     name: 'template-list',
@@ -33,6 +31,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No templates.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectTemplateList>>): null | string {

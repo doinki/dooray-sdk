@@ -2,13 +2,13 @@ import { runTaskFileView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 import { formatCreator } from '../../../shared/utils/user';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   fileId: z
     .string()
     .min(1)
@@ -17,7 +17,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: "View a task attachment's metadata (use `dooray task file-download` for the bytes)",
     name: 'file-view',
@@ -32,6 +31,7 @@ export default defineSubcommand({
       schema,
     });
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskFileView>>): string {

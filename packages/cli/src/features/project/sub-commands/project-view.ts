@@ -3,8 +3,11 @@ import { runProjectView } from '@dooray-sdk/core';
 import { resolveProjectId } from '@dooray-sdk/core/resolve';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import { renderList } from '../../../shared/utils/table';
+
+const schema = globalArgsSchema;
 
 export default defineSubcommand({
   meta: {
@@ -12,7 +15,7 @@ export default defineSubcommand({
     name: 'view',
   },
   async run({ api, args, formatter }) {
-    const projectId = await resolveProjectId({ api, ref: args.ref });
+    const projectId = await resolveProjectId({ api, ref: args.ref ?? '' });
     const result = await runProjectView({
       api,
       args: { projectId },
@@ -20,6 +23,7 @@ export default defineSubcommand({
 
     formatter.printData(result, renderPretty);
   },
+  schema,
 });
 
 function renderPretty({

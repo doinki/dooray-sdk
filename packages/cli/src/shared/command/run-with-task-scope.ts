@@ -8,7 +8,7 @@ import { parseArgsOrThrow } from '../schemas/parse-args';
 
 interface TaskScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;
-  args: ArgInput;
+  args: { id?: string; ref?: string } & ArgInput;
   /** Optional last-chance guard (e.g. a delete confirmation), run after the task id is resolved but before the action. */
   confirm?: (input: { args: Args; id: string; projectId?: string }) => Promise<void> | void;
   formatter: OutputFormatter;

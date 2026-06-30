@@ -3,12 +3,12 @@ import { statusClassSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { localeNamesSchema } from '../utils/status-locale';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   class: statusClassSchema,
   localeNames: localeNamesSchema
     .meta({ hint: 'locale=name[,...]' })
@@ -29,7 +29,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Add a task status (API returns no id; verify with status-list)',
     name: 'status-create',
@@ -46,6 +45,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Created status \`${data.name}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectStatusCreate>>): string {

@@ -4,9 +4,9 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
@@ -14,7 +14,7 @@ import { formatCreator } from '../../../shared/utils/user';
 
 export type CommentSort = (typeof COMMENT_SORTS)[number];
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   all: allSchema,
   page: pageSchema,
   size: sizeSchema,
@@ -25,7 +25,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: "List a task's comments and system events (oldest-first)",
     name: 'comment-list',
@@ -42,6 +41,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No comments.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskCommentList>>): null | string {

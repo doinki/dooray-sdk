@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   id: z.string().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to delete'),
   moveTo: z
     .string()
@@ -20,7 +20,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Delete a status; its tasks move to `--move-to` (irreversible)',
     name: 'status-delete',
@@ -43,4 +42,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Deleted status \`${data.id}\`.`);
   },
+  schema,
 });

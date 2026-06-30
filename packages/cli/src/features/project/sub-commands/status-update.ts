@@ -3,12 +3,12 @@ import { statusClassSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { localeNamesSchema } from '../utils/status-locale';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   class: statusClassSchema.optional(),
   id: z.string().trim().min(1).meta({ hint: 'statusId', positional: true }).describe('Status id to update'),
   localeNames: localeNamesSchema
@@ -23,7 +23,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description:
       "Replace a status's class, name, order, and locale names (PUT semantics — omitted fields may be reset)",
@@ -41,4 +40,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated status \`${data.id}\`.`);
   },
+  schema,
 });

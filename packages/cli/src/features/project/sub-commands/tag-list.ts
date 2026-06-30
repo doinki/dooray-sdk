@@ -1,20 +1,18 @@
 import { runProjectTagList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
-import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   page: pageSchema,
   size: sizeSchema,
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'List tags with their tag-group constraints (required, single-select)',
     name: 'tag-list',
@@ -31,6 +29,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No tags.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectTagList>>): null | string {

@@ -3,17 +3,16 @@ import { runWikiCommentCreate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown).'),
 } satisfies CommandSchemaShape<WikiCommentCreateArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Add a comment to a wiki page', name: 'comment-create' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({
@@ -27,4 +26,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Created comment \`${result.data.id}\`.`);
   },
+  schema,
 });

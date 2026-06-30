@@ -3,13 +3,13 @@ import { MILESTONE_STATES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { optionalDate } from '../utils/fields';
 
-const schema = z
-  .object({
+const schema = globalArgsSchema
+  .extend({
     endDate: optionalDate('New end date with timezone offset (e.g. `2026-08-22+09:00`)'),
     id: z.string().min(1).meta({ hint: 'milestoneId', positional: true }).describe('Milestone id'),
     name: z.string().trim().min(1).optional().meta({ hint: 'text' }).describe('New milestone name'),
@@ -34,7 +34,6 @@ const schema = z
   });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Update a milestone (supplied fields only; state toggles open/close)',
     name: 'milestone-update',
@@ -51,4 +50,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated milestone \`${data.id}\`.`);
   },
+  schema,
 });

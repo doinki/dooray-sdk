@@ -2,7 +2,10 @@ import { runProjectStatusList } from '@dooray-sdk/core';
 import { resolveProjectId } from '@dooray-sdk/core/resolve';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderList } from '../../../shared/utils/table';
+
+const schema = globalArgsSchema;
 
 export default defineSubcommand({
   meta: {
@@ -10,7 +13,7 @@ export default defineSubcommand({
     name: 'status-list',
   },
   async run({ api, args, formatter }) {
-    const projectId = await resolveProjectId({ api, ref: args.ref });
+    const projectId = await resolveProjectId({ api, ref: args.ref ?? '' });
     const result = await runProjectStatusList({
       api,
       args: { projectId },
@@ -19,6 +22,7 @@ export default defineSubcommand({
     formatter.printData(result, renderPretty);
     if (result.data.length === 0) formatter.printInfo('No statuses.');
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectStatusList>>): null | string {

@@ -3,16 +3,15 @@ import { runWikiUpdateTitle } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   title: z.string().trim().min(1).meta({ hint: 'text' }).describe('New page title.'),
 } satisfies CommandSchemaShape<WikiUpdateTitleArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: "Replace a wiki page's title (leaves body and cc unchanged)",
     name: 'update-title',
@@ -29,4 +28,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated title of wiki page \`${id}\`.`);
   },
+  schema,
 });

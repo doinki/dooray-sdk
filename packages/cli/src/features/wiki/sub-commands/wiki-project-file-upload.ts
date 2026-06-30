@@ -4,13 +4,13 @@ import { WIKI_FILE_TYPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   contentType: z
     .string()
     .optional()
@@ -21,7 +21,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiProjectFileUploadArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description:
       'Upload a file to a wiki itself, not a specific page (pass the returned id to `dooray wiki create --file-ids`)',
@@ -39,6 +38,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Uploaded file \`${result.data.id}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiProjectFileUpload>>): string {

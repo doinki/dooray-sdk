@@ -5,12 +5,12 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
-const schema = z.object({
+const schema = globalArgsSchema.omit({ ref: true }).extend({
   member: z
     .string()
     .default('me')
@@ -34,8 +34,6 @@ const schema = z.object({
 } satisfies Record<keyof ProjectListArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'List projects accessible to the caller, with filters and pagination', name: 'list' },
   async run({ api, args, formatter }) {
     const data = parseArgsOrThrow(schema, args);
@@ -48,6 +46,7 @@ export default defineSubcommand({
     formatter.printData(result, renderPretty);
     formatter.printInfo(result.data.length === 0 ? 'No projects.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectList>>): null | string {

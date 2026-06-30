@@ -3,13 +3,13 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   fileId: z
     .string()
     .min(1)
@@ -19,7 +19,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Delete a task attachment (irreversible)', name: 'file-delete' },
   async run({ api, args, formatter }) {
     const { data } = await runWithTaskScope({
@@ -35,4 +34,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Deleted attachment \`${data.fileId}\`.`);
   },
+  schema,
 });

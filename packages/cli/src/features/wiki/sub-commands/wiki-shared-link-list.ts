@@ -5,14 +5,14 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   all: allSchema,
   page: pageSchema,
   size: sizeSchema,
@@ -23,7 +23,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiSharedLinkListArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "List a wiki page's external shared links", name: 'shared-link-list' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({
@@ -37,6 +36,7 @@ export default defineSubcommand({
 
     formatter.printInfo(result.data.length === 0 ? 'No shared links.' : renderPagingFooter(result.paging));
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiSharedLinkList>>): null | string {

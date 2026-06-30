@@ -2,11 +2,11 @@ import { runTaskSetStatus } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   statusId: z
     .string()
     .min(1)
@@ -15,7 +15,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: "Set a task's status to any project status (also reopens a closed task)", name: 'set-status' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
@@ -29,4 +28,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated status of task \`${result.data.id}\`.`);
   },
+  schema,
 });

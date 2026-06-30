@@ -4,13 +4,13 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   beforeId: z
     .string()
     .optional()
@@ -31,7 +31,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiMoveArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Reparent a wiki page, optionally ordering it or moving it into another wiki (irreversible)',
     name: 'move',
@@ -50,4 +49,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Moved wiki page \`${id}\`.`);
   },
+  schema,
 });

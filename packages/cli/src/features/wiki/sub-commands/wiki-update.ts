@@ -3,12 +3,12 @@ import { runWikiUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
   cc: z
     .string()
@@ -19,7 +19,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiUpdateArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description:
       "Replace a wiki page's title, body, and cc together (use `dooray wiki update-title`, `dooray wiki update-body`, or `dooray wiki update-cc` to change just one)",
@@ -37,4 +36,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated wiki page \`${id}\`.`);
   },
+  schema,
 });

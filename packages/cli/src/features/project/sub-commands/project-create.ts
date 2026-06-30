@@ -4,11 +4,11 @@ import { PROJECT_SCOPES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.omit({ ref: true }).extend({
   categoryId: z
     .string()
     .trim()
@@ -28,8 +28,6 @@ const schema = z.object({
 } satisfies Record<keyof ProjectCreateArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "Create a new project in the caller's organization (name = API project code)",
     name: 'create',
@@ -45,4 +43,5 @@ export default defineSubcommand({
     formatter.printData(result, renderId);
     formatter.printInfo(`Created project \`${data.name}\`.`);
   },
+  schema,
 });

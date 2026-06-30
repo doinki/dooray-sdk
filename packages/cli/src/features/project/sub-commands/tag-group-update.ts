@@ -2,11 +2,11 @@ import { runProjectTagGroupUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   id: z
     .string()
     .min(1)
@@ -20,7 +20,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: "Update a tag group's constraints (required / single-select)",
     name: 'tag-group-update',
@@ -35,4 +34,5 @@ export default defineSubcommand({
       schema,
     });
   },
+  schema,
 });

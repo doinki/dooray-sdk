@@ -3,12 +3,12 @@ import { runWikiProjectFileDownload } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   attachFileId: z
     .string()
     .trim()
@@ -27,7 +27,6 @@ const schema = z.object({
 >);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Download a wiki-level attachment to a local file', name: 'project-file-download' },
   async run({ api, args, formatter }) {
     const { result } = await runWithProjectScope({
@@ -41,6 +40,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Downloaded to \`${result.data.path}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiProjectFileDownload>>): string {

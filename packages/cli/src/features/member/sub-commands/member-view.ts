@@ -3,11 +3,11 @@ import { runMemberView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { renderMember } from '../utils/render';
 
-const schema = z.object({
+const schema = globalArgsSchema.omit({ ref: true }).extend({
   id: z
     .string()
     .trim()
@@ -17,8 +17,6 @@ const schema = z.object({
 } satisfies Record<keyof MemberViewArgs, any>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: { description: 'Show a tenant member by id', name: 'view' },
   async run({ api, args, formatter }) {
     const data = parseArgsOrThrow(schema, args);
@@ -27,4 +25,5 @@ export default defineSubcommand({
 
     formatter.printData(result, renderMember);
   },
+  schema,
 });

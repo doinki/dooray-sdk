@@ -2,13 +2,13 @@ import { runTaskCommentUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { mimeTypeField } from '../utils/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   body: z
     .string()
     .min(1)
@@ -29,7 +29,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: 'Edit a task comment (--body and --file-ids each replace the whole value)',
     name: 'comment-update',
@@ -46,4 +45,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Updated comment \`${result.data.id}\`.`);
   },
+  schema,
 });

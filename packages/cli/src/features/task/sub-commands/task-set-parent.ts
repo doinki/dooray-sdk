@@ -2,11 +2,11 @@ import { runTaskSetParent } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   parentId: z
     .string()
     .min(1)
@@ -15,7 +15,6 @@ const schema = z.object({
 });
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Re-parent a task as a subtask of another task in the same project', name: 'set-parent' },
   async run({ api, args, formatter }) {
     const { result } = await runWithTaskScope({
@@ -29,6 +28,7 @@ export default defineSubcommand({
 
     formatter.printInfo(`Re-parented task \`${result.data.post.id}\`.`);
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskSetParent>>): string {

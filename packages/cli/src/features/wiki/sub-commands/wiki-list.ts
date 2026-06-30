@@ -3,13 +3,13 @@ import { runWikiList } from '@dooray-sdk/core';
 import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { truncate } from '../../../shared/utils/text';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   parentId: z
     .string()
     .optional()
@@ -18,7 +18,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiListArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: {
     description: "List a wiki's pages one level deep (pass --parent-id for a page's children)",
     name: 'list',
@@ -35,6 +34,7 @@ export default defineSubcommand({
 
     if (result.data.length === 0) formatter.printInfo('No pages.');
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runWikiList>>): null | string {

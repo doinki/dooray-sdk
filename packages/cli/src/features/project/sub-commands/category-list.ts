@@ -1,10 +1,12 @@
 import { runProjectCategoryList } from '@dooray-sdk/core';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderList } from '../../../shared/utils/table';
 
+const schema = globalArgsSchema.omit({ ref: true });
+
 export default defineSubcommand({
-  globalArgs: ['json', 'profile', 'verbose'],
   meta: {
     description: "List the tenant's project categories (read-only; managed in admin)",
     name: 'category-list',
@@ -15,6 +17,7 @@ export default defineSubcommand({
     formatter.printData(result, renderPretty);
     if (result.data.length === 0) formatter.printInfo('No categories.');
   },
+  schema,
 });
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runProjectCategoryList>>): null | string {

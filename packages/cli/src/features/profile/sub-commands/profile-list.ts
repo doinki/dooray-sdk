@@ -1,9 +1,11 @@
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderList } from '../../../shared/utils/table';
 import { runProfileList } from '../operations/profile-list';
 
+const schema = globalArgsSchema.pick({ jq: true, json: true });
+
 export default defineSubcommand({
-  globalArgs: ['json'],
   meta: { description: 'List saved profiles', name: 'list' },
   mode: 'local',
   run({ formatter, profileStore }) {
@@ -11,6 +13,7 @@ export default defineSubcommand({
 
     formatter.printData(result, renderPretty);
   },
+  schema,
 });
 
 function renderPretty({ data: { profiles } }: Awaited<ReturnType<typeof runProfileList>>): string {

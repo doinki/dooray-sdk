@@ -4,14 +4,14 @@ import { z } from 'zod';
 
 import { confirmDeletion } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
+import { globalArgsSchema } from '../../../shared/command/global-args';
 import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
-import { argsFromSchema } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
-const schema = z.object({
+const schema = globalArgsSchema.extend({
   commentId: z
     .string()
     .trim()
@@ -22,7 +22,6 @@ const schema = z.object({
 } satisfies CommandSchemaShape<WikiCommentDeleteArgs>);
 
 export default defineSubcommand({
-  args: argsFromSchema(schema),
   meta: { description: 'Delete a wiki comment (irreversible)', name: 'comment-delete' },
   async run({ api, args, formatter }) {
     const { result } = await runWithWikiScope({
@@ -38,4 +37,5 @@ export default defineSubcommand({
 
     formatter.printInfo(`Deleted comment \`${result.data.id}\`.`);
   },
+  schema,
 });
