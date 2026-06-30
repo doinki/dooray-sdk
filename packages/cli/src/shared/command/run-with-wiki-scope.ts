@@ -1,33 +1,18 @@
-import type { DoorayApi } from '@dooray-sdk/client';
 import { resolveWikiId } from '@dooray-sdk/core/resolve';
-import type { z } from 'zod';
 
-import type { OutputFormatter, Render } from '../formatter/output-formatter';
-import type { ArgInput } from '../schemas/parse-args';
-import { parseArgsOrThrow } from '../schemas/parse-args';
-
-interface WikiScopeContext<Args extends Record<string, unknown>, Result> {
-  api: DoorayApi;
-  args: { id?: string; ref?: string } & ArgInput;
-  /** Optional last-chance guard (e.g. a delete confirmation), run after the page id is resolved but before the action. */
-  confirm?: (input: { args: Args; id: string; projectId?: string }) => Promise<void> | void;
-  formatter: OutputFormatter;
-  render: Render<Result>;
-  run: (input: { api: DoorayApi; args: { id: string; projectId?: string } & Args }) => Promise<Result>;
-  schema: z.ZodType<Args>;
-}
+import type { RefScopeContext } from './run-with-scope';
+import { runWithScope } from './run-with-scope';
 
 export async function runWithWikiScope<Args extends Record<string, unknown>, Result>(
-  context: WikiScopeContext<Args, Result>,
+  context: RefScopeContext<Args, Result>,
 ): Promise<{ data: Args; id: string; result: Result }> {
-  const { api, args, confirm, formatter, render, run, schema } = context;
+  const { confirm, ...core } = context;
 
-  const data = parseArgsOrThrow(schema, args);
-  const { id, projectId } = resolveWikiId(args);
-  await confirm?.({ args: data, id, projectId });
-  const result = await run({ api, args: { ...data, id, projectId } });
+  const scope = await runWithScope<Args, Result, { id: string; projectId?: string }>(core, async (data) => {
+    const { id, projectId } = resolveWikiId(core.args);
+    await confirm?.({ args: data, id, projectId });
+    return { id, projectId };
+  });
 
-  formatter.printData(result, render);
-
-  return { data, id, result };
+  return { data: scope.data, id: scope.ids.id, result: scope.result };
 }

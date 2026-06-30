@@ -1,5 +1,8 @@
 import columnify from 'columnify';
 
+import { snakeCase } from './case';
+import { isBlank } from './text';
+
 interface Column<T> {
   align?: 'left' | 'right';
   header: string;
@@ -13,7 +16,7 @@ export function renderList<T>(
     columnSplitter?: string;
   } = {},
 ): string {
-  const keyed = columns.map((column) => ({ column, key: toSnakeCase(column.header) }));
+  const keyed = columns.map((column) => ({ column, key: snakeCase(column.header) }));
 
   const config: Record<string, { align: 'left' | 'right' }> = {};
   for (const { column, key } of keyed) if (column.align) config[key] = { align: column.align };
@@ -32,13 +35,5 @@ export function renderList<T>(
 }
 
 function formatCell(value: unknown): unknown {
-  if (value === undefined || value === null || value === '') return '-';
-  return value;
-}
-
-function toSnakeCase(value: string): string {
-  return value
-    .replaceAll(/([a-z0-9])([A-Z])/g, '$1_$2')
-    .replaceAll('-', '_')
-    .toLowerCase();
+  return isBlank(value) ? '-' : value;
 }

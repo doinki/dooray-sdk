@@ -15,28 +15,32 @@ import { createVerboseClientOptions } from './verbose';
 
 type RunContext<S extends z.ZodObject> = { args: { _: string[] } & z.input<S> } & Omit<CommandContext, 'args'>;
 
+type LocalRunContext<S extends z.ZodObject> = {
+  formatter: OutputFormatter;
+  profileStore: ProfileStore;
+} & RunContext<S>;
+
+type ApiRunContext<S extends z.ZodObject> = {
+  api: ReturnType<typeof createDoorayClient>;
+  formatter: OutputFormatter;
+  profile: ProfileRecord;
+  profileStore: ProfileStore;
+} & RunContext<S>;
+
+interface BaseOptions<S extends z.ZodObject> {
+  meta?: CommandMeta;
+  schema?: S;
+}
+
 type DefineSubcommandOptions<S extends z.ZodObject> =
-  | {
-      meta?: CommandMeta;
+  | ({
       mode: 'local';
-      run: (
-        context: { formatter: OutputFormatter; profileStore: ProfileStore } & RunContext<S>,
-      ) => Promise<void> | void;
-      schema?: S;
-    }
-  | {
-      meta?: CommandMeta;
+      run: (context: LocalRunContext<S>) => Promise<void> | void;
+    } & BaseOptions<S>)
+  | ({
       mode?: 'api';
-      run: (
-        context: {
-          api: ReturnType<typeof createDoorayClient>;
-          formatter: OutputFormatter;
-          profile: ProfileRecord;
-          profileStore: ProfileStore;
-        } & RunContext<S>,
-      ) => Promise<void> | void;
-      schema?: S;
-    };
+      run: (context: ApiRunContext<S>) => Promise<void> | void;
+    } & BaseOptions<S>);
 
 export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: DefineSubcommandOptions<S>) {
   const { meta, mode, run, schema } = def;
@@ -53,9 +57,10 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
 
       try {
         const profileStore = new ProfileStore();
+        const runCtx = ctx as unknown as RunContext<S>;
 
         if (mode === 'local') {
-          await run({ ...(ctx as unknown as RunContext<S>), formatter, profileStore });
+          await run({ ...runCtx, formatter, profileStore });
         } else {
           const { profile, token } = resolveProfile(profileStore, ctx.args.profile);
 
@@ -65,7 +70,7 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
             token,
           });
 
-          await run({ ...(ctx as unknown as RunContext<S>), api, formatter, profile, profileStore });
+          await run({ ...runCtx, api, formatter, profile, profileStore });
         }
       } catch (error: unknown) {
         const surface = toSurfaceError(error);

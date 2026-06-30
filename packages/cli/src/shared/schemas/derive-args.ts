@@ -1,17 +1,16 @@
 import type { ArgsDef } from 'citty';
 import type { z } from 'zod';
 
+import { kebabCase } from '../utils/case';
+
 type ArgDef = ArgsDef[string];
 
 export type CommandSchemaShape<TArgs> = Omit<{ [K in keyof TArgs]: z.ZodType<TArgs[K]> }, 'id' | 'projectId'> &
   Record<string, z.ZodType>;
 
 export function argsFromSchema(schema: z.ZodObject): ArgsDef {
-  return Object.fromEntries(Object.entries(schema.shape).map(([key, field]) => [toKebab(key), toArgDef(field)]));
+  return Object.fromEntries(Object.entries(schema.shape).map(([key, field]) => [kebabCase(key), toArgDef(field)]));
 }
-
-const UPPERCASE = /[A-Z]/g;
-const toKebab = (key: string): string => key.replaceAll(UPPERCASE, (c) => `-${c.toLowerCase()}`);
 
 export interface ArgMeta {
   alias?: string | string[];

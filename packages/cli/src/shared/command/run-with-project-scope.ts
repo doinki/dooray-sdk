@@ -4,7 +4,7 @@ import type { z } from 'zod';
 
 import type { OutputFormatter, Render } from '../formatter/output-formatter';
 import type { ArgInput } from '../schemas/parse-args';
-import { parseArgsOrThrow } from '../schemas/parse-args';
+import { runWithScope } from './run-with-scope';
 
 interface ProjectScopeContext<Args extends Record<string, unknown>, Result> {
   api: DoorayApi;
@@ -20,14 +20,12 @@ interface ProjectScopeContext<Args extends Record<string, unknown>, Result> {
 export async function runWithProjectScope<Args extends Record<string, unknown>, Result>(
   context: ProjectScopeContext<Args, Result>,
 ): Promise<{ data: Args; result: Result }> {
-  const { api, args, confirm, formatter, render, run, schema } = context;
+  const { confirm, ...core } = context;
 
-  const data = parseArgsOrThrow(schema, args);
-  await confirm?.({ args: data });
-  const projectId = await resolveProjectId({ api, ref: args.ref ?? '' });
-  const result = await run({ api, args: { ...data, projectId } });
+  const scope = await runWithScope<Args, Result, { projectId: string }>(core, async (data) => {
+    await confirm?.({ args: data });
+    return { projectId: await resolveProjectId({ api: core.api, ref: core.args.ref ?? '' }) };
+  });
 
-  formatter.printData(result, render);
-
-  return { data, result };
+  return { data: scope.data, result: scope.result };
 }

@@ -22,3 +22,8 @@ export function formatDateTime(value: null | string | undefined): string | undef
 export function truncate(value: string, max: number): string {
   return value.length > max ? `${value.slice(0, Math.max(0, max - 3))}...` : value;
 }
+
+/** True for the "empty" values that render as `-`: undefined, null, or the empty string. */
+export function isBlank(value: unknown): boolean {
+  return value === undefined || value === null || value === '';
+}

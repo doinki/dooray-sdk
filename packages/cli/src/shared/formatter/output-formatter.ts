@@ -5,6 +5,8 @@ import type { SurfaceError } from '@dooray-sdk/core/errors';
 import chalk from 'chalk';
 import columnify from 'columnify';
 
+import { isBlank } from '../utils/text';
+
 /** Render the data for human consumption, or return `null` to print nothing (empty result). */
 export type Render<T> = (data: T) => null | string;
 
@@ -140,7 +142,7 @@ export function renderKeyValue(rows: KeyValueRows): string {
 }
 
 function formatKeyValue(value: unknown): string {
-  if (value === undefined || value === null || value === '') return '-';
+  if (isBlank(value)) return '-';
   if (typeof value === 'object') return JSON.stringify(value, null, 2);
 
   // oxlint-disable-next-line typescript/no-base-to-string
