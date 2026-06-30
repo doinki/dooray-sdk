@@ -79,7 +79,7 @@ dooray task list --ref <project> --jq '.data[] | {id, subject, status: .workflow
 
 ## Contributing — adding a command
 
-Each command lives in `src/features/<group>/sub-commands/<name>.ts` and is **schema-driven**: define a [zod](https://zod.dev) schema once, and `argsFromSchema` derives the CLI arguments (type, description, enum choices, required-ness) from it — there is no separate hand-written `args` block to keep in sync.
+Each command lives in `src/features/<group>/subcommands/<name>.ts` and is **schema-driven**: define a [zod](https://zod.dev) schema once, and `argsFromSchema` derives the CLI arguments (type, description, enum choices, required-ness) from it — there is no separate hand-written `args` block to keep in sync.
 
 ```ts
 import { argsFromSchema } from '../../../shared/schema/derive-args';

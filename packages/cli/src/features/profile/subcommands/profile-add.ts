@@ -1,4 +1,4 @@
-import authLogin from '../../auth/sub-commands/auth-login';
+import authLogin from '../../auth/subcommands/auth-login';
 
 const profileAdd = {
   ...authLogin,

@@ -1,4 +1,4 @@
-import memberMe from '../../member/sub-commands/member-me';
+import memberMe from '../../member/subcommands/member-me';
 
 const authStatus = {
   ...memberMe,

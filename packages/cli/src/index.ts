@@ -9,11 +9,11 @@ export default defineCommand({
     version: packageJson.version,
   },
   subCommands: {
-    auth: () => import('./features/auth/sub-commands').then((m) => m.default),
-    member: () => import('./features/member/sub-commands').then((m) => m.default),
-    profile: () => import('./features/profile/sub-commands').then((m) => m.default),
-    project: () => import('./features/project/sub-commands').then((m) => m.default),
-    task: () => import('./features/task/sub-commands').then((m) => m.default),
-    wiki: () => import('./features/wiki/sub-commands').then((m) => m.default),
+    auth: () => import('./features/auth/subcommands').then((m) => m.default),
+    member: () => import('./features/member/subcommands').then((m) => m.default),
+    profile: () => import('./features/profile/subcommands').then((m) => m.default),
+    project: () => import('./features/project/subcommands').then((m) => m.default),
+    task: () => import('./features/task/subcommands').then((m) => m.default),
+    wiki: () => import('./features/wiki/subcommands').then((m) => m.default),
   },
 });
