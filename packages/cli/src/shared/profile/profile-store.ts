@@ -27,7 +27,7 @@ const DEFAULTS: DoorayConfigStore = {
   profiles: {},
 };
 
-export interface ProfileStoreOptions {
+interface ProfileStoreOptions {
   cwd?: string;
 }
 
@@ -103,8 +103,10 @@ export class ProfileStore {
   public saveProfile(profile: ProfileRecord, token: string): void {
     if (!findEnvironmentById(profile.environmentId)) throw new Error(`unknown environment: ${profile.environmentId}`);
 
-    this.#conf.set('profiles', { ...this.#profiles(), [profile.name]: { ...profile, token } });
-    this.#conf.set('activeProfile', profile.name);
+    this.#conf.set({
+      activeProfile: profile.name,
+      profiles: { ...this.#profiles(), [profile.name]: { ...profile, token } },
+    });
   }
 
   public setActive(name: string): void {
