@@ -140,10 +140,6 @@ export class UnknownProfileError extends Error {
   }
 }
 
-export function createDefaultProfileStore(options: ProfileStoreOptions = {}): ProfileStore {
-  return new ProfileStore(options);
-}
-
 function stripToken(stored: StoredProfile | undefined): ProfileRecord | undefined {
   return stored ? stripTokenRequired(stored) : undefined;
 }

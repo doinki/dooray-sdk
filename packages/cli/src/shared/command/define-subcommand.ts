@@ -6,8 +6,8 @@ import type { z } from 'zod';
 
 import type { OutputFormatter } from '../formatter/output-formatter';
 import { createOutputFormatter } from '../formatter/output-formatter';
-import type { ProfileRecord, ProfileStore } from '../profile/profile-store';
-import { createDefaultProfileStore } from '../profile/profile-store';
+import type { ProfileRecord } from '../profile/profile-store';
+import { ProfileStore } from '../profile/profile-store';
 import { resolveProfile } from '../profile/resolve-profile';
 import { argsFromSchema } from '../schemas/derive-args';
 import { isJsonOutput, jsonFields } from './json-output';
@@ -39,12 +39,12 @@ type DefineSubcommandOptions<S extends z.ZodObject> =
     };
 
 export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: DefineSubcommandOptions<S>) {
-  const { meta, schema } = def;
+  const { meta, mode, run, schema } = def;
 
   return defineCommand({
     args: schema ? argsFromSchema(schema) : undefined,
     meta,
-    async run(ctx) {
+    run: async (ctx) => {
       const formatter = createOutputFormatter({
         fields: jsonFields(ctx.args.json),
         jq: typeof ctx.args.jq === 'string' && ctx.args.jq ? ctx.args.jq : undefined,
@@ -52,10 +52,10 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
       });
 
       try {
-        const profileStore = createDefaultProfileStore();
+        const profileStore = new ProfileStore();
 
-        if (def.mode === 'local') {
-          await def.run({ ...(ctx as unknown as RunContext<S>), formatter, profileStore });
+        if (mode === 'local') {
+          await run({ ...(ctx as unknown as RunContext<S>), formatter, profileStore });
         } else {
           const { profile, token } = resolveProfile(profileStore, ctx.args.profile);
 
@@ -65,7 +65,7 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
             token,
           });
 
-          await def.run({ ...(ctx as unknown as RunContext<S>), api, formatter, profile, profileStore });
+          await run({ ...(ctx as unknown as RunContext<S>), api, formatter, profile, profileStore });
         }
       } catch (error: unknown) {
         const surface = toSurfaceError(error);
