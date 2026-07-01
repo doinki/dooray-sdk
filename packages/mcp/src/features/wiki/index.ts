@@ -18,9 +18,6 @@ import { registerWikiProjectFileUpload } from './project-file-upload';
 import { registerWikiProjectList } from './project-list';
 import { registerWikiSharedLinkList } from './shared-link-list';
 import { registerWikiUpdate } from './update';
-import { registerWikiUpdateBody } from './update-body';
-import { registerWikiUpdateCc } from './update-cc';
-import { registerWikiUpdateTitle } from './update-title';
 import { registerWikiView } from './view';
 
 export function registerWikiTools(server: McpServer, api: DoorayApi): void {
@@ -28,9 +25,6 @@ export function registerWikiTools(server: McpServer, api: DoorayApi): void {
   registerWikiView(server, api);
   registerWikiCreate(server, api);
   registerWikiUpdate(server, api);
-  registerWikiUpdateTitle(server, api);
-  registerWikiUpdateBody(server, api);
-  registerWikiUpdateCc(server, api);
   registerWikiDelete(server, api);
   registerWikiMove(server, api);
   registerWikiCommentList(server, api);

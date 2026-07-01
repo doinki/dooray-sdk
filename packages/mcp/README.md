@@ -49,8 +49,8 @@ Tools are named `<entity>_<verb>` and share a common set of verbs: `_list` (brow
 
 - **`member_*`** — current user, search, view
 - **`project_*`** — list, view, create, check name; members and member groups; milestones; statuses; tags; templates; categories; email addresses; hooks
-- **`task_*`** — list, view, create (and drafts), update, close, move, set parent / status / assignee status; comments; file attachments
-- **`wiki_*`** — list wikis and pages, view, create, update (title / body / cc), delete, move; comments; file attachments; shared links
+- **`task_*`** — list, view, create, update, close, move, set parent / status / assignee status; comments; file attachments
+- **`wiki_*`** — list wikis and pages, view, create, update, delete, move; comments; file attachments; shared links
 
 ## References
 

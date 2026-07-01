@@ -10,10 +10,13 @@ import type { WikiScopedArgs } from '../../shared/scope';
 import { wikiScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('Page body (Markdown).'),
-  cc: z.array(z.string()).describe('Referrer member ids, or `@me`. Replaces the whole list.'),
+  body: z.string().optional().describe('New page body (Markdown). Omit to keep current.'),
+  cc: z
+    .array(z.string())
+    .optional()
+    .describe('Referrer member ids, or `@me`. Replaces the whole list; omit to keep current.'),
   ref: wikiScopeShape.ref,
-  title: z.string().describe('Page title.'),
+  title: z.string().optional().describe('New page title. Omit to keep current.'),
 } satisfies Record<keyof WikiScopedArgs<WikiUpdateArgs>, z.ZodType>;
 
 export function registerWikiUpdate(server: McpServer, api: DoorayApi): void {
@@ -21,8 +24,7 @@ export function registerWikiUpdate(server: McpServer, api: DoorayApi): void {
     'wiki_update',
     {
       annotations: { destructiveHint: false, idempotentHint: true, openWorldHint: false, readOnlyHint: false },
-      description:
-        "Replace a wiki page's title, body, and referrers together; use wiki_update_title, wiki_update_body, or wiki_update_cc to change just one.",
+      description: "Edit a wiki page's title, body, or referrers; omitted fields keep their current values.",
       inputSchema,
       title: 'Update wiki page',
     },

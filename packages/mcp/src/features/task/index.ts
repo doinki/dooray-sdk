@@ -8,7 +8,6 @@ import { registerTaskCommentList } from './comment-list';
 import { registerTaskCommentUpdate } from './comment-update';
 import { registerTaskCommentView } from './comment-view';
 import { registerTaskCreate } from './create';
-import { registerTaskCreateDraft } from './create-draft';
 import { registerTaskFileDelete } from './file-delete';
 import { registerTaskFileDownload } from './file-download';
 import { registerTaskFileList } from './file-list';
@@ -20,14 +19,12 @@ import { registerTaskSetAssigneeStatus } from './set-assignee-status';
 import { registerTaskSetParent } from './set-parent';
 import { registerTaskSetStatus } from './set-status';
 import { registerTaskUpdate } from './update';
-import { registerTaskUploadDraftFile } from './upload-draft-file';
 import { registerTaskView } from './view';
 
 export function registerTaskTools(server: McpServer, api: DoorayApi): void {
   registerTaskList(server, api);
   registerTaskView(server, api);
   registerTaskCreate(server, api);
-  registerTaskCreateDraft(server, api);
   registerTaskUpdate(server, api);
   registerTaskClose(server, api);
   registerTaskMove(server, api);
@@ -44,5 +41,4 @@ export function registerTaskTools(server: McpServer, api: DoorayApi): void {
   registerTaskFileDownload(server, api);
   registerTaskFileUpload(server, api);
   registerTaskFileDelete(server, api);
-  registerTaskUploadDraftFile(server, api);
 }
