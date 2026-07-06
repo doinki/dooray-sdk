@@ -5,7 +5,7 @@ import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { runProfileUse } from '../operations/profile-use';
 
 const schema = z.object({
-  name: z.string().trim().min(1).meta({ positional: true }).describe('Profile name to activate'),
+  name: z.string().min(1).meta({ positional: true }).describe('Profile name to activate'),
 });
 
 export default defineSubcommand({

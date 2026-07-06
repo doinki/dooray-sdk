@@ -9,15 +9,9 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
-  body: z
-    .string()
-    .trim()
-    .min(1)
-    .meta({ hint: 'text' })
-    .describe('New comment body (Markdown). Replaces the whole body.'),
+  body: z.string().min(1).meta({ hint: 'text' }).describe('New comment body (Markdown). Replaces the whole body.'),
   commentId: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
     .describe('Comment id to update (from `dooray wiki comment-list`).'),

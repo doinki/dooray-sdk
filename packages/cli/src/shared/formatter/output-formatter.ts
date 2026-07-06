@@ -16,6 +16,8 @@ export interface OutputFormatter {
   printData<T>(data: T, render: Render<T>): void;
   printError(error: SurfaceError): void;
   printInfo(line: string): void;
+  /** stderr footer for a list result: `No <noun>.` when empty, else the paging summary. */
+  printListFooter(result: { data: readonly unknown[]; paging: Paging }, noun: string): void;
 }
 
 export interface OutputFormatterOptions {
@@ -60,13 +62,17 @@ export function createOutputFormatter(options: OutputFormatterOptions = {}): Out
     },
     printError(error) {
       if (json) {
-        writeLine(stdout, JSON.stringify({ error: error.message, hint: error.hint }));
+        writeLine(stdout, JSON.stringify({ error: { code: error.code, hint: error.hint, message: error.message } }));
         return;
       }
       writeLine(stderr, `${colors.error('error:')} ${error.message}`);
       if (error.hint) writeLine(stderr, `${colors.muted('hint:')} ${error.hint}`);
     },
     printInfo(line) {
+      if (!json) writeLine(stderr, line);
+    },
+    printListFooter(result, noun) {
+      const line = result.data.length === 0 ? `No ${noun}.` : renderPagingFooter(result.paging);
       if (!json) writeLine(stderr, line);
     },
   };

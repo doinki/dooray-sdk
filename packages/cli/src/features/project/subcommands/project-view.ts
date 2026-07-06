@@ -63,8 +63,8 @@ function renderPretty({
           [
             { header: 'id', value: (t) => t.id },
             { header: 'name', value: (t) => t.name },
-            { header: 'group_id', value: (t) => t.groupId },
-            { header: 'group_name', value: (t) => t.groupName },
+            { header: 'groupId', value: (t) => t.groupId },
+            { header: 'groupName', value: (t) => t.groupName },
           ],
           { columnSplitter: '   ' },
         ),
@@ -101,7 +101,7 @@ function renderMilestones(rows: ProjectMilestoneRow[]): string {
     [
       { header: 'id', value: (m) => m.id },
       { header: 'name', value: (m) => m.name },
-      { header: 'date_range', value: (m) => m.dateRange },
+      { header: 'dateRange', value: (m) => m.dateRange },
       { header: 'state', value: (m) => m.state },
     ],
     { columnSplitter: '   ' },

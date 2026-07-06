@@ -2,10 +2,9 @@ import type { WikiFileDeleteArgs } from '@dooray-sdk/core';
 import { runWikiFileDelete } from '@dooray-sdk/core';
 import { z } from 'zod';
 
-import { confirmDeletion } from '../../../shared/command/confirm-deletion';
+import { confirmField } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
@@ -14,7 +13,6 @@ import { yesSchema } from '../../../shared/schemas/fields';
 const schema = globalArgsSchema.extend({
   fileId: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
     .describe('Page file id to delete (from `dooray wiki view`).'),
@@ -27,8 +25,7 @@ export default defineSubcommand({
     const { data } = await runWithWikiScope({
       api,
       args,
-      confirm: ({ args: a }) =>
-        confirmDeletion({ json: isJsonOutput(args.json), message: `Delete attachment \`${a.fileId}\`?`, skip: a.yes }),
+      confirm: confirmField(({ args }) => `Delete attachment \`${args.fileId}\`?`),
       formatter,
       render: renderId,
       run: runWikiFileDelete,

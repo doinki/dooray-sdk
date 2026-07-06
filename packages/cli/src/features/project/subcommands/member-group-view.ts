@@ -1,3 +1,4 @@
+import type { ProjectMemberGroupViewArgs } from '@dooray-sdk/core';
 import { runProjectMemberGroupView } from '@dooray-sdk/core';
 import columnify from 'columnify';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   id: z
@@ -13,7 +15,7 @@ const schema = globalArgsSchema.extend({
     .min(1)
     .meta({ hint: 'memberGroupId', positional: true })
     .describe('Member group id (from `member-group-list`)'),
-});
+} satisfies CommandSchemaShape<ProjectMemberGroupViewArgs>);
 
 export default defineSubcommand({
   meta: {

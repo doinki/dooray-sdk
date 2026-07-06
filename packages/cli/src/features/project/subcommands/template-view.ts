@@ -1,4 +1,5 @@
 import type { ProjectTemplate } from '@dooray-sdk/client/project';
+import type { TemplateViewArgs } from '@dooray-sdk/core';
 import { runProjectTemplateView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -6,6 +7,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { formatUser } from '../../../shared/utils/user';
 
 const schema = globalArgsSchema.extend({
@@ -17,7 +19,7 @@ const schema = globalArgsSchema.extend({
         '{year}`) in the response. When false/omitted, return them literally',
     ),
   id: z.string().min(1).meta({ hint: 'templateId', positional: true }).describe('Template id'),
-});
+} satisfies CommandSchemaShape<TemplateViewArgs>);
 
 export default defineSubcommand({
   meta: {

@@ -2,6 +2,7 @@ import { confirm } from '@clack/prompts';
 
 import { cancelledError, confirmationRequiredError } from '../error/cli-errors';
 import { assertInteractive, unwrapPrompt } from '../prompts/interactive';
+import { isJsonOutput } from './json-output';
 
 export interface ConfirmDeletionOptions {
   json?: boolean;
@@ -25,3 +26,19 @@ export async function confirmDeletion(options: ConfirmDeletionOptions): Promise<
   const answer = unwrapPrompt(await confirm({ initialValue: false, message: options.message }));
   if (!answer) throw cancelledError();
 }
+
+interface ConfirmScope<A> {
+  args: A;
+  id?: string;
+  projectId?: string;
+}
+
+/**
+ * The `confirm` callback for `runWith*Scope`, wiring `--json`/`--yes` automatically —
+ * pass only the message. Collapses the identical `confirmDeletion({ json, message, skip })`
+ * closure repeated across every destructive command.
+ */
+export const confirmField =
+  <A extends { json?: string; yes?: boolean }>(buildMessage: (scope: ConfirmScope<A>) => string) =>
+  (scope: ConfirmScope<A>): Promise<void> =>
+    confirmDeletion({ json: isJsonOutput(scope.args.json), message: buildMessage(scope), skip: scope.args.yes });

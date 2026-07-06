@@ -10,7 +10,7 @@ import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 
 const schema = globalArgsSchema.extend({
-  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
+  body: z.string().min(1).meta({ hint: 'text' }).describe('Page body (Markdown).'),
   cc: z
     .string()
     .transform(splitCsv)
@@ -23,8 +23,8 @@ const schema = globalArgsSchema.extend({
     .optional()
     .meta({ hint: 'id[,id...]' })
     .describe('File ids to attach, comma-separated (from `dooray wiki project-file-upload`).'),
-  parentId: z.string().trim().min(1).meta({ hint: 'pageId' }).describe('Parent page id (from `dooray wiki list`).'),
-  title: z.string().trim().min(1).meta({ hint: 'text' }).describe('Page title.'),
+  parentId: z.string().min(1).meta({ hint: 'pageId' }).describe('Parent page id (from `dooray wiki list`).'),
+  title: z.string().min(1).meta({ hint: 'text' }).describe('Page title.'),
 } satisfies CommandSchemaShape<WikiCreateArgs>);
 
 export default defineSubcommand({

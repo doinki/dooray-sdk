@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { renderList } from '../../../shared/utils/table';
 
@@ -31,7 +31,7 @@ const schema = globalArgsSchema.omit({ ref: true }).extend({
     .describe(
       'Project type filter — `private` includes 1-on-1 personal projects (which always appear first); `public` excludes them (default: public)',
     ),
-} satisfies Record<keyof ProjectListArgs, any>);
+} satisfies CommandSchemaShape<ProjectListArgs>);
 
 export default defineSubcommand({
   meta: { description: 'List projects accessible to the caller, with filters and pagination', name: 'list' },
@@ -44,7 +44,7 @@ export default defineSubcommand({
     });
 
     formatter.printData(result, renderPretty);
-    formatter.printInfo(result.data.length === 0 ? 'No projects.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'projects');
   },
   schema,
 });
@@ -59,9 +59,9 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runProjectList>>): nul
     { header: 'state', value: (p) => p.state },
     { header: 'scope', value: (p) => p.scope },
     { header: 'type', value: (p) => p.type },
-    { header: 'category_id', value: (p) => p.projectCategoryId },
-    { header: 'organization_id', value: (p) => p.organization.id },
-    { header: 'drive_id', value: (p) => p.drive?.id },
-    { header: 'wiki_id', value: (p) => p.wiki?.id },
+    { header: 'categoryId', value: (p) => p.projectCategoryId },
+    { header: 'organizationId', value: (p) => p.organization.id },
+    { header: 'driveId', value: (p) => p.drive?.id },
+    { header: 'wikiId', value: (p) => p.wiki?.id },
   ]);
 }

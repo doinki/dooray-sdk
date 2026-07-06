@@ -24,7 +24,7 @@ export async function runWithProjectScope<Args extends Record<string, unknown>, 
 
   const scope = await runWithScope<Args, Result, { projectId: string }>(core, async (data) => {
     await confirm?.({ args: data });
-    return { projectId: await resolveProjectId({ api: core.api, ref: core.args.ref ?? '' }) };
+    return { projectId: await resolveProjectId({ api: core.api, ref: core.args.ref || process.env.DOORAY_REF || '' }) };
   });
 
   return { data: scope.data, result: scope.result };

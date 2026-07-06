@@ -9,7 +9,7 @@ import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
-  body: z.string().trim().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown).'),
+  body: z.string().min(1).meta({ hint: 'text' }).describe('Comment body (Markdown).'),
 } satisfies CommandSchemaShape<WikiCommentCreateArgs>);
 
 export default defineSubcommand({

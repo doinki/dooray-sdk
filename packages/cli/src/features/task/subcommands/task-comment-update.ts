@@ -1,3 +1,4 @@
+import type { TaskCommentUpdateArgs } from '@dooray-sdk/core';
 import { runTaskCommentUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { mimeTypeField } from '../utils/fields';
 
@@ -23,10 +25,10 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Attachment ids (comma-separated). Replaces the whole list; omit to keep current.')
-    .meta({ hint: 'id[,id...]' }),
+    .meta({ hint: 'id[,id...]' })
+    .describe('Attachment ids (comma-separated). Replaces the whole list; omit to keep current.'),
   mimeType: mimeTypeField(),
-});
+} satisfies CommandSchemaShape<TaskCommentUpdateArgs>);
 
 export default defineSubcommand({
   meta: {

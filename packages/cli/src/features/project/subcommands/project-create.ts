@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 
 const schema = globalArgsSchema.omit({ ref: true }).extend({
@@ -18,14 +19,13 @@ const schema = globalArgsSchema.omit({ ref: true }).extend({
   description: z.string().trim().optional().meta({ alias: 'd', hint: 'text' }).describe('Project description'),
   name: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'text' })
     .describe('Display name and API project code (tenant-unique; restricted charset)'),
   scope: z
     .enum(PROJECT_SCOPES)
     .describe('private: only project members can access; public: any non-guest member of the organization can access'),
-} satisfies Record<keyof ProjectCreateArgs, any>);
+} satisfies CommandSchemaShape<ProjectCreateArgs>);
 
 export default defineSubcommand({
   meta: {

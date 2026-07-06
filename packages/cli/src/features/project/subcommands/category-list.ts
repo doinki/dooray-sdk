@@ -26,7 +26,7 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runProjectCategoryList
   return renderList(data, [
     { header: 'id', value: ({ category }) => category.id },
     { header: 'name', value: ({ category, depth }) => `${'-'.repeat(depth)}${category.name}` },
-    { header: 'parent_id', value: ({ category }) => category.parentProjectCategoryId },
+    { header: 'parentId', value: ({ category }) => category.parentProjectCategoryId },
     { header: 'order', value: ({ category }) => category.order },
   ]);
 }

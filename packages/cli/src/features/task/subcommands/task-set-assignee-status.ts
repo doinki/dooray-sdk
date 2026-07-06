@@ -1,3 +1,4 @@
+import type { TaskSetAssigneeStatusArgs } from '@dooray-sdk/core';
 import { runTaskSetAssigneeStatus } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   memberId: z
@@ -17,7 +19,7 @@ const schema = globalArgsSchema.extend({
     .min(1)
     .meta({ hint: 'statusId' })
     .describe('Status id to set for this assignee (from `dooray project status-list`).'),
-});
+} satisfies CommandSchemaShape<TaskSetAssigneeStatusArgs>);
 
 export default defineSubcommand({
   meta: {

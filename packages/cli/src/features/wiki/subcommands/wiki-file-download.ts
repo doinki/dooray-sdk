@@ -11,13 +11,11 @@ import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 const schema = globalArgsSchema.extend({
   fileId: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'fileId', positional: true })
     .describe('Page file id (from `dooray wiki view`).'),
   output: z
     .string()
-    .trim()
     .min(1)
     .meta({ alias: 'o', hint: 'path' })
     .describe('Local path including the filename to write (e.g. `./diagram.png`). Overwrites any existing file.'),

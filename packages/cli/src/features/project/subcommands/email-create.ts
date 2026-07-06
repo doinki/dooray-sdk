@@ -1,3 +1,4 @@
+import type { EmailCreateArgs } from '@dooray-sdk/core';
 import { runProjectEmailCreate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   email: z
@@ -18,7 +20,7 @@ const schema = globalArgsSchema.extend({
     .min(1)
     .meta({ hint: 'text' })
     .describe('Display name shown alongside the address (e.g. in mail clients)'),
-});
+} satisfies CommandSchemaShape<EmailCreateArgs>);
 
 export default defineSubcommand({
   meta: {

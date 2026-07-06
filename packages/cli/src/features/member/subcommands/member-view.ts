@@ -4,17 +4,17 @@ import { z } from 'zod';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
 import { renderMember } from '../utils/render';
 
 const schema = globalArgsSchema.omit({ ref: true }).extend({
   id: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'memberId', positional: true })
     .describe('Member id (from `dooray member search`)'),
-} satisfies Record<keyof MemberViewArgs, any>);
+} satisfies CommandSchemaShape<MemberViewArgs>);
 
 export default defineSubcommand({
   meta: { description: 'Show a tenant member by id', name: 'view' },

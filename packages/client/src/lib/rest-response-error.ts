@@ -90,5 +90,7 @@ function isRestResponseErrorInstance<T extends RestResponse>(value: unknown): va
 }
 
 function formatErrorMessage(request: Request, { resultCode, resultMessage }: RestResponseHeader): string {
-  return `[${resultCode}] ${resultMessage} (${request.method} ${request.url})`;
+  const code = resultCode ? `[${resultCode}] ` : '';
+
+  return `${code}${resultMessage} (${request.method} ${request.url})`;
 }

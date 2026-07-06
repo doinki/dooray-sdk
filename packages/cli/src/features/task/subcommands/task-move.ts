@@ -1,12 +1,13 @@
+import type { TaskMoveArgs } from '@dooray-sdk/core';
 import { runTaskMove } from '@dooray-sdk/core';
 import { z } from 'zod';
 
-import { confirmDeletion } from '../../../shared/command/confirm-deletion';
+import { confirmField } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = globalArgsSchema.extend({
@@ -17,7 +18,7 @@ const schema = globalArgsSchema.extend({
     .meta({ hint: 'projectId' })
     .describe('Destination project id (from `dooray project list`).'),
   yes: yesSchema,
-});
+} satisfies CommandSchemaShape<TaskMoveArgs>);
 
 export default defineSubcommand({
   meta: {
@@ -28,12 +29,10 @@ export default defineSubcommand({
     const { result } = await runWithTaskScope({
       api,
       args,
-      confirm: ({ args: a, id }) =>
-        confirmDeletion({
-          json: isJsonOutput(args.json),
-          message: `Move task \`${id}\` to project \`${a.targetProjectId}\`? This clears its status and tags.`,
-          skip: a.yes,
-        }),
+      confirm: confirmField(
+        ({ args, id }) =>
+          `Move task \`${id}\` to project \`${args.targetProjectId}\`? This clears its status and tags.`,
+      ),
       formatter,
       render: renderPretty,
       run: runTaskMove,
@@ -47,7 +46,7 @@ export default defineSubcommand({
 
 function renderPretty({ data }: Awaited<ReturnType<typeof runTaskMove>>): string {
   return renderKeyValue([
-    ['taskId', data.post.id],
+    ['id', data.post.id],
     ['projectId', data.project.id],
   ]);
 }

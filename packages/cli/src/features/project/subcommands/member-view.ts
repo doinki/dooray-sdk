@@ -1,3 +1,4 @@
+import type { ProjectMemberViewArgs } from '@dooray-sdk/core';
 import { runProjectMemberView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   id: z
@@ -12,7 +14,7 @@ const schema = globalArgsSchema.extend({
     .min(1)
     .meta({ hint: 'memberId', positional: true })
     .describe('Member id to look up — use the organizationMemberId values from `project member-list`'),
-});
+} satisfies CommandSchemaShape<ProjectMemberViewArgs>);
 
 export default defineSubcommand({
   meta: {

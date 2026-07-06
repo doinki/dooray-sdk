@@ -1,16 +1,17 @@
+import type { TagListArgs } from '@dooray-sdk/core';
 import { runProjectTagList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 
 const schema = globalArgsSchema.extend({
   page: pageSchema,
   size: sizeSchema,
-});
+} satisfies CommandSchemaShape<TagListArgs>);
 
 export default defineSubcommand({
   meta: {
@@ -27,7 +28,7 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(result.data.length === 0 ? 'No tags.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'tags');
   },
   schema,
 });
@@ -39,9 +40,9 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runProjectTagList>>): 
     { header: 'id', value: (t) => t.id },
     { header: 'name', value: (t) => t.name },
     { header: 'color', value: (t) => t.color },
-    { header: 'group_id', value: (t) => t.tagGroup?.id },
-    { header: 'group_name', value: (t) => t.tagGroup?.name },
+    { header: 'groupId', value: (t) => t.tagGroup?.id },
+    { header: 'groupName', value: (t) => t.tagGroup?.name },
     { header: 'required', value: (t) => t.tagGroup?.mandatory },
-    { header: 'single_select', value: (t) => t.tagGroup?.selectOne },
+    { header: 'singleSelect', value: (t) => t.tagGroup?.selectOne },
   ]);
 }

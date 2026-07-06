@@ -23,9 +23,6 @@ export default defineCommand({
     'project-list': () => import('./wiki-project-list').then((m) => m.default),
     'shared-link-list': () => import('./wiki-shared-link-list').then((m) => m.default),
     update: () => import('./wiki-update').then((m) => m.default),
-    'update-body': () => import('./wiki-update-body').then((m) => m.default),
-    'update-cc': () => import('./wiki-update-cc').then((m) => m.default),
-    'update-title': () => import('./wiki-update-title').then((m) => m.default),
     view: () => import('./wiki-view').then((m) => m.default),
   },
 });

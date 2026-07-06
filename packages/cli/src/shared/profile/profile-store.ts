@@ -90,9 +90,13 @@ export class ProfileStore {
       .toSorted((a, b) => a.name.localeCompare(b.name));
   }
 
+  /** Blank the active profile's token but keep its metadata so `profile use` can re-auth. */
   public logoutActive(): void {
     const active = this.#conf.get('activeProfile');
-    if (active) this.#deleteProfile(active);
+    const stored = active ? this.#profiles()[active] : undefined;
+    if (!active || !stored) return;
+
+    this.#conf.set('profiles', { ...this.#profiles(), [active]: { ...stored, token: '' } });
   }
 
   public removeProfile(name: string): void {

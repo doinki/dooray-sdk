@@ -16,7 +16,7 @@ const schema = globalArgsSchema.extend({
     .optional()
     .meta({ hint: 'mime' })
     .describe('MIME type. Omit to infer from the file extension.'),
-  filePath: z.string().trim().min(1).meta({ hint: 'path' }).describe('Path of the local file to upload.'),
+  filePath: z.string().min(1).meta({ hint: 'path', positional: true }).describe('Path of the local file to upload.'),
   type: z.enum(WIKI_FILE_TYPES).optional().describe('File type: `general` or `inline_image` (default: `general`).'),
 } satisfies CommandSchemaShape<WikiProjectFileUploadArgs>);
 

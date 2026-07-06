@@ -1,3 +1,4 @@
+import type { TagGroupUpdateArgs } from '@dooray-sdk/core';
 import { runProjectTagGroupUpdate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   id: z
@@ -17,7 +19,7 @@ const schema = globalArgsSchema.extend({
     .boolean()
     .optional()
     .describe('single-select = at most one tag from this group can be assigned to a task'),
-});
+} satisfies CommandSchemaShape<TagGroupUpdateArgs>);
 
 export default defineSubcommand({
   meta: {

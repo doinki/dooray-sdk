@@ -2,11 +2,11 @@ import type { WikiMoveArgs } from '@dooray-sdk/core';
 import { runWikiMove } from '@dooray-sdk/core';
 import { z } from 'zod';
 
-import { confirmDeletion } from '../../../shared/command/confirm-deletion';
+import { confirmField } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
+import { renderId } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
@@ -39,10 +39,9 @@ export default defineSubcommand({
     const { id } = await runWithWikiScope({
       api,
       args,
-      confirm: ({ args: a, id }) =>
-        confirmDeletion({ json: isJsonOutput(args.json), message: `Move wiki page \`${id}\`?`, skip: a.yes }),
+      confirm: confirmField(({ id }) => `Move wiki page \`${id}\`?`),
       formatter,
-      render: () => null,
+      render: renderId,
       run: runWikiMove,
       schema,
     });

@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { jsonEnvDefault } from './json-output';
 
 /** Optional flag whose default is env-derived: no env value → just optional, with no citty default. */
-function envDefault<T extends z.ZodType>(schema: T, value: unknown) {
+export function envDefault<T extends z.ZodType>(schema: T, value: unknown) {
   return value === undefined ? schema.optional() : schema.optional().default(value as never);
 }
 

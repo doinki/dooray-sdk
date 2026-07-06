@@ -1,18 +1,19 @@
 import type { ProjectTemplateSummary } from '@dooray-sdk/client/project';
+import type { TemplateListArgs } from '@dooray-sdk/core';
 import { runProjectTemplateList } from '@dooray-sdk/core';
 import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { formatUser } from '../../../shared/utils/user';
 
 const schema = globalArgsSchema.extend({
   page: pageSchema,
   size: sizeSchema,
-});
+} satisfies CommandSchemaShape<TemplateListArgs>);
 
 export default defineSubcommand({
   meta: {
@@ -29,7 +30,7 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(result.data.length === 0 ? 'No templates.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'templates');
   },
   schema,
 });

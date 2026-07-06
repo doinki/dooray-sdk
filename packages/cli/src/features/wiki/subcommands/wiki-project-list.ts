@@ -4,7 +4,6 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { parseArgsOrThrow } from '../../../shared/schemas/parse-args';
@@ -24,7 +23,7 @@ export default defineSubcommand({
     const result = await runWikiProjectList({ api, args: data });
 
     formatter.printData(result, renderPretty);
-    formatter.printInfo(result.data.length === 0 ? 'No wikis.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'wikis');
   },
   schema,
 });

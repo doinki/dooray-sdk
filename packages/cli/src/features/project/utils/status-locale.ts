@@ -8,7 +8,7 @@ import { splitCsv } from '../../../shared/utils/csv';
  * Parse a `locale=name,locale=name` CLI value into the SDK's per-locale name list.
  * Shared by `project status-create` and `project status-update`.
  */
-export const localeNamesSchema = z
+export const localeNamesCsvSchema = z
   .string()
   .transform((input, ctx) => {
     const entries = splitCsv(input);

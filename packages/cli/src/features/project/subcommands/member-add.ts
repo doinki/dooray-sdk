@@ -1,3 +1,4 @@
+import type { ProjectMemberAddArgs } from '@dooray-sdk/core';
 import { runProjectMemberAdd } from '@dooray-sdk/core';
 import { ASSIGNABLE_ROLES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
   id: z
@@ -16,7 +18,7 @@ const schema = globalArgsSchema.extend({
       'Organization member id to add (look up via `dooray member search`). Must already belong to the project’s organization',
     ),
   role: z.enum(ASSIGNABLE_ROLES).describe('Role to assign — admin can manage the project, member can participate'),
-});
+} satisfies CommandSchemaShape<ProjectMemberAddArgs>);
 
 export default defineSubcommand({
   meta: { description: 'Add an existing organization member to the project', name: 'member-add' },

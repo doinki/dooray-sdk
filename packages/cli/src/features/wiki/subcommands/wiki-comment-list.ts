@@ -5,11 +5,11 @@ import { pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
 import { formatDateTime, truncate } from '../../../shared/utils/text';
+import { formatMemberName } from '../../../shared/utils/user';
 
 const schema = globalArgsSchema.extend({
   all: allSchema,
@@ -29,7 +29,7 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(result.data.length === 0 ? 'No comments.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'comments');
   },
   schema,
 });
@@ -39,7 +39,7 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiCommentList>>):
 
   return renderList(data, [
     { header: 'id', value: (c) => c.id },
-    { header: 'author', value: (c) => `${c.creator.member.name}(${c.creator.member.organizationMemberId})` },
+    { header: 'author', value: (c) => formatMemberName(c.creator.member) },
     { header: 'body', value: (c) => truncate(c.body.content.replaceAll(/\s+/g, ' ').trim(), 60) },
     { header: 'createdAt', value: (c) => formatDateTime(c.createdAt) },
     { header: 'updatedAt', value: (c) => formatDateTime(c.modifiedAt) },

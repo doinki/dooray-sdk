@@ -1,12 +1,13 @@
+import type { StatusDeleteArgs } from '@dooray-sdk/core';
 import { runProjectStatusDelete } from '@dooray-sdk/core';
 import { z } from 'zod';
 
-import { confirmDeletion } from '../../../shared/command/confirm-deletion';
+import { confirmField } from '../../../shared/command/confirm-deletion';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
-import { isJsonOutput } from '../../../shared/command/json-output';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { yesSchema } from '../../../shared/schemas/fields';
 
 const schema = globalArgsSchema.extend({
@@ -17,7 +18,7 @@ const schema = globalArgsSchema.extend({
     .meta({ hint: 'id' })
     .describe('Required — id of the status that orphaned tasks are moved to'),
   yes: yesSchema,
-});
+} satisfies CommandSchemaShape<StatusDeleteArgs>);
 
 export default defineSubcommand({
   meta: {
@@ -28,12 +29,7 @@ export default defineSubcommand({
     const { data } = await runWithProjectScope({
       api,
       args,
-      confirm: ({ args: a }) =>
-        confirmDeletion({
-          json: isJsonOutput(args.json),
-          message: `Delete status \`${a.id}\`? Tasks in it move to \`${a.moveTo}\`.`,
-          skip: a.yes,
-        }),
+      confirm: confirmField(({ args }) => `Delete status \`${args.id}\`? Tasks in it move to \`${args.moveTo}\`.`),
       formatter,
       render: renderId,
       run: runProjectStatusDelete,

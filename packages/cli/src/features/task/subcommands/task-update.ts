@@ -1,3 +1,4 @@
+import type { TaskUpdateArgs } from '@dooray-sdk/core';
 import { runTaskUpdate } from '@dooray-sdk/core';
 import { TASK_PRIORITIES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { mimeTypeField } from '../utils/fields';
 
@@ -14,8 +16,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Assignees (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('Assignees (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.'),
   body: z
     .string()
     .optional()
@@ -25,15 +27,16 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('cc (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('cc (comma-separated `@me` or member ids). Replaces the whole list; omit to keep current.'),
   dueDate: z
     .string()
     .trim()
+    .transform((v) => (v === '' ? null : v))
     .optional()
     .meta({ hint: 'YYYY-MM-DD±HH:MM' })
     .describe(
-      'Due date with timezone offset (e.g. `2026-06-20+09:00`); applies only with --due-date-flag. Omit to keep current.',
+      'Due date with timezone offset (e.g. `2026-06-20+09:00`); applies only with --due-date-flag. Omit to keep current; pass an empty value (`--due-date=`) to clear it.',
     ),
   dueDateFlag: z.boolean().optional().describe('Set with --due-date to apply it. Omit to keep current.'),
   milestoneId: z
@@ -53,8 +56,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Tag ids (comma-separated). Replaces the whole list; omit to keep current.')
-    .meta({ hint: 'id[,id...]' }),
+    .meta({ hint: 'id[,id...]' })
+    .describe('Tag ids (comma-separated). Replaces the whole list; omit to keep current.'),
   title: z.string().optional().meta({ hint: 'text' }).describe('New title. Omit to keep current.'),
   version: z.coerce
     .number()
@@ -63,7 +66,7 @@ const schema = globalArgsSchema.extend({
     .describe(
       'Optimistic-lock version. Omit to apply to the latest revision; pass a known version to fail on a concurrent edit.',
     ),
-});
+} satisfies CommandSchemaShape<TaskUpdateArgs>);
 
 export default defineSubcommand({
   meta: {

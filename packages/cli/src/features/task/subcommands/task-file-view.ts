@@ -1,3 +1,4 @@
+import type { TaskFileViewArgs } from '@dooray-sdk/core';
 import { runTaskFileView } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,6 +6,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithTaskScope } from '../../../shared/command/run-with-task-scope';
 import { renderKeyValue } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { formatDateTime } from '../../../shared/utils/text';
 import { formatCreator } from '../../../shared/utils/user';
 
@@ -14,7 +16,7 @@ const schema = globalArgsSchema.extend({
     .min(1)
     .meta({ hint: 'fileId', positional: true })
     .describe('Attachment id (from `dooray task file-list`).'),
-});
+} satisfies CommandSchemaShape<TaskFileViewArgs>);
 
 export default defineSubcommand({
   meta: {

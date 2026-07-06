@@ -1,3 +1,4 @@
+import type { TaskCreateArgs } from '@dooray-sdk/core';
 import { runTaskCreate } from '@dooray-sdk/core';
 import { TASK_PRIORITIES } from '@dooray-sdk/core/constants';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { mimeTypeField } from '../utils/fields';
 
@@ -14,8 +16,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Assignees (comma-separated `@me` or member ids; default: `@me`).')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('Assignees (comma-separated `@me` or member ids; default: `@me`).'),
   body: z
     .string()
     .optional()
@@ -25,8 +27,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('cc (comma-separated `@me` or member ids).')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('cc (comma-separated `@me` or member ids).'),
   dueDate: z
     .string()
     .trim()
@@ -52,10 +54,10 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Tag ids (comma-separated; from `dooray project tag-list`).')
-    .meta({ hint: 'id[,id...]' }),
-  title: z.string().trim().min(1).meta({ hint: 'text' }).describe('Task title.'),
-});
+    .meta({ hint: 'id[,id...]' })
+    .describe('Tag ids (comma-separated; from `dooray project tag-list`).'),
+  title: z.string().min(1).meta({ hint: 'text' }).describe('Task title.'),
+} satisfies CommandSchemaShape<TaskCreateArgs>);
 
 export default defineSubcommand({
   meta: { description: 'Create a task in a project (omit --assignees to assign yourself)', name: 'create' },

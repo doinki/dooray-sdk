@@ -20,7 +20,7 @@ export interface FormatUserOptions {
 /** Single display rule for task/template users: member name, email name (address fallback), group code (member expansion fallback). */
 export function formatUser(user: UserLike, options: FormatUserOptions = {}): string {
   if (user.type === 'group')
-    return user.group.code ?? (user.group.members ?? []).map((member) => formatMember(member, options)).join(', ');
+    return user.group.code || (user.group.members ?? []).map((member) => formatMember(member, options)).join(', ');
   if (user.type === 'member') return formatMember(user.member, options);
 
   const { emailAddress, name } = user.emailUser;
@@ -44,4 +44,14 @@ export type CreatorLike =
 export function formatCreator(creator: CreatorLike): string {
   if (creator.type === 'emailUser') return creator.emailUser.name ?? creator.emailUser.emailAddress;
   return String(creator.member.organizationMemberId);
+}
+
+/** `name(organizationMemberId)`, or just the id when the member has no name. Shared by wiki page/comment authors. */
+export function formatMemberName(member: { name?: null | string; organizationMemberId: number | string }): string {
+  return member.name ? `${member.name}(${member.organizationMemberId})` : String(member.organizationMemberId);
+}
+
+/** `name(emailAddress)` for a mail participant, falling back to the address when the name is absent. */
+export function formatMailUser(user: { emailAddress: string; name?: null | string }): string {
+  return user.name ? `${user.name}(${user.emailAddress})` : user.emailAddress;
 }

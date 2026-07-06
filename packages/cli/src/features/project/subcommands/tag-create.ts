@@ -1,3 +1,4 @@
+import type { TagCreateArgs } from '@dooray-sdk/core';
 import { runProjectTagCreate } from '@dooray-sdk/core';
 import { z } from 'zod';
 
@@ -5,16 +6,16 @@ import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
 import { renderId } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 
 const schema = globalArgsSchema.extend({
-  color: z.string().trim().min(1).meta({ hint: 'rrggbb' }).describe('6-digit hex color without `#` (e.g. `ffffff`)'),
+  color: z.string().min(1).meta({ hint: 'rrggbb' }).describe('6-digit hex color without `#` (e.g. `ffffff`)'),
   name: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'text' })
     .describe('Tag name. Use `<group>:<tag>` (e.g. `Priority:High`) to create the tag inside a tag group'),
-});
+} satisfies CommandSchemaShape<TagCreateArgs>);
 
 export default defineSubcommand({
   meta: { description: 'Create a tag (use `group:tag` to nest it under a tag group)', name: 'tag-create' },

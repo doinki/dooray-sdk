@@ -10,7 +10,7 @@ import type { ProfileRecord } from '../profile/profile-store';
 import { ProfileStore } from '../profile/profile-store';
 import { resolveProfile } from '../profile/resolve-profile';
 import { argsFromSchema } from '../schemas/derive-args';
-import { isJsonOutput, jsonFields } from './json-output';
+import { isJsonOutput, jsonEnvDefault, jsonFields } from './json-output';
 import { createVerboseClientOptions } from './verbose';
 
 type RunContext<S extends z.ZodObject> = { args: { _: string[] } & z.input<S> } & Omit<CommandContext, 'args'>;
@@ -49,10 +49,13 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
     args: schema ? argsFromSchema(schema) : undefined,
     meta,
     run: async (ctx) => {
+      // Raw citty args don't carry zod's env-derived defaults, so apply the $DOORAY_* fallbacks here at the
+      // point of use (forwarding them through citty's parser breaks `--ref`/positional handling).
+      const jsonArg = (ctx.args.json as string | undefined) ?? jsonEnvDefault();
       const formatter = createOutputFormatter({
-        fields: jsonFields(ctx.args.json),
+        fields: jsonFields(jsonArg),
         jq: typeof ctx.args.jq === 'string' && ctx.args.jq ? ctx.args.jq : undefined,
-        json: isJsonOutput(ctx.args.json),
+        json: isJsonOutput(jsonArg),
       });
 
       try {
@@ -62,10 +65,15 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
         if (mode === 'local') {
           await run({ ...runCtx, formatter, profileStore });
         } else {
-          const { profile, token } = resolveProfile(profileStore, ctx.args.profile);
+          const { profile, token } = resolveProfile(
+            profileStore,
+            (ctx.args.profile as string | undefined) ?? process.env.DOORAY_PROFILE,
+          );
 
           const api = createDoorayClient({
-            ...createVerboseClientOptions(!!ctx.args.verbose),
+            ...createVerboseClientOptions(
+              (ctx.args.verbose as boolean | undefined) ?? process.env.DOORAY_VERBOSE === 'true',
+            ),
             baseUrl: profile.baseUrl,
             token,
           });
@@ -76,7 +84,7 @@ export function defineSubcommand<S extends z.ZodObject = z.ZodObject>(def: Defin
         const surface = toSurfaceError(error);
         if (surface.code !== 'cancelled') formatter.printError(surface);
 
-        process.exitCode = 1;
+        process.exitCode = surface.code === 'cancelled' ? 130 : 1;
       }
     },
   });

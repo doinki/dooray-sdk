@@ -23,11 +23,3 @@ export function confirmationRequiredError(): DoorayError {
     message: 'This action needs confirmation, but no interactive terminal is available.',
   });
 }
-
-export function retryBudgetExceededError(waitMs: number): DoorayError {
-  return new DoorayError({
-    code: 'rate_limited',
-    hint: 'Retry in a moment or reduce `--size`.',
-    message: `Retry budget exceeded (required wait ${String(waitMs)}ms).`,
-  });
-}

@@ -8,6 +8,7 @@ import { runWithProjectScope } from '../../../shared/command/run-with-project-sc
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { renderList } from '../../../shared/utils/table';
 import { truncate } from '../../../shared/utils/text';
+import { formatMemberName } from '../../../shared/utils/user';
 
 const schema = globalArgsSchema.extend({
   parentId: z
@@ -43,13 +44,7 @@ function renderPretty({ data }: Awaited<ReturnType<typeof runWikiList>>): null |
   return renderList(data, [
     { header: 'id', value: (p) => p.id },
     { header: 'title', value: (p) => truncate(p.subject, 60) },
-    {
-      header: 'author',
-      value: (p) =>
-        p.creator.member.name
-          ? `${p.creator.member.name}(${p.creator.member.organizationMemberId})`
-          : p.creator.member.organizationMemberId,
-    },
+    { header: 'author', value: (p) => formatMemberName(p.creator.member) },
     { header: 'parentPageId', value: (p) => p.parentPageId },
     { header: 'root', value: (p) => p.root },
     { header: 'version', value: (p) => p.version },

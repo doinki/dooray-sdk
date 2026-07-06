@@ -1,3 +1,4 @@
+import type { TaskListArgs } from '@dooray-sdk/core';
 import { runTaskList } from '@dooray-sdk/core';
 import { SORT_OPTIONS, STATUS_CLASSES } from '@dooray-sdk/core/constants';
 import { datePatternSchema, pageSchema, sizeSchema } from '@dooray-sdk/core/schemas';
@@ -6,7 +7,7 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithProjectScope } from '../../../shared/command/run-with-project-scope';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
+import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { splitCsv } from '../../../shared/utils/csv';
 import { renderList } from '../../../shared/utils/table';
 import { formatDate, truncate } from '../../../shared/utils/text';
@@ -17,16 +18,16 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
+    .meta({ hint: 'user[,user...]' })
     .describe(
       'Filter by assignee (comma-separated `@me`, member ids, or `none` for unassigned; `none` overrides any ids).',
-    )
-    .meta({ hint: 'user[,user...]' }),
+    ),
   author: z
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by author (comma-separated `@me` or member ids).')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('Filter by author (comma-separated `@me` or member ids).'),
   authorEmail: z
     .string()
     .optional()
@@ -36,8 +37,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by cc (comma-separated `@me` or member ids).')
-    .meta({ hint: 'user[,user...]' }),
+    .meta({ hint: 'user[,user...]' })
+    .describe('Filter by cc (comma-separated `@me` or member ids).'),
   created: datePatternSchema
     .optional()
     .meta({ hint: 'pattern' })
@@ -50,8 +51,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by milestone id (comma-separated).')
-    .meta({ hint: 'id[,id...]' }),
+    .meta({ hint: 'id[,id...]' })
+    .describe('Filter by milestone id (comma-separated).'),
   number: z.coerce
     .number()
     .int()
@@ -59,13 +60,13 @@ const schema = globalArgsSchema.extend({
     .optional()
     .describe('Filter by task number, the numeric part of the task key (e.g. `123` for `ABC-123`).'),
   page: pageSchema,
-  parent: z.string().optional().meta({ hint: 'id' }).describe("Parent task id; returns that task's subtasks."),
+  parent: z.string().optional().meta({ hint: 'taskId' }).describe("Parent task id; returns that task's subtasks."),
   search: z
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by exact task title (comma-separated); not partial titles or body text.')
-    .meta({ hint: 'title[,title...]' }),
+    .meta({ hint: 'title[,title...]' })
+    .describe('Filter by exact task title (comma-separated); not partial titles or body text.'),
   size: sizeSchema,
   sort: z
     .enum(SORT_OPTIONS)
@@ -75,8 +76,8 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by status id, not name (comma-separated; from `dooray project status-list`).')
-    .meta({ hint: 'id[,id...]' }),
+    .meta({ hint: 'id[,id...]' })
+    .describe('Filter by status id, not name (comma-separated; from `dooray project status-list`).'),
   statusClass: z
     .string()
     .transform(splitCsv)
@@ -88,13 +89,13 @@ const schema = globalArgsSchema.extend({
     .string()
     .transform(splitCsv)
     .optional()
-    .describe('Filter by tag id (comma-separated).')
-    .meta({ hint: 'id[,id...]' }),
+    .meta({ hint: 'id[,id...]' })
+    .describe('Filter by tag id (comma-separated).'),
   updated: datePatternSchema
     .optional()
     .meta({ hint: 'pattern' })
     .describe('Filter by last-updated date (same grammar as --created).'),
-});
+} satisfies CommandSchemaShape<TaskListArgs>);
 
 export default defineSubcommand({
   meta: {
@@ -112,7 +113,7 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(result.data.length === 0 ? 'No tasks.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'tasks');
   },
   schema,
 });

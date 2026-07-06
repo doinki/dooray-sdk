@@ -9,7 +9,7 @@ export async function runWithTaskScope<Args extends Record<string, unknown>, Res
   const { confirm, ...core } = context;
 
   const scope = await runWithScope<Args, Result, { id: string; projectId?: string }>(core, async (data) => {
-    const { id, projectId } = resolveTaskId(core.args);
+    const { id, projectId } = resolveTaskId({ ...core.args, ref: core.args.ref || process.env.DOORAY_REF });
     await confirm?.({ args: data, id, projectId });
     return { id, projectId };
   });

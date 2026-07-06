@@ -12,7 +12,6 @@ import { formatDateTime } from '../../../shared/utils/text';
 const schema = globalArgsSchema.extend({
   commentId: z
     .string()
-    .trim()
     .min(1)
     .meta({ hint: 'commentId', positional: true })
     .describe('Comment id to view (from `dooray wiki comment-list`).'),

@@ -7,7 +7,6 @@ import { z } from 'zod';
 import { defineSubcommand } from '../../../shared/command/define-subcommand';
 import { globalArgsSchema } from '../../../shared/command/global-args';
 import { runWithWikiScope } from '../../../shared/command/run-with-wiki-scope';
-import { renderPagingFooter } from '../../../shared/formatter/output-formatter';
 import type { CommandSchemaShape } from '../../../shared/schemas/derive-args';
 import { allSchema } from '../../../shared/schemas/fields';
 import { renderList } from '../../../shared/utils/table';
@@ -34,7 +33,7 @@ export default defineSubcommand({
       schema,
     });
 
-    formatter.printInfo(result.data.length === 0 ? 'No shared links.' : renderPagingFooter(result.paging));
+    formatter.printListFooter(result, 'shared links');
   },
   schema,
 });

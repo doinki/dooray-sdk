@@ -19,6 +19,6 @@ export function jsonFields(value: unknown): string[] | undefined {
 
 /** Resolve the `--json` default from $DOORAY_JSON: unset/`false` → off; `true` → full object; otherwise a field list. */
 export function jsonEnvDefault(env = process.env.DOORAY_JSON): string | undefined {
-  if (env === undefined || env === 'false') return undefined;
+  if (env === undefined || env === '' || env === 'false') return undefined;
   return env === 'true' ? '' : env;
 }
