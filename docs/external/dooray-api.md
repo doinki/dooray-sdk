@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-06-11T18:31:25+09:00"
+dooray_updated_at: "2026-07-07T19:08:01+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -414,6 +414,218 @@ GET /common/v1/members?externalEmailAddresses=hongildong01@xxx.dooray.com,rabbit
     * 401
     * 403
     * 404
+    * 500
+
+## Common > Streams
+
+### GET /common/v1/streams
+
+* 사용자의 두레이 내에서 발생한 활동(피드) 목록을 응답
+* 요청 시간 기준 최근 2주 내역만 조회되며, 항상 최신 활동순으로 정렬됩니다.
+
+주의: 마지막 페이지까지 조회 방법
+
+size=20으로 요청하더라도 응답 배열에 항상 20개의 데이터가 반환되는 것은 아닙니다.
+응답 건수가 size보다 적다고 해서 마지막 페이지에 도달한 것은 아니므로, 마지막 응답의 cursor 값을 다음 요청의 before 파라미터로 전달하여 조회를 계속해야 합니다.
+응답 배열이 비어([]) 반환될 때까지 반복 호출하여 모든 데이터를 조회하시기 바랍니다.
+
+#### Request
+
+* Parameters
+
+```
+size={}     /* 기본값: 20, 최댓값: 200 */
+before={}   /* 커서. 직전 응답의 cursor 값을 넣어 다음 페이지를 조회 (timestamp) */
+read={}     /* 읽음 여부 필터 (true/false) */
+```
+
+##### 요청 예제
+
+```
+GET /common/v1/streams?size=20 // 최신 20개 내용 조회
+* 그 다음 페이지: GET /common/v1/streams?size=20&before={직전 응답의 cursor} // 직전 응답 기준 최신 20개
+```
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": [
+        /* 이벤트 타입별 객체. 각 원소는 { "type": "{타입}", "{타입}": {...} } 형태이며, type 값에 따라 모델이 다름. 아래 타입별 스펙 참고 */
+    ],
+    "cursor": "1781768002000000000"     /* 다음 페이지 조회용 커서. 다음 요청의 before 파라미터로 사용 */
+}
+```
+
+* `result[]` 의 각 원소는 `{ "type": "{타입}", "{타입}": { ... } }` 형태입니다.
+* 응답되는 이벤트 타입: `project`, `mail`, `schedule`, `event`, `post`, `page`, `pageComment`, `fileEvent`
+
+##### type: project (프로젝트 멤버 변경 등)
+
+```javascript
+{
+    "type": "project",
+    "project": {
+        "id": "",                                   /* 프로젝트 ID */
+        "name": "",                                 /* 프로젝트 이름 */
+        "actor": { "organizationMemberId": "" },    /* 행위자 */
+        "action": "invited",                        /* invited, leaved, archived, activated, code_changed, open_permission_changed, open_organizations_changed */
+        "actionDetail": { "type": "invited" },
+        "at": "2026-06-15T11:32:46+09:00"           /* 발생 일시 */
+    }
+}
+```
+
+##### type: mail (메일 수신)
+
+```javascript
+{
+    "type": "mail",
+    "mail": {
+        "id": "",                                   /* 메일 ID */
+        "folder": { "id": "", "name": "" },         /* 메일 폴더 */
+        "sentAt": "",                               /* 발송 일시 */
+        "subject": "",                              /* 제목 */
+        "users": {
+            "from": { "type": "emailUser", "emailUser": { "name": "", "emailAddress": "" } }
+        },
+        "body": { "mimeType": "text/plain", "content": "" }
+    }
+}
+```
+
+##### type: schedule (일정)
+
+```javascript
+{
+    "type": "schedule",
+    "schedule": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 일정 ID */
+        "calendarId": "",
+        "users": {                                  /* member.status: accepted, declined, tentative, not_confirmed */
+            "from": { "type": "member", "member": { "organizationMemberId": "", "name": "", "emailAddress": "", "status": "accepted" } },
+            "to": [ { "type": "member", "member": { "organizationMemberId": "", "name": "", "status": "not_confirmed" } } ],
+            "cc": []
+        },
+        "startedAt": "2026-06-15T11:30:00+09:00",
+        "endedAt": "2026-06-15T12:30:00+09:00",
+        "wholeDayFlag": false,                      /* 종일 일정 여부 */
+        "subject": "",
+        "recurrenceType": "none",                   /* none(반복일정 아님), unmodified(일반 반복 일정), modified(반복 일정 중 이 일정만 수정한 경우)*/
+        "recurrenceRule": {                         /* 반복 일정인 경우 */
+            "frequency": "",                        /* daily, weekly, monthly, yearly */
+            "interval": 1,
+            "until": "",                        /* datetime 반복 종료 날짜 */
+            "byday": "",                        /* SU, MO, TU, WE, TH, FR, ST, 1 MO, 2 TU, -1 WE, -2 TH etc. */
+            "bymonth": "",                      /* 1 - 12 */
+            "bymonthday": "",                   /* 1 - 31 */
+        }
+    }
+}
+```
+
+##### type: event (업무 댓글 등)
+
+```javascript
+{
+    "type": "event",
+    "event": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 이벤트 ID */
+        "type": "comment",                          /* 이벤트 상세 타입 */
+        "postId": "",                               /* 연관 업무(post) ID */
+        "creator": { "type": "member", "member": { "organizationMemberId": "", "name": "" } },
+        "body": { "mimeType": "text/x-markdown", "content": "" }
+    }
+}
+```
+
+##### type: post (업무)
+
+```javascript
+{
+    "type": "post",
+    "post": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 업무 ID */
+        "projectId": "",
+        "users": {
+            "from": { "type": "member", "member": { "organizationMemberId": "", "name": "" } },
+            "to": [ { "type": "member", "member": { "organizationMemberId": "", "name": "" } } ],
+            "cc": []
+        },
+        "subject": "",
+        "body": { "mimeType": "text/x-markdown", "content": "" },
+        "createdAt": "",
+        "updatedAt": ""
+    }
+}
+```
+
+##### type: page (위키 페이지)
+
+```javascript
+{
+    "type": "page",
+    "page": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 페이지 ID */
+        "wikiId": "",
+        "parentPageId": "",
+        "subject": "",
+        "referrers": [ { "organizationMemberId": "" } ],    /* 참조자 */
+        "body": { "mimeType": "text/x-markdown", "content": "" },
+        "creator": { "organizationMemberId": "", "name": "" },
+        "createdAt": "2026-06-15T11:30:00+09:00"
+    }
+}
+```
+
+##### type: pageComment (위키 페이지 댓글)
+
+```javascript
+{
+    "type": "pageComment",
+    "pageComment": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 댓글 ID */
+        "pageId": "",
+        "body": { "mimeType": "text/x-markdown", "content": "" },
+        "creator": { "organizationMemberId": "", "name": "" },
+        "createdAt": ""
+    }
+}
+```
+
+##### type: fileEvent (드라이브 파일 이벤트)
+
+```javascript
+{
+    "type": "fileEvent",
+    "fileEvent": {
+        "read": false,                              /* 읽음 여부 */
+        "id": "",                                   /* 이벤트 ID */
+        "type": "event",
+        "fileId": "",
+        "creator": { "type": "member", "member": { "organizationMemberId": "", "name": "" } },
+        "action": "insert",                         /* 파일 액션 */
+        "actionDetail": { "type": "FILE_TO_USER_INSERT" }
+    }
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 401
     * 500
 
 ## Project > Category
@@ -2614,7 +2826,8 @@ toMemberSize (업무 담당자 수)
     "dueDateFlag": true,                            /* 제거 예정 필드. true 로만 사용하기를 권장 */
     "milestoneId": "1",
     "tagIds": ["1", "2"],
-    "priority": "none"                              /* hightest, high, normal, low, lowest, none */
+    "priority": "none",                              /* hightest, high, normal, low, lowest, none */
+    "estimatedDays": 0                              /* 소요일 nullable */
 }
 ```
 
