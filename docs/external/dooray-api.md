@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-07-07T19:08:01+09:00"
+dooray_updated_at: "2026-07-24T08:38:29+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -434,9 +434,9 @@ size=20으로 요청하더라도 응답 배열에 항상 20개의 데이터가 �
 * Parameters
 
 ```
-size={}     /* 기본값: 20, 최댓값: 200 */
-before={}   /* 커서. 직전 응답의 cursor 값을 넣어 다음 페이지를 조회 (timestamp) */
-read={}     /* 읽음 여부 필터 (true/false) */
+    size={}     /* 기본값: 20, 최댓값: 200 */
+    before={}   /* 커서. 직전 응답의 cursor 값을 넣어 다음 페이지를 조회 (timestamp) */
+    read={}     /* 읽음 여부 필터 (true/false) */
 ```
 
 ##### 요청 예제
@@ -1779,6 +1779,35 @@ GET /common/v1/streams?size=20 // 최신 20개 내용 조회
 
     * 200
     * 400
+    * 401
+    * 403
+    * 404
+    * 500
+
+### DELETE /project/v1/projects/{project-id}/members/{member-id}
+
+* 프로젝트 멤버 삭제
+
+#### Request
+
+* 없음
+
+#### Response
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": null
+}
+```
+
+* HTTP 응답코드
+
+    * 200
     * 401
     * 403
     * 404
