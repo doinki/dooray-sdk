@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-07-24T08:38:29+09:00"
+dooray_updated_at: "2026-08-06T19:48:01+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -848,6 +848,120 @@ GET /common/v1/streams?size=20 // 최신 20개 내용 조회
     * 401
     * 403
     * 404
+    * 500
+
+### PUT /project/v1/projects/{project-id}
+
+* 프로젝트 정보를 수정합니다.
+* 프로젝트 어드민 권한이 필요합니다.
+
+#### Request
+
+* Body
+
+```javascript
+{
+    "code": "",                                 /* 화면에 보이는 프로젝트 명 */
+    "description": "",
+    "projectCategoryId": "{projectCategoryId}"  /* Optional 프로젝트 카테고리 변경 시 사용 */
+}
+```
+
+* 요청 본문에 포함하지 않은 필드는 변경되지 않습니다.
+* `code` 는 다른 프로젝트와 중복될 수 없으며, 3 \~ 30 자로 입력합니다.
+* `projectCategoryId` 는 `GET /project/v1/project-categories` 로 조회한 카테고리의 id 를 사용합니다.
+* 보관(archived) 상태인 프로젝트는 수정할 수 없습니다. `POST /project/v1/projects/{project-id}/set-active` 로 사용 상태로 되돌린 후 수정합니다.
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": null
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 400 - 요청 본문이 없거나, 이미 사용 중인 프로젝트 명이거나, `code`/`description` 형식·길이 제한을 위반한 경우, 존재하지 않는 프로젝트 카테고리인 경우, 보관 상태인 프로젝트를 수정하려는 경우
+    * 401
+    * 403 - 프로젝트를 수정할 권한이 없는 경우
+    * 404 - 존재하지 않는 프로젝트인 경우
+    * 500
+
+### POST /project/v1/projects/{project-id}/set-archive
+
+* 프로젝트를 보관(archived) 상태로 변경합니다.
+* 프로젝트 어드민 권한이 필요합니다.
+
+#### Request
+
+* Body
+
+    * 없음
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": null
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 401
+    * 403 - 프로젝트를 수정할 권한이 없는 경우
+    * 404 - 존재하지 않는 프로젝트인 경우
+    * 500
+
+### POST /project/v1/projects/{project-id}/set-active
+
+* 보관(archived) 상태인 프로젝트를 사용(active) 상태로 되돌립니다.
+* 프로젝트 어드민 권한이 필요합니다.
+
+#### Request
+
+* Body
+
+    * 없음
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": null
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 401
+    * 403 - 프로젝트를 수정할 권한이 없는 경우
+    * 404 - 존재하지 않는 프로젝트인 경우
     * 500
 
 ### POST /project/v1/projects/is-creatable
