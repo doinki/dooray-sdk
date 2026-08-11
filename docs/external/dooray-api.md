@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-08-06T19:48:01+09:00"
+dooray_updated_at: "2026-08-10T14:42:40+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -3038,7 +3038,7 @@ toMemberSize (업무 담당자 수)
 
 ### POST /project/v1/projects/{project-id}/posts/{post-id}/set-workflow
 
-* 업무 전체의 상태를 변경
+* 업무 상태를 변경 (담당자 상태도 함께 변경됨)
 
 #### Request
 
@@ -3075,10 +3075,11 @@ toMemberSize (업무 담당자 수)
 
 ### POST /project/v1/projects/{project-id}/posts/{post-id}/set-done
 
-* 업무 상태를 완료로 변경
+* 업무 상태를 [완료] 그룹의 하나의 상태로 변경
 
-    * 업무 완료 클래스내에 workflow 가 여러가지인 경우, 대표 상태로 변경
-    * 완료 이전으로 되어 있던 담당자들의 상태가 모두 변경됨
+    * 업무 상태 그룹 중 [완료] 그룹에 여러 개의 상태가 있으면 대표 상태로 변경됨
+    * 대표 상태는 프로젝트 설정에서 볼 때 [완료] 그룹 중 상위에 있는 것
+    * 담당자 상태도 함께 변경됨
 
 #### Request
 
