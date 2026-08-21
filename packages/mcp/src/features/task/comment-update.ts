@@ -6,12 +6,15 @@ import { resolveTaskId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('New comment body (Markdown unless mimeType is text/html). Replaces the whole body.'),
+  body: z
+    .string()
+    .describe(`New comment body (Markdown unless mimeType is text/html). Replaces the whole body. ${BODY_SYNTAX_HINT}`),
   commentId: z.string().describe('Comment id to update; from task_comment_list.'),
   fileIds: z
     .array(z.string())

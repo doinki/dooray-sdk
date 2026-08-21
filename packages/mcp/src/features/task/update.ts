@@ -6,6 +6,7 @@ import { resolveTaskId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
@@ -15,7 +16,10 @@ const inputSchema = {
     .array(z.string())
     .optional()
     .describe('Assignee member ids or `@me`. Replaces the whole list; omit to keep current.'),
-  body: z.string().optional().describe('New body (Markdown unless mimeType is text/html). Omit to keep current.'),
+  body: z
+    .string()
+    .optional()
+    .describe(`New body (Markdown unless mimeType is text/html). Omit to keep current. ${BODY_SYNTAX_HINT}`),
   cc: z.array(z.string()).optional().describe('CC member ids or `@me`. Replaces the whole list; omit to keep current.'),
   dueDate: z
     .string()
