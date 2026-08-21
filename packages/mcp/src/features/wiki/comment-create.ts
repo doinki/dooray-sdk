@@ -5,12 +5,13 @@ import { resolveWikiId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { WikiScopedArgs } from '../../shared/scope';
 import { wikiScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('Comment body (Markdown).'),
+  body: z.string().describe(`Comment body (Markdown). ${BODY_SYNTAX_HINT}`),
   ref: wikiScopeShape.ref,
 } satisfies Record<keyof WikiScopedArgs<WikiCommentCreateArgs>, z.ZodType>;
 

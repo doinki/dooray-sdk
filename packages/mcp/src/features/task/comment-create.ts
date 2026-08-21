@@ -6,12 +6,13 @@ import { resolveTaskId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { TaskScopedArgs } from '../../shared/scope';
 import { taskScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('Comment body (Markdown unless mimeType is text/html).'),
+  body: z.string().describe(`Comment body (Markdown unless mimeType is text/html). ${BODY_SYNTAX_HINT}`),
   fileIds: z.array(z.string()).optional().describe('Attachment file ids; from task_file_upload or task_file_list.'),
   mimeType: z
     .enum(BODY_MIME_TYPES)

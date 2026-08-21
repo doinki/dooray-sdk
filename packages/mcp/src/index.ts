@@ -7,6 +7,7 @@ import { registerMemberTools } from './features/member';
 import { registerProjectTools } from './features/project';
 import { registerTaskTools } from './features/task';
 import { registerWikiTools } from './features/wiki';
+import { BODY_SYNTAX_URI, registerBodySyntaxResource } from './shared/body-syntax';
 import { createClient } from './shared/client';
 
 const instructions = [
@@ -24,6 +25,8 @@ const instructions = [
   '',
   "Files: file tools read from and write to the server host's filesystem, not the agent's own.",
   '',
+  `Bodies: task/wiki bodies and comments render Dooray-flavored Markdown; its extensions are documented in the ${BODY_SYNTAX_URI} resource.`,
+  '',
   'Errors: a failed call sets `isError` and returns `{error: {code, hint, message}}`. Follow the `hint` to fix the input before retrying, since an identical retry fails the same way.',
 ].join('\n');
 
@@ -39,6 +42,7 @@ const server = new McpServer(
 
 const api = createClient();
 
+registerBodySyntaxResource(server);
 registerMemberTools(server, api);
 registerTaskTools(server, api);
 registerProjectTools(server, api);

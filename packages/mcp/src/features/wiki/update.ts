@@ -5,12 +5,13 @@ import { resolveWikiId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { WikiScopedArgs } from '../../shared/scope';
 import { wikiScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().optional().describe('New page body (Markdown). Omit to keep current.'),
+  body: z.string().optional().describe(`New page body (Markdown). Omit to keep current. ${BODY_SYNTAX_HINT}`),
   cc: z
     .array(z.string())
     .optional()

@@ -61,3 +61,7 @@ Project-, task-, and wiki-scoped tools use a single `ref` argument:
 - a Dooray URL
 
 `ref` resolves according to the tool's scope: the project on `project_*`, the task on `task_*`, and the wiki page on `wiki_*`. On project-scoped tools, a task, drive, or wiki URL resolves to its owning project.
+
+## Resources
+
+- `dooray-mcp://docs/body-syntax` — Dooray-flavored Markdown extensions for task and wiki bodies and comments (task links, mentions, callouts, layouts, embeds). Each body-accepting tool's `body` description points here.

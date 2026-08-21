@@ -6,13 +6,17 @@ import { resolveProjectId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
   assignees: z.array(z.string()).optional().describe('Assignee member ids or `@me` (default: @me).'),
-  body: z.string().optional().describe('Task body (Markdown unless mimeType is text/html) (default: empty).'),
+  body: z
+    .string()
+    .optional()
+    .describe(`Task body (Markdown unless mimeType is text/html) (default: empty). ${BODY_SYNTAX_HINT}`),
   cc: z.array(z.string()).optional().describe('CC member ids or `@me`.'),
   dueDate: z
     .string()

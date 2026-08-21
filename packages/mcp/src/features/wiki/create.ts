@@ -5,12 +5,13 @@ import { resolveProjectId } from '@dooray-sdk/core/resolve';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import z from 'zod';
 
+import { BODY_SYNTAX_HINT } from '../../shared/body-syntax';
 import { runTool } from '../../shared/result';
 import type { ProjectScopedArgs } from '../../shared/scope';
 import { projectScopeShape } from '../../shared/scope';
 
 const inputSchema = {
-  body: z.string().describe('Page body (Markdown).'),
+  body: z.string().describe(`Page body (Markdown). ${BODY_SYNTAX_HINT}`),
   cc: z.array(z.string()).optional().describe('Referrer member ids, or `@me`.'),
   fileIds: z.array(z.string()).optional().describe('File ids to attach; from wiki_project_file_upload.'),
   parentId: z.string().describe('Parent page id; from wiki_list.'),
