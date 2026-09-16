@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-08-10T14:42:40+09:00"
+dooray_updated_at: "2026-09-03T19:36:03+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -3038,7 +3038,7 @@ toMemberSize (업무 담당자 수)
 
 ### POST /project/v1/projects/{project-id}/posts/{post-id}/set-workflow
 
-* 업무 상태를 변경 (담당자 상태도 함께 변경됨)
+* 업무 전체의 상태를 변경
 
 #### Request
 
@@ -3075,11 +3075,10 @@ toMemberSize (업무 담당자 수)
 
 ### POST /project/v1/projects/{project-id}/posts/{post-id}/set-done
 
-* 업무 상태를 [완료] 그룹의 하나의 상태로 변경
+* 업무 상태를 완료로 변경
 
-    * 업무 상태 그룹 중 [완료] 그룹에 여러 개의 상태가 있으면 대표 상태로 변경됨
-    * 대표 상태는 프로젝트 설정에서 볼 때 [완료] 그룹 중 상위에 있는 것
-    * 담당자 상태도 함께 변경됨
+    * 업무 완료 클래스내에 workflow 가 여러가지인 경우, 대표 상태로 변경
+    * 완료 이전으로 되어 있던 담당자들의 상태가 모두 변경됨
 
 #### Request
 
@@ -4991,6 +4990,88 @@ curl --location 'https://api.dooray.com/calendar/v1/calendars/321679732717818141
 * HTTP 응답코드
 
     * 200
+    * 401
+    * 403
+
+## Calendar > Busy Hours
+
+### POST /calendar/v1/fetch-busy-hours
+
+사용자별 바쁨 시간 조회
+
+* 요청한 `organizationMemberIds` 순서대로 응답합니다.
+* 조회 기간은 7일 미만이어야 합니다. `beginDateTime` 과 `endDateTime` 의 차이가 7일 이상이면 400 으로 응답합니다.
+* 한 번에 조회 가능한 사용자는 최대 20명입니다. 20명을 초과하면 400 으로 응답합니다.
+
+#### Request
+
+* Body
+
+```javascript
+{
+    "organizationMemberIds": [                  /* 조회할 조직 멤버 id 목록, 필수, 비어있을 수 없음, 최대 20개 */
+        "{organizationMemberId}"
+    ],
+    "beginDateTime": "2026-09-01T00:00:00+09:00",  /* 확인할 일정 범위의 시작 시간, 필수 */
+    "endDateTime": "2026-09-04T00:00:00+09:00"     /* 확인할 일정 범위의 마지막 시간, 필수, beginDateTime 으로부터 7일 미만 */
+}
+```
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultMessage": "",
+        "resultCode": 0
+    },
+    "result": [
+        {
+            "member": {
+                "id": "3948172650391847263",
+                "name": "홍길동",
+                "primaryDepartment": {              /* 주 소속 부서, 없으면 id 와 name 이 각각 null */
+                    "id": "5720483916274095318",
+                    "name": "플랫폼개발팀"
+                },
+                "defaultOrganization": {
+                    "id": "1837465920184736251",
+                    "name": "두레이"
+                },
+                "positionName": null                /* 직책명, 없으면 null */
+            },
+            "busyHours": [                          /* 요청 기간 내 바쁨 시간, 정렬 순서 보장 안 됨 */
+                {
+                    "startedAt": "2026-09-03T11:00:00+09:00",
+                    "endedAt": "2026-09-03T11:30:00+09:00"
+                }
+            ],
+            "officeHours": [                        /* 요청 기간 내 날짜별 근무 시간 */
+                {
+                    "begin": "2026-09-03T11:11:00+09:00",
+                    "end": "2026-09-03T12:11:00+09:00"
+                }
+            ],
+            "outOfOfficeHours": [                   /* 요청 기간 내 부재 시간 */
+                {
+                    "begin": "2026-09-03T13:00:00+09:00",
+                    "end": "2026-09-03T14:00:00+09:00"
+                }
+            ]
+        }
+    ]
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 400 - 조회 기간이 7일 이상인 경우
+    * 400 - 조회 대상 사용자가 20명을 초과한 경우
+    * 400 - 요청 본문이 올바르지 않은 경우 (`organizationMemberIds` 가 비어있거나 `beginDateTime`/`endDateTime` 이 없는 경우)
     * 401
     * 403
 
@@ -6945,6 +7026,519 @@ page={}             /* 기본값: 0 */
     * 403
     * 404
     * 500
+
+## Wiki > Webhooks
+
+* 위키 Hook 에 관련한 API
+* 위키 프로젝트에서 발생한 이벤트를 지정한 URL 로 전송합니다.
+
+### POST /project/v1/projects/{project-id}/wiki-hooks
+
+* 위키 Hook 생성
+* `project-id` 는 위키가 속한 프로젝트의 id 입니다.
+
+#### Request
+
+* Body
+
+```javascript
+{
+    "url": "",                                          /* 필수. 이벤트를 수신할 URL. https 만 허용 */
+    "eventTypes": [ "pageCreated", "pageUpdated" ],     /* 필수. 수신할 이벤트 목록 */
+    "messageType": "dooray",                            /* 필수. dooray | slack */
+    "enabled": true                                     /* Optional. 미지정시 false (Hook 이 비활성 상태로 생성됨) */
+}
+```
+
+* `eventTypes` 에 사용할 수 있는 이벤트
+
+    * pageCreated - 페이지 생성
+    * pageUpdated - 페이지 수정 (발행된 페이지만)
+    * pageDeleted - 페이지 삭제
+    * pageMoved - 페이지 이동
+    * pageReferrerUpdated - 페이지 참조자 변경
+    * pageFileCreated - 페이지 파일 추가 (파일 1개당 1건)
+    * pageFileDeleted - 페이지 파일 삭제 (파일 1개당 1건)
+    * pageCommentCreated - 페이지 댓글 생성
+    * pageCommentUpdated - 페이지 댓글 수정
+    * pageCommentDeleted - 페이지 댓글 삭제
+* `eventTypes` 에는 필요한 이벤트를 등록
+
+    * 1개 url 이 여러 이벤트를 모두 받는 것이 가능.
+    * 목록에 없는 값을 보내면 400 으로 응답합니다.
+* `url` 은 scheme 이 `https` 이고 host 가 있는 형식만 허용합니다.
+* `messageType` 은 Hook 으로 전송되는 메시지의 포맷
+
+    * dooray - Dooray! 형식
+    * slack - Slack incoming webhook 형식
+    * 형식별 상세한 메시지 형태는 [Wiki > 위키 Hook 형태](#wiki--위키-hook-형태) 참고
+
+#### Response
+
+* Body
+
+```javascript
+{
+    "header": {
+        "isSuccessful": true,
+        "resultCode": 0,
+        "resultMessage": ""
+    },
+    "result": {
+        "id": ""
+    }
+}
+```
+
+* HTTP 응답코드
+
+    * 200
+    * 400 url 이 없거나 https 형식이 아닌 경우, 지원하지 않는 eventTypes/messageType 을 보낸 경우, project-id 가 숫자가 아닌 경우
+    * 401
+    * 403 위키 관리자가 아니거나, 사용할 수 없는 상태의 위키인 경우
+    * 404 project-id 에 해당하는 위키가 없는 경우
+    * 409 저장 중 충돌이 발생한 경우
+    * 429
+    * 500
+
+## Wiki > 위키 Hook 형태
+
+* 위키 Hook 등록 후, 위키 페이지에서 이벤트가 발생했을 때 등록한 URL 로 발송되는 메시지 형태
+* 발송 방식
+
+    * Method: POST
+    * Header: `Content-Type: application/json`
+* Hook 생성시 지정한 `messageType` 에 따라 body 형태가 다름
+
+    * dooray - Dooray! 형식
+    * slack - Slack incoming webhook 형식
+
+### 이벤트 타입
+
+| `webhookType` | 설명 | 비고 |
+| ----------- | --- | --- |
+| pageCreated | 페이지 생성 |  |
+| pageUpdated | 페이지 수정 | 발행(publish) 된 페이지만 발송 |
+| pageDeleted | 페이지 삭제 |  |
+| pageMoved | 페이지 이동 | 다른 위키로 이동한 경우 목적지/원본 위키 양쪽으로 각각 1건 발송 |
+| pageReferrerUpdated | 페이지 참조자 변경 |  |
+| pageFileCreated | 페이지 파일 추가 | 파일 1개당 1건 발송 |
+| pageFileDeleted | 페이지 파일 삭제 | 파일 1개당 1건 발송. 완전 삭제는 발송하지 않음 |
+| pageCommentCreated | 페이지 댓글 생성 |  |
+| pageCommentUpdated | 페이지 댓글 수정 |  |
+| pageCommentDeleted | 페이지 댓글 삭제 |  |
+
+### dooray 형식
+
+#### 전체 스키마
+
+```javascript
+{
+    "webhookType": "pageCommentCreated",                        /* 이벤트 타입 */
+    "version": 2,                                               /* hook message format version */
+    "titleLink": "https://{domain}/project/pages/123#comment-456",  /* 이벤트가 발생한 위치의 링크 */
+    "tenant": {                                                 /* 페이지가 속한 테넌트 */
+        "id": "1000"                                            /* 테넌트 ID */
+    },
+    "project": {                                                /* 위키가 속한 프로젝트 */
+        "id": "2000",                                           /* 프로젝트 ID */
+        "code": "WIKI"                                          /* 프로젝트 코드 */
+    },
+    "page": {                                                   /* 모든 이벤트에 항상 포함 */
+        "id": "123",                                            /* 페이지 ID */
+        "title": "페이지 제목",                                   /* 페이지 제목 */
+        "version": 7,                                           /* 페이지 버전. 숫자 */
+        "createdAt": "2026-09-03T10:00:00+09:00",               /* 페이지 생성 날짜시간 ISO8601 포맷 */
+        "updatedAt": "2026-09-03T11:00:00+09:00",               /* 페이지 수정 날짜시간. 수정된 적이 없으면 없음 */
+        "deletedAt": "2026-09-03T12:00:00+09:00"                /* 페이지 삭제 날짜시간. pageDeleted 에만 있음 */
+    },
+    "comment": {                                                /* 댓글 이벤트에만 있음 */
+        "id": "456",                                            /* 댓글 ID */
+        "mimeType": "text/x-markdown",                          /* 댓글 본문의 content type. text/html, text/x-markdown */
+        "content": "댓글 본문",                                   /* 댓글 본문 */
+        "createdAt": "2026-09-03T10:00:00+09:00",               /* 댓글 생성 날짜시간 */
+        "updatedAt": "2026-09-03T10:30:00+09:00",               /* 댓글 수정 날짜시간. 수정된 적이 없으면 없음 */
+        "deletedAt": "2026-09-03T11:00:00+09:00"                /* 댓글 삭제 날짜시간. pageCommentDeleted 에만 있음 */
+    },
+    "file": {                                                   /* 파일 이벤트에만 있음 */
+        "id": "789",                                            /* 파일 ID */
+        "name": "설계서.pdf",                                     /* 파일 이름 */
+        "mimeType": "application/pdf",                          /* 파일의 content type */
+        "fileType": "attach",                                   /* 파일 종류 */
+        "size": 102400,                                         /* 파일 크기(bytes). 숫자 */
+        "createdAt": "2026-09-03T10:00:00+09:00",               /* 파일 추가 날짜시간 */
+        "deletedAt": "2026-09-03T11:00:00+09:00"                /* 파일 삭제 날짜시간. pageFileDeleted 에만 있음 */
+    },
+    "referrers": {                                              /* pageReferrerUpdated 에만 있음 */
+        "added": [{                                             /* 추가된 참조자 목록 */
+            "id": "10",                                         /* 멤버 ID */
+            "name": "홍길동",                                     /* 멤버 이름 */
+            "userCode": "hong",                                 /* 멤버 아이디 */
+            "emailAddress": "hong@example.com"                  /* 멤버 이메일 주소 */
+        }],
+        "removed": []                                           /* 제거된 참조자 목록 */
+    },
+    "source": {                                                 /* 이벤트 생성자 정보 */
+        "type": "member",                                       /* member 고정 */
+        "member": {
+            "id": "10",                                         /* 멤버 ID */
+            "name": "홍길동",                                     /* 멤버 이름 */
+            "userCode": "hong",                                 /* 멤버 아이디 */
+            "emailAddress": "hong@example.com"                  /* 멤버 이메일 주소 */
+        }
+    }
+}
+```
+
+* 모든 ID 는 문자열로 내려갑니다. `page.version`, `file.size` 만 숫자입니다.
+* 날짜시간은 ISO8601 포맷이며 offset(`+09:00`) 을 포함합니다. 초 단위까지 유효합니다.
+* `comment`, `file`, `referrers`, `source` 와 각 블록의 `updatedAt`, `deletedAt` 은 값이 없으면 **키 자체가 내려가지 않습니다.**
+
+    * `updatedAt` 이 없으면 "생성 후 수정된 적 없음" 을 의미합니다.
+* 스펙에 명시되지 않은 추가 필드가 내려올 수 있으므로, 클라이언트에서는 무시해야 합니다.
+
+#### 이벤트별 포함 블록
+
+| `webhookType` | page | comment | file | referrers |
+| ----------- | ---- | ------- | ---- | --------- |
+| pageCreated | O |  |  |  |
+| pageUpdated | O |  |  |  |
+| pageDeleted | O |  |  |  |
+| pageMoved | O |  |  |  |
+| pageReferrerUpdated | O |  |  | O |
+| pageFileCreated | O |  | O |  |
+| pageFileDeleted | O |  | O |  |
+| pageCommentCreated | O | O |  |  |
+| pageCommentUpdated | O | O |  |  |
+| pageCommentDeleted | O | O |  |  |
+
+#### titleLink 규칙
+
+| `webhookType` | titleLink |
+| ----------- | --------- |
+| pageDeleted | `https://{domain}/wiki/{project-id}` (위키 홈) |
+| pageCommentCreated, pageCommentUpdated | `https://{domain}/project/pages/{page-id}#comment-{comment-id}` |
+| 그 외 | `https://{domain}/project/pages/{page-id}` |
+
+#### 페이지 생성 (pageCreated)
+
+```javascript
+{
+    "webhookType": "pageCreated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 1,
+        "createdAt": "2026-09-03T10:00:00+09:00"    /* 생성 직후이므로 updatedAt 없음 */
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 수정 (pageUpdated)
+
+```javascript
+{
+    "webhookType": "pageUpdated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,                               /* 수정될 때마다 증가 */
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 삭제 (pageDeleted)
+
+```javascript
+{
+    "webhookType": "pageDeleted",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/wiki/2000",     /* 삭제된 페이지 대신 위키 홈 링크 */
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00",
+        "deletedAt": "2026-09-03T12:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 이동 (pageMoved)
+
+```javascript
+{
+    "webhookType": "pageMoved",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+* 다른 위키로 이동한 경우, 원본 위키와 목적지 위키에 등록된 Hook 으로 각각 발송됩니다.
+
+    * 이때 `project` 는 각 Hook 이 등록된 위키의 프로젝트입니다.
+
+#### 페이지 참조자 변경 (pageReferrerUpdated)
+
+```javascript
+{
+    "webhookType": "pageReferrerUpdated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "referrers": {
+        "added": [
+            { "id": "11", "name": "김두레", "userCode": "kim", "emailAddress": "kim@example.com" }
+        ],
+        "removed": [
+            { "id": "12", "name": "이두레", "userCode": "lee", "emailAddress": "lee@example.com" }
+        ]
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 파일 추가 (pageFileCreated)
+
+```javascript
+{
+    "webhookType": "pageFileCreated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "file": {
+        "id": "789",
+        "name": "설계서.pdf",
+        "mimeType": "application/pdf",
+        "fileType": "attach",
+        "size": 102400,
+        "createdAt": "2026-09-03T11:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+* 여러 파일을 한 번에 추가해도 파일 1개당 1건씩 발송됩니다.
+
+#### 페이지 파일 삭제 (pageFileDeleted)
+
+```javascript
+{
+    "webhookType": "pageFileDeleted",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "file": {
+        "id": "789",
+        "name": "설계서.pdf",
+        "mimeType": "application/pdf",
+        "fileType": "attach",
+        "size": 102400,
+        "createdAt": "2026-09-03T11:00:00+09:00",
+        "deletedAt": "2026-09-03T12:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+* 파일 1개당 1건씩 발송되며, 완전 삭제(erase)는 발송되지 않습니다.
+
+#### 페이지 댓글 생성 (pageCommentCreated)
+
+```javascript
+{
+    "webhookType": "pageCommentCreated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123#comment-456",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "comment": {
+        "id": "456",
+        "mimeType": "text/x-markdown",
+        "content": "댓글 본문",
+        "createdAt": "2026-09-03T12:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 댓글 수정 (pageCommentUpdated)
+
+```javascript
+{
+    "webhookType": "pageCommentUpdated",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123#comment-456",
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "comment": {
+        "id": "456",
+        "mimeType": "text/x-markdown",
+        "content": "수정된 댓글 본문",
+        "createdAt": "2026-09-03T12:00:00+09:00",
+        "updatedAt": "2026-09-03T12:30:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+#### 페이지 댓글 삭제 (pageCommentDeleted)
+
+```javascript
+{
+    "webhookType": "pageCommentDeleted",
+    "version": 2,
+    "titleLink": "https://example.dooray.com/project/pages/123",  /* 삭제된 댓글이므로 앵커 없음 */
+    "tenant": { "id": "1000" },
+    "project": { "id": "2000", "code": "WIKI" },
+    "page": {
+        "id": "123",
+        "title": "페이지 제목",
+        "version": 7,
+        "createdAt": "2026-09-03T10:00:00+09:00",
+        "updatedAt": "2026-09-03T11:00:00+09:00"
+    },
+    "comment": {
+        "id": "456",
+        "mimeType": "text/x-markdown",
+        "content": "댓글 본문",
+        "createdAt": "2026-09-03T12:00:00+09:00",
+        "deletedAt": "2026-09-03T13:00:00+09:00"
+    },
+    "source": {
+        "type": "member",
+        "member": { "id": "10", "name": "홍길동", "userCode": "hong", "emailAddress": "hong@example.com" }
+    }
+}
+```
+
+### slack 형식
+
+* Hook 생성시 `messageType` 을 `slack` 으로 지정한 경우, Slack incoming webhook 형식으로 발송됩니다.
+
+```javascript
+{
+    "text": "Comment Added",                                    /* 이벤트 타입별 메시지. 아래 표 참고 */
+    "attachments": [{
+        "color": "#36a64f",                                     /* 고정값 */
+        "title": "WIKI | 페이지 제목",                             /* "{프로젝트 코드} | {페이지 제목}" */
+        "text": "댓글 본문 발췌",                                   /* 이벤트 타입별로 다름. 아래 표 참고 */
+        "footer": "Dooray!",                                    /* 고정값 */
+        "author_name": "홍길동, hong@example.com",                /* "{이벤트 생성자 이름}, {이메일 주소}" */
+        "title_link": "https://example.dooray.com/project/pages/123#comment-456"  /* dooray 형식의 titleLink 와 동일 */
+    }],
+    "icon_url": "https://dooray.com/static_images/icon/dooray.png"
+}
+```
+
+| `webhookType` | `text` | `attachments[0].text` |
+| ----------- | ---- | ------------------- |
+| pageCreated | Page Created | `""` |
+| pageUpdated | Page Updated | `""` |
+| pageDeleted | Page Deleted | `""` |
+| pageMoved | Page Moved | `""` |
+| pageReferrerUpdated | Referrers Updated | `Referrers changed — {추가된 수} added, {제거된 수} removed.` |
+| pageFileCreated | File Added | `Attached: {파일 이름}` |
+| pageFileDeleted | File Removed | `Removed: {파일 이름}` |
+| pageCommentCreated | Comment Added | 댓글 본문 발췌(최대 200자, 초과시 `…` 로 절단) |
+| pageCommentUpdated | Comment Updated | 댓글 본문 발췌(최대 200자, 초과시 `…` 로 절단) |
+| pageCommentDeleted | Comment Deleted | `""` |
+
+### 참고
+
+* 위키 Hook 은 best-effort 알림입니다. 발송에 실패한 메시지는 재발송하지 않습니다.
+* 해당 위키에 그 이벤트를 구독 중인 활성 Hook 이 없으면 발송하지 않습니다.
 
 ## Messenger > Channels
 
