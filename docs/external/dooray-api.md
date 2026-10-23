@@ -4,7 +4,7 @@ pageId: "2939987647631384419"
 subject: "서비스 API"
 breadcrumb: "Home / 🔌 Dooray! API"
 dooray_created_at: "2021-02-08T18:50:39+09:00"
-dooray_updated_at: "2026-09-03T19:36:03+09:00"
+dooray_updated_at: "2026-10-23T13:55:53+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -2635,11 +2635,18 @@ interpolation={}            /* true false(default) */
     },
     "dueDate": "2019-10-08T18:00:00+09:00",         /* 만기일, null 일 수 있음 */
     "dueDateFlag": true,                            /* 제거 예정 필드. true 로만 사용하기를 권장 */
+    "startedAt": "2026-10-01T15:00:00+09:00",       /* 시작일, null 일 수 있음 */
+    "endedAt": "2026-10-03T18:00:00+09:00",         /* 종료일, null 일 수 있음 */
     "milestoneId": "1",
     "tagIds": ["1", "2"],
     "priority": "none"                              /* highest, high, normal, low, lowest, none */
 }
 ```
+
+* startedAt, endedAt 포맷
+
+    * 요청: ISO8601 날짜시간. `2026-10-01T15:00:00Z` (UTC) 와 `2026-10-01T15:00:00+09:00` (오프셋) 모두 허용
+    * 응답(조회): UTC `Z` 표기로 응답. 예) `2026-10-01T06:00:00Z`. 값이 null 인 경우 해당 필드는 응답 본문에 포함되지 않음
 
 #### Response
 
@@ -2746,6 +2753,8 @@ toMemberSize (업무 담당자 수)
        "createdAt": "",                            /* 업무 생성 날짜시간 ISO8601 포맷 */
        "dueDate": "",                              /* 업무 만기 날짜시간 ISO8601 포맷 */
        "dueDateFlag": "",
+       "startedAt": "2026-10-01T06:00:00Z",        /* 업무 시작 날짜시간 ISO8601 포맷(UTC). 값이 없으면 필드 자체가 응답에 포함되지 않음 */
+       "endedAt": "2026-10-03T09:00:00Z",          /* 업무 종료 날짜시간 ISO8601 포맷(UTC). 값이 없으면 필드 자체가 응답에 포함되지 않음 */
        "updatedAt": "",                            /* 업무 업데이트 날짜 시간 */
        "number": 1,                                /* 업무 번호. "#{프로젝트명}/{업무번호}" 포맷으로 쓸 때의 {업무번호}. 1 부터 시작 */
        "priority": "",
@@ -2850,6 +2859,8 @@ toMemberSize (업무 담당자 수)
        "createdAt": "",                            /* 업무 생성 날짜시간 ISO8601 포맷 */
        "dueDate": "",                              /* 업무 만기 날짜시간 ISO8601 포맷 */
        "dueDateFlag": "",
+       "startedAt": "2026-10-01T06:00:00Z",        /* 업무 시작 날짜시간 ISO8601 포맷(UTC). 값이 없으면 필드 자체가 응답에 포함되지 않음 */
+       "endedAt": "2026-10-03T09:00:00Z",          /* 업무 종료 날짜시간 ISO8601 포맷(UTC). 값이 없으면 필드 자체가 응답에 포함되지 않음 */
        "updatedAt": "",                            /* 업무 업데이트 날짜 시간 */
        "number": 1,                                /* 업무 번호. "#{프로젝트명}/{업무번호}" 포맷으로 쓸 때의 {업무번호}. 1 부터 시작 */
        "priority": "",
@@ -2967,12 +2978,19 @@ toMemberSize (업무 담당자 수)
     "version": 5,                                   /* null인경우 최신 버전으로 적용, version이 명시된 경우 수정하려는 버전과 다른경우 conflict 409 응답 */
     "dueDate": "2019-10-08T18:00:00+09:00",         /* 만기일, null 일 수 있음 */
     "dueDateFlag": true,                            /* 제거 예정 필드. true 로만 사용하기를 권장 */
+    "startedAt": "2026-10-01T15:00:00+09:00",       /* 시작일, null 일 수 있음 */
+    "endedAt": "2026-10-03T18:00:00+09:00",         /* 종료일, null 일 수 있음 */
     "milestoneId": "1",
     "tagIds": ["1", "2"],
     "priority": "none",                              /* hightest, high, normal, low, lowest, none */
     "estimatedDays": 0                              /* 소요일 nullable */
 }
 ```
+
+* startedAt, endedAt 포맷
+
+    * 요청: ISO8601 날짜시간. `2026-10-01T15:00:00Z` (UTC) 와 `2026-10-01T15:00:00+09:00` (오프셋) 모두 허용
+    * 응답(조회): UTC `Z` 표기로 응답. 예) `2026-10-01T06:00:00Z`. 값이 null 인 경우 해당 필드는 응답 본문에 포함되지 않음
 
 #### Response
 
