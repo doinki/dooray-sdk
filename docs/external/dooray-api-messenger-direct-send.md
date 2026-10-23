@@ -4,7 +4,7 @@ pageId: "2939992834004986234"
 subject: "메신저 1:1 메시지 전송 API"
 breadcrumb: "Home / 🔌 Dooray! API / 서비스 API"
 dooray_created_at: "2021-02-08T19:00:57+09:00"
-dooray_updated_at: "2025-04-08T11:00:39+09:00"
+dooray_updated_at: "2026-10-08T14:20:50+09:00"
 note: |
   이 파일은 .github/workflows/sync-dooray-api-docs.yml 로 자동 갱신됩니다.
   손으로 편집하지 마세요. 업스트림이 갱신되면 bot/dooray-api-docs 브랜치에 PR 이 자동으로 열립니다.
@@ -15,9 +15,17 @@ note: |
 ## API End Point
 
 * 민간 클라우드
-    * [https://api.dooray.com](https://api.dooray.com)
+
+    * [https://api.dooray.com](https://api.dooray.com/)
 * 공공 클라우드
-    * [https://api.gov-dooray.com](https://api.gov-dooray.com)
+
+    * [https://api.gov-dooray.com](https://api.gov-dooray.com/)
+* 공공 업무망 클라우드
+
+    * [https://api.gov-dooray.co.kr](https://api.gov-dooray.co.kr/)
+* 금융 클라우드
+
+    * [https://api.dooray.co.kr](https://api.dooray.co.kr/)
 
 ## 인증 토큰
 
@@ -67,6 +75,7 @@ $ curl -H 'Authorization: dooray-api {TOKEN}' -H 'Content-Type: application/json
 ## Step1. 대상 조회
 
 * 멤버 검색 조건:
+
     * name={}
     * externalEmailAddresses={},{} // max 10개
     * userCode = {}
@@ -104,6 +113,7 @@ $ curl -H 'Authorization: dooray-api {TOKEN}' -H 'Content-Type: application/json
 
 * Step 1의 응답에서 `id`를 요청 필드 `organizationMemberId`로 사용함
 * 요청 바디 구성
+
     * text: 메시지
     * organizationMemberId: 메시지를 보낼 대상의 id
 
@@ -131,6 +141,7 @@ $ curl -H 'Authorization: dooray-api {TOKEN}' -H 'Content-Type: application/json
 ### 요청
 
 * 헤더
+
     * Authorization: dooray-api {TOKEN}
 * 바디
 
@@ -157,6 +168,7 @@ $ curl -H 'Authorization: dooray-api {TOKEN}' -H 'Content-Type: application/json
 ```
 
 * HTTP 응답 코드
+
     * 200
     * 401
     * 403
